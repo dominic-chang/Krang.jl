@@ -16,6 +16,8 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Theory" => "kerr_geodesic_summary.md",
+        "api.md",
     ],
 )
 
