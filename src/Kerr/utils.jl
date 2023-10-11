@@ -19,29 +19,21 @@ function _pow(z::T, i) where {T<:Real}
 end
 
 """
-    _isreal2(num, T)
-
-Checks if a complex number is real to within machine precision
-
-    `num`: Complex number
-
-    `T`  : Type of number
+Checks if a complex number is real to some tolerance
 """
-function _isreal2(num, T)
+function _isreal2(num::Complex{T}) where T
     ren, imn = reim(num)
     return abs(imn / ren) < eps(T)^(T(1 / 5))
 end
 
 """
-    regularized_Pi(n, ϕ, k)
-
 Regularized elliptic integral of the third kind
     
-        `n`: Parameter
-    
-        `ϕ`: Argument
-    
-        `k`: Parameter
+# Arguments
+
+- `n`: Parameter
+- `ϕ`: Arguments
+- `k`: Parameter
 """
 function regularized_Pi(n, ϕ, k)
     ω = k / n
@@ -116,91 +108,80 @@ function S2(α, φ, j)
 end
 
 """
-	λ(metric::Kerr{T}, α, θo) where T
-
 Energy reduced azimuthal angular momentum
-	`metric`: Kerr
 
-	`α`: Horizontal Bardeen screen coordinate
+# Arguments
 
-	`θo`: Observer inclination
+- `metric`: Kerr
+- `α`: Horizontal Bardeen screen coordinate
+- `θo`: Observer inclination
 """
 function λ(::Kerr, α, θo)
     return -α * sin(θo)
 end
 
 """
-	η(metric::Kerr{T}, α, β, θo) where T
-
 Energy reduced Carter integral
-	`metric`: Kerr
 
-	`α`: Horizontal Bardeen screen coordinate
+# Arguments
 
-	`β`: Bardeen vertical coordinate
-
-	`θo`: Observer inclination
+- `metric`: Kerr
+- `α`: Horizontal Bardeen screen coordinate
+- `β`: Bardeen vertical coordinate
+- `θo`: Observer inclination
 """
 function η(metric::Kerr, α, β, θo)
     return (α^2 - metric.spin^2) * cos(θo)^2 + β^2
 end
 
 """
-	α(metric::Kerr{T}, α, θo) where T
-
 Horizontal Bardeen Screen Coordinate
-	`metric`: Kerr
 
-	`α`: Horizontal Bardeen screen coordinate
+# Arguments
 
-	`θo`: Observer inclination
+- `metric`: Kerr
+- `α`: Horizontal Bardeen screen coordinate
+- `θo`: Observer inclination
 """
 function α(::Kerr, λ, θo)
     return -λ / sin(θo)
 end
 
 """
-	β(metric::Kerr, λ, η, θo)
-
 Horizontal Bardeen Screen Coordinate
-	`metric`: Kerr
 
-	`λ`: Energy reduced Azimuthal angular momentul
+# Arguments
 
-	`η`: Energy reduced Carter integral 
-
-	`θo`: Observer inclination
+- `metric`: Kerr
+- `λ`: Energy reduced Azimuthal angular momentul
+- `η`: Energy reduced Carter integral 
+- `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
     return sqrt(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2)
 end
 
 """
-	αboundary(metric::Kerr, θs) where
-
 Defines a horizontal boundary on the assmyptotic observers screen where emission that originates from θs must fall within.
 
-	`metric`: Kerr metric
+# Arguments
 
-	`θs`  : Emission Inclination
-
+- `metric`: Kerr metric
+- `θs`  : Emission Inclination
 """
 function αboundary(metric::Kerr, θs)
     return metric.spin * sin(θs)
 end
 
 """
-    βboundary(metric::Kerr{T}, α, θo, θs) where {T}
-
 Defines a vertical boundary on the Assyptotic observers screen where emission that originates from θs must fall within.
 
-	`metric`: Kerr{T} metric
+# Arguments
 
-	`α`   : Horizontal Bardeen screen coordinate
-
-	`θo`  : Observer inclination
-
-    `θs`  : Emission Inclination
+- `metric`: Kerr{T} metric
+- `α`   : Horizontal Bardeen screen coordinate
+- `θo`  : Observer inclination
+- `θs`  : Emission Inclination
 """
 function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
     a = metric.spin
@@ -209,17 +190,14 @@ function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
 end
 
 """
-	r_potential(metric::Kerr{T}, r, η, λ) where T
-
 Radial potential of spacetime
 
-	`metric`: Kerr{T} metric
+# Arguments
 
-	`η`  : Reduced Carter constant
-
-	`λ`  : Reduced azimuthal agular momentum
-
-	`r`  : Boyer Lindquist radius
+- `metric`: Kerr{T} metric
+- `η`  : Reduced Carter constant
+- `λ`  : Reduced azimuthal agular momentum
+- `r`  : Boyer Lindquist radius
 """
 function r_potential(metric::Kerr{T}, η, λ, r) where {T}
     a = metric.spin
@@ -228,18 +206,14 @@ function r_potential(metric::Kerr{T}, η, λ, r) where {T}
 end
 
 """
-	θ_potential(metric::Kerr{T}, r, η, λ) where T
+Theta potential of a Kerr blackhole
 
-Theta potential of a kerr blackhole
+# Arguments
 
-	`metric`: Kerr{T} metric
-
-	`η`  : Reduced Carter constant
-
-	`λ`  : Reduced azimuthal agular momentum
-
-	`θ`  : Boyer Lindquist inclination
-
+- `metric`: Kerr{T} metric
+- `η`  : Reduced Carter constant
+- `λ`  : Reduced azimuthal agular momentum
+- `θ`  : Boyer Lindquist inclination
 """
 function θ_potential(metric::Kerr{T}, η, λ, θ) where {T}
     a = metric.spin
@@ -250,16 +224,13 @@ end
 # Radial functions
 ##----------------------------------------------------------------------------------------------------------------------
 """
-  get_radial_roots(metric::Kerr{T}, η, λ) where T
-
 Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
 
-  `metric`: Kerr{T} metric
+# Arguments
 
-  `η`  : Reduced Carter constant
-
-  `λ`  : Reduced azimuthal agular momentum
-
+- `metric`: Kerr{T} metric
+- `η`  : Reduced Carter constant
+- `λ`  : Reduced azimuthal agular momentum
 """
 function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     a = metric.spin
@@ -302,20 +273,15 @@ end
 _get_root_diffs(r1, r2, r3, r4) = r2 - r1, r3 - r1, r3 - r2, r4 - r1, r4 - r2, r4 - r3
 
 """
-  Ir(metric::Kerr{T}, νr::Bool, θo, rs, α, β) where T
-
 Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$
 
-  `metric`: Kerr{T} metric
+# Arguments
 
-  `νr` : Radial velocity direction at emission
-
-  `θo` : Observer inclination
-
-  `α`  : Horizontal Bardeen screen coordinate
-
-  `β`  : Vertical Bardeen screen coordinate
-
+- `metric`: Kerr{T} metric
+- `νr` : Sign of radial velocity direction at emission
+- `θo` : Observer inclination
+- `α`  : Horizontal Bardeen screen coordinate
+- `β`  : Vertical Bardeen screen coordinate
 """
 function Ir(metric::Kerr, νr::Bool, θo, rs, α, β)
     return Ir(metric, νr, rs, η(metric, α, β, θo), λ(metric, α, θo))
@@ -323,7 +289,7 @@ end
 function Ir(metric::Kerr{T}, νr::Bool, rs, η, λ) where {T}
     roots = get_radial_roots(metric, η, λ)
     root_diffs = _get_root_diffs(roots...)
-    numreals = sum(_isreal2.(roots, T))
+    numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
         return Ir_case2(metric, real.(roots), real.(root_diffs), rs, νr)
@@ -721,8 +687,6 @@ function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
 end
 
 """
-    radial_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}, τ, νr)
-
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 """
 function radial_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}, τ, νr) where {T}
@@ -787,10 +751,7 @@ function radial_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}, τ, νr) 
 end
 
 """
-    radial_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where {T}
-
 Returns the radial integrals for the case where there are two real roots in the radial potential
-
 """
 function radial_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where {T}
     r1, r2, _, _ = roots
@@ -839,8 +800,6 @@ function radial_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where
     return I0_total, I1_total, I2_total, Ip_total, Im_total
 end
 """
-    radial_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}, τ)
-
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
 function radial_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where {T}
@@ -895,46 +854,34 @@ end
 # Inclination functions
 ##----------------------------------------------------------------------------------------------------------------------
 """
-  mino_time(η, λ, a, θs, θo, isindir::Bool, n::Int64)
-
 Mino time of trajectory between two inclinations for a given screen coordinate
 
-  `α` : Horizontal Bardeen screen coordinate
+# Arguments 
 
-  `β` : Vertical Bardeen screen coordinate 
-
-  `a` : Blackhole angular Momentum
-
-  `θs` : Emission inclination
-
-  `θo` : Observer inclination
-
-  `isindir` : Is the path direct or indirect?
-
-  `n` : nth image in orde of amount of minotime traversed
+- `α` : Horizontal Bardeen screen coordinate
+- `β` : Vertical Bardeen screen coordinate 
+- `a` : Blackhole angular Momentum
+- `θs` : Emission inclination
+- `θo` : Observer inclination
+- `isindir` : Is the path direct or indirect?
+- `n` : nth image in orde of amount of minotime traversed
 """
 function mino_time(metric::Kerr{T}, α, β, θs, θo, isindir, n) where {T}
     return Gθ(metric, α, β, θs, θo, isindir, n)[1]
 end
 
 """
-  Gθ(metric::Kerr{T}, α, β, θs, θo, isindir, n) where T
-
 Returns the antiderivative \$G_\\theta=\\int\\frac{d\\theta}{\\sqrt{\\Theta(\\theta)}}\$
 
-  `metric`: Kerr{T} metric
+# Arguments 
 
-  `α` : Horizontal Bardeen screen coordinate
-
-  `β` : Vertical Bardeen screen coordinate
-
-  `θs` : Emission inclination
-
-  `θo` : Observer inclination
-
-  `isindir` : Is the path direct or indirect?
-
-  `n` : nth image ordered by minotime
+- `metric`: Kerr{T} metric
+- `α` : Horizontal Bardeen screen coordinate
+- `β` : Vertical Bardeen screen coordinate
+- `θs` : Emission inclination
+- `θo` : Observer inclination
+- `isindir` : Is the path direct or indirect?
+- `n` : nth image ordered by minotime
 """
 function Gθ(metric::Kerr{T}, α, β, θs, θo, isindir, n) where {T}
     return _Gθ(metric::Kerr{T}, sign(β), θs, θo, isindir, n, η(metric, α, β, θo), λ(metric, α, θo))

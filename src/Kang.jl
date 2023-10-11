@@ -2,6 +2,11 @@ module Kang
 using DocStringExtensions
 using StaticArrays
 using FastElliptic
+@template (FUNCTIONS, METHODS, MACROS) =
+    """
+    $(TYPEDSIGNATURES)
+    $(DOCSTRING)
+    """
 
 # Write your package code here.
 include("metrics/AbstractMetric.jl")
