@@ -9,6 +9,7 @@ FastElliptic = "2a8b799e-c098-4961-872a-356c768d184c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+DocStringExtensions = "0.9"
 StaticArrays = "1"
 julia = "1"
 
