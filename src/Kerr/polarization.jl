@@ -1,4 +1,4 @@
-export p_bl_d, penrose_walker, screen_polarisation, calcPol, evpa
+export p_bl_d, penrose_walker, screen_polarisation, calcPol, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
 ##----------------------------------------------------------------------------------------------------------------------
 #Polarization stuff
 ##----------------------------------------------------------------------------------------------------------------------
