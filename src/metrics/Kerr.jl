@@ -1,3 +1,5 @@
+export Kerr, horizon, metric_dd, metric_uu
+
 """
     $TYPEDEF
 

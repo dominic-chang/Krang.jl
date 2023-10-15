@@ -30,8 +30,8 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - name: Install FastElliptic
-        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+      - name: Install JacobiElliptic
+        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-runtest@v1

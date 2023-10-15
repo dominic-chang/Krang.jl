@@ -23,12 +23,12 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1.9'
-      - name: Install FastElliptic
-        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+      - name: Install JacobiElliptic
+        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Install docs dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Install examples dependencies
-        run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+        run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token

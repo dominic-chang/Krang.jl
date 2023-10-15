@@ -16,7 +16,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius_inclination_parameterized(metric::Kerr{T}, α, β, θs, θo, isindir, n)::Tuple{Any, Bool, Bool} where {T}
+function emission_radius(metric::Kerr{T}, α, β, θs, θo, isindir, n)::Tuple{Any, Bool, Bool} where {T}
     if cos(θs) > abs(cos(θo))
         αmin = αboundary(metric, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(metric, α, θo, θs) : zero(T))
@@ -50,7 +50,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 -`isindir` : Normalized angular momentum
 -`n` : Image index
 """
-function emission_radius_mino_time_parameterized(metric::Kerr{T}, α, β, τ, θo) where {T}
+function emission_radius(metric::Kerr{T}, α, β, τ, θo) where {T}
     return _rs(metric, τ, get_radial_roots(metric, η(metric, α, β, θo), λ(metric, α, θo)))
 end
 
@@ -166,7 +166,7 @@ function emission_coordinates(metric::Kerr{T}, α, β, θs, θo, isindir, n) whe
 
     roots = get_radial_roots(metric, ηtemp, λtemp)
     emission_radius, νr, _ = _rs(metric, τ, roots)
-    numreals = sum(_isreal2.(roots, T))
+    numreals = sum(_isreal2.(roots))
     if numreals == 4
         roots = real.(roots)
         I0, I1, I2, Ip, Im = radial_integrals_case2(metric, emission_radius, roots, τ, νr)
@@ -227,7 +227,7 @@ function raytrace(metric::Kerr{T}, α, β, θo, τ) where {T}
     λtemp = λ(metric, α, θo)
     roots = get_radial_roots(metric, ηtemp, λtemp)
     emission_radius, νr, _ = _rs(metric, τ, roots)
-    numreals = sum(_isreal2.(roots, T))
+    numreals = sum(_isreal2.(roots))
     if numreals == 4
         roots = real.(roots)
         I0, I1, I2, Ip, Im = radial_integrals_case2(metric, emission_radius, roots, τ, νr)
@@ -264,7 +264,7 @@ function _rs(metric::Kerr{T}, τ, roots::NTuple{4}) where {T}
 
     rh = one(T) + √(one(T) - a^2)
 
-    numreals = sum(_isreal2.(roots, T))
+    numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 1 & 2
         ans, νr = _rs_case1_and_2(metric, real.(roots), rh, τ)
@@ -291,7 +291,7 @@ function _rs_case1_and_2(metric::Kerr{T}, roots::NTuple{4}, rh, τ) where {T}
     if τ > 2fo
         return T(NaN), true
     end
-    sn = r41 * FastElliptic.sn(X2, k)^2
+    sn = r41 * JacobiElliptic.sn(X2, k)^2
     return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T)
 end
 
@@ -305,12 +305,12 @@ function _rs_case3(::Kerr{T}, roots::NTuple{4,Complex}, τ) where {T}
     B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (T(4) * A * B))
 
-    fo = FastElliptic.F(acos((A - B) / (A + B)), k)
+    fo = JacobiElliptic.F(acos(clamp((A - B) / (A + B), -1, 1)), k)
     X3 = real(fo - √(A * B) * τ)
     if X3 < zero(T)
         return T(NaN), true
     end
-    cn = FastElliptic.cn(X3, k)
+    cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
     den = -A + B + (A + B) * cn
 
@@ -330,10 +330,10 @@ function _rs_case4(metric::Kerr{T}, roots::NTuple{4,Complex}, rh, τ) where {T}
     k4 = 4 * C * D / (C + D)^2
 
     go = √max((T(4) * a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    fo = T(2) / (C + D) * FastElliptic.F(T(π / 2) + atan(go), k4)
+    fo = T(2) / (C + D) * JacobiElliptic.F(T(π / 2) + atan(go), k4)
     X4 = (C + D) / T(2) * (fo - τ)
-    num = go - FastElliptic.sc(X4, k4)
-    den = one(T) + go * FastElliptic.sc(X4, k4)
+    num = go - JacobiElliptic.sc(X4, k4)
+    den = one(T) + go * JacobiElliptic.sc(X4, k4)
 
     return -(a2 * num / den + b1), X4 > zero(T)
 end
@@ -359,8 +359,8 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         argo = (cos(θo)^2 - um) / (up - um)
         k = one(T) - m
         tempfac = inv(√abs(um * a^2))
-        τo = tempfac * FastElliptic.F(asin(√argo), k)
-        Ghat_2 = tempfac * FastElliptic.K(k)
+        τo = tempfac * JacobiElliptic.F(asin(√argo), k)
+        Ghat_2 = tempfac * JacobiElliptic.K(k)
         τhat = 2Ghat_2
         Δτtemp = (τ % τhat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * τo)
         n = floor(τ / τhat)
@@ -368,21 +368,21 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         absτs = abs(argmin(abs, [τhat - Δτtemp, Δτtemp]))
         τs = (θo > T(π / 2) ? -one(T) : one(T)) * absτs
 
-        argr = (FastElliptic.sn(absτs / tempfac, k))^2
+        argr = (JacobiElliptic.sn(absτs / tempfac, k))^2
         ans = acos((θo > T(π / 2) ? -one(T) : one(T)) * √((up - um) * argr + um))
         τo = (ans > π / 2 ? -1 : 1) * τo
     else
         argo = clamp(cos(θo) / √(up), -one(T), one(T))
         k = m
         tempfac = inv(√abs(um * a^2))
-        τo = tempfac * FastElliptic.F(asin(argo), k)
-        Ghat_2 = tempfac * FastElliptic.K(k)
+        τo = tempfac * JacobiElliptic.F(asin(argo), k)
+        Ghat_2 = tempfac * JacobiElliptic.K(k)
         τhat = Ghat_2 + Ghat_2
         Δτtemp = (τ % τhat + signβ * τo)
         n = floor(τ / τhat)
         τs = argmin(abs, [(-one(T))^n * signβ * (τhat - Δτtemp), (-one(T))^n * signβ * Δτtemp])
         #τs = abs(argmin(abs, [(Ghat - Δτtemp), Δτtemp]))
-        newargs = FastElliptic.sn(τs / tempfac, k)
+        newargs = JacobiElliptic.sn(τs / tempfac, k)
         ans = acos(√up * newargs)
     end
 
@@ -405,7 +405,7 @@ end
 
 function _ϕs(metric::Kerr{T}, α, β, θs, θo, rs, τ, νr, roots, isindir, n) where {T}
     λtemp = λ(metric, α, θo)
-    numreals = sum(_isreal2.(roots, T))
+    numreals = sum(_isreal2.(roots))
     root_diffs = _get_root_diffs(roots...)
     Iϕ = zero(T)
     if numreals == 4 #case2
