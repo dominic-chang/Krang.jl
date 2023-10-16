@@ -13,7 +13,7 @@ end
 function _pow(z::T, i) where {T<:Real}
     zabs = abs(z)
     if sign(z) < zero(T)
-        return (zabs^i) * (cos(T(2π)) * i) + sin(T(2π) * i) * one(T)im
+        return (zabs^i) * (cos(T(π) * i) + sin(T(π) * i)im)
     end
     return zabs^i + zero(T)im
 end
@@ -292,7 +292,7 @@ function Ir(metric::Kerr{T}, νr::Bool, rs, η, λ) where {T}
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
-        return Ir_case2(metric, real.(roots), real.(root_diffs), rs, νr)
+        return Ir_case1_and_2(metric, real.(roots), rs, νr)
     elseif numreals == 2 #case3
         if abs(imag(roots[4])) < T(1e-10)
             roots = (roots[1], roots[4], roots[2], roots[3])
