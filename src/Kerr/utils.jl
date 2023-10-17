@@ -202,7 +202,7 @@ Radial potential of spacetime
 function r_potential(metric::Kerr{T}, η, λ, r) where {T}
     a = metric.spin
     λ2 = λ^2
-    a * (a * (r * (r + 2) - η) - T(4) * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
+    a * (a * (r * (r + 2) - η) - 4 * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
 end
 
 """
@@ -278,7 +278,7 @@ Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$
 # Arguments
 
 - `metric`: Kerr{T} metric
-- `νr` : Sign of radial velocity direction at emission
+- `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 - `θo` : Observer inclination
 - `α`  : Horizontal Bardeen screen coordinate
 - `β`  : Vertical Bardeen screen coordinate
@@ -292,16 +292,16 @@ function Ir(metric::Kerr{T}, νr::Bool, rs, η, λ) where {T}
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
-        return Ir_case1_and_2(metric, real.(roots), rs, νr)
+        return Ir_case1_and_2(metric, real.(roots), rs, νr)[1]
     elseif numreals == 2 #case3
         if abs(imag(roots[4])) < T(1e-10)
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
-        return Ir_case3(metric, real.(roots), root_diffs, rs)
+        return Ir_case3(metric, roots, root_diffs, rs)
     else #case 4
-        return Ir_case4(metric, real.(roots), root_diffs, rs)
+        return Ir_case4(metric, roots, root_diffs, rs)
     end
-    return zero(T)
+    return T(NaN), T(NaN)
 end
 
 function Ir_case1_and_2(::Kerr{T}, roots::NTuple{4}, rs, νr) where {T}
@@ -318,29 +318,11 @@ function Ir_case1_and_2(::Kerr{T}, roots::NTuple{4}, rs, νr) where {T}
     return Ir_inf - (νr ? Ir_s : -Ir_s), Ir_inf
 end
 
-function Ir_inf_case3(::Kerr{T}, root_diffs::NTuple{6}) where {T}
-    r21, r31, r32, r41, r42, _ = root_diffs
-    r21 = real(r21)
-
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
-    #if A2 < zero(0.0) || B2 < zero(T)
-    #  return zero(T)
-    #end
-    A, B = √A2, √B2
-
-    k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    coef = √inv(A * B)
-    Ir_inf = coef * JacobiElliptic.F((acos(((A - B) / (A + B)))), k3)
-
-    return Ir_inf
-end
-
 function Ir_case3(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where {T}
     r1, r2, _, _ = roots
     r21, r31, r32, r41, r42, _ = root_diffs
 
-    r1, r2, r21 = real.(r1, r2, r21)
+    r1, r2, r21 = real.((r1, r2, r21))
 
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
@@ -351,25 +333,25 @@ function Ir_case3(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where 
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) / (A * (rs - r1))
-    x3_s = ((one(T) + zero(T)im - temprat) / (one(T) + temprat))
+    x3_s = ((one(T) - temprat) / (one(T) + temprat))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
     Ir_inf = coef * JacobiElliptic.F((acos(((A - B) / (A + B)))), k3)
 
-    return Ir_inf - Ir_s
+    return Ir_inf - Ir_s, Ir_inf
 end
 
 function Ir_case4(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where {T}
-    r1, _, _, r4 = roots
+    _, r1, _, r4 = roots
     _, r31, r32, r41, r42, _ = root_diffs
 
-    if real(r32 * r41) < 0 || real(r31 * r42) < zero(T)
+    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
         return zero(T)
     end
     C = √real(r31 * r42)
     D = √real(r32 * r41)
     k4 = 4C * D / (C + D)^2
-    a2 = -imag(r1)
+    a2 = abs(imag(r1))
     b1 = real(r4)
 
     k4 = T(4) * C * D / (C + D)^2
@@ -377,10 +359,10 @@ function Ir_case4(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where 
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
     x4_s = (rs + b1) / a2
     coef = 2 / (C + D)
-    Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
-    Ir_inf = coef * JacobiElliptic.F(T(π / 2) + atan(go), k4)
-
-    return Ir_inf - Ir_s
+    Ir_s_coef = JacobiElliptic.F(atan(x4_s) + atan(go), k4)
+    Ir_inf_coef = JacobiElliptic.F(T(π / 2) + atan(go), k4)
+    #return (C+D), coef
+    return coef.*(Ir_inf_coef - Ir_s_coef, Ir_inf_coef)
 end
 
 function Iϕ_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, τ, νr, λ) where {T}
@@ -466,7 +448,7 @@ function Iϕ_case3(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     Ip = -inv(B * rp2 + A * rp1) * ((B + A) * τ + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * (R1p_o - R1p_s))
     Im = -inv(B * rm2 + A * rm1) * ((B + A) * τ + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * (R1m_o - R1m_s))
 
-    return real(2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im))
+    return (2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im))
 end
 
 function Iϕ_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, τ, λ) where {T}
@@ -506,7 +488,7 @@ function Iϕ_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     Ip = go / (a2 * (1 - go * x4_p)) * (τ - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1p_o - S1p_s))
     Im = go / (a2 * (1 - go * x4_m)) * (τ - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1m_o - S1m_s))
 
-    return real(2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im))
+    return 2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
 end
 
 function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, τ, νr, λ) where {T}
@@ -543,10 +525,10 @@ function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     )
 
     #equation B37
-    I1_total = r3 * I0_total + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k) - (νr ? -1 : 1) * Π1_s)# Removed the logarithmic divergence
+    I1_total = r3 * I0_total + log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k) + (νr ? -1 : 1) * Π1_s)# Removed the logarithmic divergence
     #equation B38
     I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (τ - E_o - (νr ? -1 : 1) * I2_s)# Assymptotic Divergent piece is not included
+    I2_total = r3 - (r1 * r4 + r2 * r3) / 2 * τ - E_o + (νr ? -1 : 1) * I2_s# Assymptotic Divergent piece is not included
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -566,10 +548,7 @@ function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
         Im_total -= Πm_s
     end
 
-    logdiv = log(16 / (r31 + r42)^2)
-    lineardiv = r3
-
-    return 4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total + (logdiv + lineardiv)
+    return -(4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total)
 end
 
 function It_case3(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, τ, λ) where {T}
@@ -612,29 +591,18 @@ function It_case3(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     Π2_s = ((2 * r21 * √(A * B) / (B2 - A2))^2) * R2(αo, φ_s, k3)
     Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3)# Divergence is removed, will be added back in the end
 
-    R1p_s = R1(αp, φ_s, k3)
-    R1p_turn = R1(αp, φ_o, k3)
-    R1m_s = R1(αm, φ_s, k3)
-    R1m_turn = R1(αm, φ_o, k3)
-
-    Ip_s = -inv(B * rp2 + A * rp1) * ((B + A) * F_s + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * R1p_s)
-    Ip_o = -inv(B * rp2 + A * rp1) * ((B + A) * F_o + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * R1p_turn)
-    Im_s = -inv(B * rm2 + A * rm1) * ((B + A) * F_s + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * R1m_s)
-    Im_o = -inv(B * rm2 + A * rm1) * ((B + A) * F_o + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * R1m_turn)
-
     I0_total = τ
-    I1_total = (B * r2 + A * r1) / (B + A) * τ + Π1_o - Π1_s
-    I2_total = ((((B * r2 + A * r1) / (B + A))^2) * τ - 2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * (Π2_o - Π2_s))
-    Ip_total = Ip_o - Ip_s
-    Im_total = Im_o - Im_s
+    # Removed logarithmic divergence
+    I1_total = (B * r2 + A * r1) / (B + A) * I0_total + Π1_o - Π1_s + log(16 * r21^2 / ((A2 - B2)^2 + 4 * A * B * r21^2)) / 2 
+    # Removed linear divergence
+    I2_total = ((((B * r2 + A * r1) / (B + A))^2) * I0_total - 2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * (Π2_o - Π2_s)) + (B * r2 + A * r1) / (A + B)
+    Ip_total = -inv(B * rp2 + A * rp1) * ((B + A) * I0_total + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * (R1(αp, φ_o, k3) - R1(αp, φ_s, k3)))
+    Im_total = -inv(B * rm2 + A * rm1) * ((B + A) * I0_total + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * (R1(αm, φ_o, k3) - R1(αm, φ_s, k3)))
 
-    logdiv = log(16 * r21^2 / ((A2 - B2)^2 + 4 * A * B * r21^2))
-    lineardiv = (B * r2 + A * r1) / (A + B)
-
-    return 4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total + (logdiv + lineardiv)
+    return -(4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total)
 end
 
-function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, λ) where {T}
+function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, τ, λ) where {T}
     a = metric.spin
     r1, _, _, r4 = roots
     _, r31, r32, r41, r42, _ = root_diffs
@@ -674,16 +642,20 @@ function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     Π2_o = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * regularizedS2(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
 
     I0_total = τ
-    I1_total = (a2 / go - b1) * τ - Π1_o + Π1_s
-    I2_total = (a2 / go - b1)^2 * τ - 2(a2 / go - b1) * Π1_o + Π2_o + 2(a2 / go - b1) * Π1_s - Π2_s
+    # Removed logarithmic divergence
+    I1_total = (a2 / go - b1) * τ - (Π1_o - Π1_s) 
+    # Removed linear divergence
+    I2_total =
+        ((a2 / go - b1)^2) * τ - 2(a2 / go - b1) * (Π1_o - Π1_s) + (Π2_o - Π2_s) -
+        ((16 * a2^4 + (C^2 - D^2)^2 - 8 * (a2^2) * (C^2 + D^2) + 8 * (a2^3) * (C + D - 2 * b1 * go) + 2 * a2 * (C + D) * (-(C - D)^2 + 2 * b1 * (C + D) * go)) / (4 * a2 * (4 * a2^2 - (C + D)^2) * go))
     Ip_total = go / (a2 * (1 - go * x4_p)) * (τ - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1p_o - S1p_s))
     Im_total = go / (a2 * (1 - go * x4_m)) * (τ - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1m_o - S1m_s))
 
 
-    logdiv = zero(T)
-    lineardiv = -((16 * a2^4 + (C^2 - D^2)^2 - 8 * (a2^2) * (C^2 + D^2) + 8 * (a2^3) * (C + D - 2 * b1 * go) + 2 * a2 * (C + D) * (-(C - D)^2 + 2 * b1 * (C + D) * go)) / (4 * a2 * (4 * a2^2 - (C + D)^2) * go))
+    #logdiv = zero(T)
+    #lineardiv = -((16 * a2^4 + (C^2 - D^2)^2 - 8 * (a2^2) * (C^2 + D^2) + 8 * (a2^3) * (C + D - 2 * b1 * go) + 2 * a2 * (C + D) * (-(C - D)^2 + 2 * b1 * (C + D) * go)) / (4 * a2 * (4 * a2^2 - (C + D)^2) * go))
 
-    return 4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total + (logdiv + lineardiv)
+    return -(4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total)# + (logdiv + lineardiv)
 end
 
 """

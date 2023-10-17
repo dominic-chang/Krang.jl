@@ -322,7 +322,7 @@ function _rs_case4(metric::Kerr{T}, roots::NTuple{4,Complex}, rh, τ) where {T}
     root_diffs = _get_root_diffs(roots...)
     _, r31, r32, r41, r42, _ = root_diffs
 
-    τ > Ir_case4(metric, roots, root_diffs, rh) && return T(NaN), true
+    τ > Ir_case4(metric, roots, root_diffs, rh)[1] && return T(NaN), true
     a2 = abs(imag(r1))
     b1 = real(r4)
     C = √abs(r31 * r42)
