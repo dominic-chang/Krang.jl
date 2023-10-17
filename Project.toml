@@ -9,9 +9,10 @@ JacobiElliptic = "2a8b799e-c098-4961-872a-356c768d184c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+DocStringExtensions = "0.9"
 JacobiElliptic = "0.1"
 StaticArrays = "1"
-julia = "1"
+julia = "1.9"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
