@@ -1,7 +1,7 @@
 module Kang
 using DocStringExtensions
 using StaticArrays
-using FastElliptic
+using JacobiElliptic
 @template (FUNCTIONS, METHODS, MACROS) =
     """
     $(TYPEDSIGNATURES)
@@ -13,5 +13,5 @@ include("metrics/AbstractMetric.jl")
 include("metrics/Kerr.jl")
 include("Kerr/raytracer.jl")
 include("Kerr/api.jl")
-
+include("Kerr/polarization.jl")
 end

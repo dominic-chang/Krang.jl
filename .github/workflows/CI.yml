@@ -17,21 +17,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - '1.9'
-          - 'nightly'
-        os:
-          - ubuntu-latest
-        arch:
-          - x64
+        version: ['1.9']
+        os: [ubuntu-latest]
+        arch: [x64]
+        allow_failure: [false]
+        include:
+          - version: 'nightly'
+            os: [ubuntu-latest]
+            arch: [x64]
+            allow_failure: true
     steps:
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - name: Install FastElliptic
-        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+      - name: Install JacobiElliptic
+        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-runtest@v1

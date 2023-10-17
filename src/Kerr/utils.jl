@@ -37,7 +37,7 @@ Regularized elliptic integral of the third kind
 """
 function regularized_Pi(n, ϕ, k)
     ω = k / n
-    return FastElliptic.F(ϕ, k) - FastElliptic.Pi(ω, ϕ, k)
+    return JacobiElliptic.F(ϕ, k) - JacobiElliptic.Pi(ω, ϕ, k)
 end
 
 function regularized_R1(α::T, φ::T, j) where {T}
@@ -48,10 +48,10 @@ end
 function regularized_R2(α::T, φ::T, j) where {T}
 
     return one(T) / (one(T) - α^2) * (
-        FastElliptic.F(φ, j)
+        JacobiElliptic.F(φ, j)
         -
         α^2 / (j + (one(T) - j) * α^2) * (
-            FastElliptic.E(φ, j)
+            JacobiElliptic.E(φ, j)
         #-α*sin(φ)*sqrt(one(T)-j*sin(φ)^2)/(one(T)+α*cos(φ)) #Linear Divergent term
         )
     ) #+ 
@@ -60,11 +60,11 @@ end
 
 function regularizedS1(α, φ, j)
     α2 = α * α
-    return inv(1 + α2) * (FastElliptic.F(φ, j) + α2 * regularized_Pi(1 + α2, φ, j))# - α*f2(α, sin(φ), j)) # logarithmic divergence removed
+    return inv(1 + α2) * (JacobiElliptic.F(φ, j) + α2 * regularized_Pi(1 + α2, φ, j))# - α*f2(α, sin(φ), j)) # logarithmic divergence removed
 end
 
 function regularizedS2(α, φ, j)
-    -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * FastElliptic.F(φ, j) + α^2 * FastElliptic.E(φ, j)) + # + α^2*√(1-j*sin(φ)^2)*(α-tan(φ))/(1+α*tan(φ))-α^3) +
+    -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j)) + # + α^2*√(1-j*sin(φ)^2)*(α-tan(φ))/(1+α*tan(φ))-α^3) +
     (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * regularizedS1(α, φ, j)
 end
 
@@ -84,26 +84,26 @@ function f2(α, sinφ, j)
 end
 
 function R1(α::T, φ::T, j) where {T}
-    return one(T) / (one(T) - α^2) * (FastElliptic.Pi(α^2 / (α^2 - one(T)), φ, j) - α * f1(α, sin(φ), j))
+    return one(T) / (one(T) - α^2) * (JacobiElliptic.Pi(α^2 / (α^2 - one(T)), φ, j) - α * f1(α, sin(φ), j))
 end
 
 function R2(α::T, φ::T, j) where {T}
     return one(T) / (one(T) - α^2) * (
-        FastElliptic.F(φ, j)
+        JacobiElliptic.F(φ, j)
         -
         α^2 / (j + (one(T) - j) * α^2) * (
-            FastElliptic.E(φ, j) - α * sin(φ) * √(one(T) - j * sin(φ)^2) / (one(T) + α * cos(φ))
+            JacobiElliptic.E(φ, j) - α * sin(φ) * √(one(T) - j * sin(φ)^2) / (one(T) + α * cos(φ))
         )
     ) + inv(j + (one(T) - j) * α^2) * (2 * j - α^2 / (α^2 - one(T))) * R1(α, φ, j)
 end
 
 function S1(α, φ, j)
     α2 = α * α
-    return inv(1 + α2) * (FastElliptic.F(φ, j) + α2 * FastElliptic.Pi(1 + α2, φ, j) - α * f2(α, sin(φ), j))
+    return inv(1 + α2) * (JacobiElliptic.F(φ, j) + α2 * JacobiElliptic.Pi(1 + α2, φ, j) - α * f2(α, sin(φ), j))
 end
 
 function S2(α, φ, j)
-    #-inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * FastElliptic.F(φ, j) + α^2 * FastElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
+    #-inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
     return (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
 end
 
@@ -312,8 +312,8 @@ function Ir_case1_and_2(::Kerr{T}, roots::NTuple{4}, rs, νr) where {T}
     x2_s2 = ((rs - r4) / (rs - r3) * r31 / r41)
     x2_s = √abs(x2_s2)
     coef = 2 / √real(r31 * r42)
-    Ir_s = !(-one(T) < x2_s2 < one(T)) ? T(NaN) : coef * FastElliptic.F(asin(x2_s), k)
-    Ir_inf = coef * FastElliptic.F(asin(√(r31 / r41)), k)
+    Ir_s = !(-one(T) < x2_s2 < one(T)) ? T(NaN) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_inf = coef * JacobiElliptic.F(asin(√(r31 / r41)), k)
 
     return Ir_inf - (νr ? Ir_s : -Ir_s), Ir_inf
 end
@@ -331,7 +331,7 @@ function Ir_inf_case3(::Kerr{T}, root_diffs::NTuple{6}) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     coef = √inv(A * B)
-    Ir_inf = coef * FastElliptic.F((acos(((A - B) / (A + B)))), k3)
+    Ir_inf = coef * JacobiElliptic.F((acos(((A - B) / (A + B)))), k3)
 
     return Ir_inf
 end
@@ -353,8 +353,8 @@ function Ir_case3(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where 
     temprat = B * (rs - r2) / (A * (rs - r1))
     x3_s = ((one(T) + zero(T)im - temprat) / (one(T) + temprat))
     coef = one(T) * √inv(A * B)
-    Ir_s = coef * FastElliptic.F((acos(x3_s)), k3)
-    Ir_inf = coef * FastElliptic.F((acos(((A - B) / (A + B)))), k3)
+    Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
+    Ir_inf = coef * JacobiElliptic.F((acos(((A - B) / (A + B)))), k3)
 
     return Ir_inf - Ir_s
 end
@@ -377,8 +377,8 @@ function Ir_case4(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where 
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
     x4_s = (rs + b1) / a2
     coef = 2 / (C + D)
-    Ir_s = coef * FastElliptic.F(atan(x4_s) + atan(go), k4)
-    Ir_inf = coef * FastElliptic.F(T(π / 2) + atan(go), k4)
+    Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
+    Ir_inf = coef * JacobiElliptic.F(T(π / 2) + atan(go), k4)
 
     return Ir_inf - Ir_s
 end
@@ -400,15 +400,15 @@ function Iϕ_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     x2_o = √(r31 / r41)
     !(-1 < x2_s < 1) && return zero(T)
 
-    #Fo = isnan(τo) ? 2 / √real(r31 * r42) * FastElliptic.F(asin(x2_o), k) : τo
-    #Fs = 2 / √real(r31 * r42) * FastElliptic.F(asin(x2_s), k)
+    #Fo = isnan(τo) ? 2 / √real(r31 * r42) * JacobiElliptic.F(asin(x2_o), k) : τo
+    #Fs = 2 / √real(r31 * r42) * JacobiElliptic.F(asin(x2_s), k)
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πp_o = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Πm_s = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
-    Πm_o = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
+    Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
+    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    Πm_o = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
 
     Ip = -Πp_o - τ / rp3
     Im = -Πm_o - τ / rm3
@@ -528,9 +528,9 @@ function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
-    E_s = √(r31 * r42) * FastElliptic.E(asin(x2_s), k)
-    E_o = √(r31 * r42) * FastElliptic.E(asin(x2_o), k)
-    Π1_s = coef * FastElliptic.Pi(n, asin(x2_s), k)
+    E_s = √(r31 * r42) * JacobiElliptic.E(asin(x2_s), k)
+    E_o = √(r31 * r42) * JacobiElliptic.E(asin(x2_o), k)
+    Π1_s = coef * JacobiElliptic.Pi(n, asin(x2_s), k)
 
     I0_total = τ
 
@@ -550,10 +550,10 @@ function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πp_o = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Πm_s = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
-    Πm_o = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
+    Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
+    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    Πm_o = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
 
     Ip_total = -Πp_o - τ / rp3
     Im_total = -Πm_o - τ / rm3
@@ -708,9 +708,9 @@ function radial_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}, τ, νr) 
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
-    E_s = √(r31 * r42) * FastElliptic.E(asin(x2_s), k)
-    E_o = √(r31 * r42) * FastElliptic.E(asin(x2_o), k)
-    Π1_s = coef * FastElliptic.Pi(n, asin(x2_s), k)
+    E_s = √(r31 * r42) * JacobiElliptic.E(asin(x2_s), k)
+    E_o = √(r31 * r42) * JacobiElliptic.E(asin(x2_o), k)
+    Π1_s = coef * JacobiElliptic.Pi(n, asin(x2_s), k)
 
     I0_total = τ
 
@@ -730,10 +730,10 @@ function radial_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}, τ, νr) 
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πp_o = coef_p * FastElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Πm_s = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
-    Πm_o = coef_m * FastElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
+    Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
+    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    Πm_o = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
 
     Ip_total = -Πp_o - τ / rp3
     Im_total = -Πm_o - τ / rm3
@@ -827,13 +827,13 @@ function radial_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-    #Fr_s = 2 / (C + D) * FastElliptic.F(atan(x4_s) + atan(go), k4)
+    #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
     Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
     Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
 
     S1p_o = S1(gp, T(π / 2) + atan(go), k4)
     S1m_o = S1(gm, T(π / 2) + atan(go), k4)
-    #Fr_o = 2 / (C + D) * FastElliptic.F(T(π/2) + atan(go), k4)
+    #Fr_o = 2 / (C + D) * JacobiElliptic.F(T(π/2) + atan(go), k4)
     Π1_o = 2 / (C + D) * (a2 / go * (1 + go^2)) * regularizedS1(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
     Π2_o = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * regularizedS2(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
 
@@ -920,9 +920,9 @@ function _Gθ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
             return T(NaN), Gs, Go, Ghat, isvortical
         end
         tempfac = one(T) / √abs(um * a2)
-        Go = ((θs > T(π / 2)) ? -one(T) : one(T)) * tempfac * FastElliptic.F(asin(√argo), k)
-        Gs = ((θs > T(π / 2)) ? -one(T) : one(T)) * tempfac * FastElliptic.F(asin(√args), k)
-        Ghat = 2 * tempfac * FastElliptic.K(k)
+        Go = ((θs > T(π / 2)) ? -one(T) : one(T)) * tempfac * JacobiElliptic.F(asin(√argo), k)
+        Gs = ((θs > T(π / 2)) ? -one(T) : one(T)) * tempfac * JacobiElliptic.F(asin(√args), k)
+        Ghat = 2 * tempfac * JacobiElliptic.K(k)
     else
         args = cos(θs) / √(up)
         argo = cos(θo) / √(up)
@@ -931,9 +931,9 @@ function _Gθ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
             return T(NaN), Gs, Go, Ghat, isvortical
         end
         tempfac = one(T) / √abs(um * a^2)
-        Go = tempfac * FastElliptic.F(asin(argo), k)
-        Gs = tempfac * FastElliptic.F(asin(args), k)
-        Ghat = 2 * tempfac * FastElliptic.K(k)
+        Go = tempfac * JacobiElliptic.F(asin(argo), k)
+        Gs = tempfac * JacobiElliptic.F(asin(args), k)
+        Ghat = 2 * tempfac * JacobiElliptic.K(k)
     end
 
 
@@ -965,8 +965,8 @@ function _Gs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         argo = (cos(θo)^2 - um) / (up - um)
         k = one(T) - m
         tempfac = one(T) / √abs(um * a^2)
-        Go = tempfac * FastElliptic.F(asin(√argo), k)
-        Ghat_2 = tempfac * FastElliptic.K(k)
+        Go = tempfac * JacobiElliptic.F(asin(√argo), k)
+        Ghat_2 = tempfac * JacobiElliptic.K(k)
         Ghat = 2Ghat_2
         Δτtemp = (τ % Ghat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * Go)
         n = floor(τ / Ghat)
@@ -975,8 +975,8 @@ function _Gs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         argo = cos(θo) / √(up)
         k = m
         tempfac = inv(√abs(um * a^2))
-        Go = tempfac * FastElliptic.F(asin(argo), k)
-        Ghat_2 = tempfac * FastElliptic.K(k)
+        Go = tempfac * JacobiElliptic.F(asin(argo), k)
+        Ghat_2 = tempfac * JacobiElliptic.K(k)
         Ghat = Ghat_2 + Ghat_2
         Δτtemp = (τ % Ghat + signβ * Go)
         n = floor(τ / Ghat)
@@ -1021,9 +1021,9 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
         argn = (up - um) / (1 - um)
-        Go = ((θs > T(π / 2)) ? -1 : 1) * tempfac * FastElliptic.Pi(argn, asin(√argo), k)
-        Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * FastElliptic.Pi(argn, asin(√args), k)
-        Ghat = 2tempfac * FastElliptic.Pi(argn, k)
+        Go = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.Pi(argn, asin(√argo), k)
+        Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.Pi(argn, asin(√args), k)
+        Ghat = 2tempfac * JacobiElliptic.Pi(argn, k)
     else
         args = cos(θs) / √(up)
         argo = cos(θo) / √(up)
@@ -1032,9 +1032,9 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
             return T(Inf), Gs, Ghat, isvortical
         end
         tempfac = inv(√abs(um * a^2))
-        Go = tempfac * FastElliptic.Pi(up, asin(argo), k)
-        Gs = tempfac * FastElliptic.Pi(up, asin(args), k)
-        Ghat = 2tempfac * FastElliptic.Pi(up, k)
+        Go = tempfac * JacobiElliptic.Pi(up, asin(argo), k)
+        Gs = tempfac * JacobiElliptic.Pi(up, asin(args), k)
+        Ghat = 2tempfac * JacobiElliptic.Pi(up, k)
     end
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
@@ -1078,9 +1078,9 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         end
         tempfac = √abs(um / a^2)
         argn = (up - um) / (1 - um)
-        Go = ((θs > T(π / 2)) ? -1 : 1) * tempfac * FastElliptic.E(asin(√argo), k)
-        Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * FastElliptic.E(asin(√args), k)
-        Ghat = 2tempfac * FastElliptic.E(k)
+        Go = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.E(asin(√argo), k)
+        Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.E(asin(√args), k)
+        Ghat = 2tempfac * JacobiElliptic.E(k)
 
     else
         args = cos(θs) / √(up)
@@ -1090,9 +1090,9 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
             return T(Inf), Gs, Ghat, isvortical
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
-        Go = tempfac * (FastElliptic.E(asin(argo), k) - FastElliptic.F(asin(argo), k)) / (2k)
-        Gs = tempfac * (FastElliptic.E(asin(args), k) - FastElliptic.F(asin(argo), k)) / (2k)
-        Ghat = 2tempfac * (FastElliptic.E(k) - FastElliptic.K(k)) / k
+        Go = tempfac * (JacobiElliptic.E(asin(argo), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
+        Gs = tempfac * (JacobiElliptic.E(asin(args), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
+        Ghat = 2tempfac * (JacobiElliptic.E(k) - JacobiElliptic.K(k)) / k
     end
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))

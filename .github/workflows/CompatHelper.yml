@@ -7,8 +7,8 @@ jobs:
   CompatHelper:
     runs-on: ubuntu-latest
     steps:
-      - name: Install FastElliptic
-        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/FastElliptic.git")]); Pkg.instantiate()'
+      - name: Install JacobiElliptic
+        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
       - name: CompatHelper.main()
