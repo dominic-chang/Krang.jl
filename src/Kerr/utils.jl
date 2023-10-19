@@ -64,7 +64,8 @@ function regularizedS1(α, φ, j)
 end
 
 function regularizedS2(α, φ, j)
-    -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j)) + # + α^2*√(1-j*sin(φ)^2)*(α-tan(φ))/(1+α*tan(φ))-α^3) +
+
+    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j))+# + α^2*√(1-j*sin(φ)^2)-α^3) +
     (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * regularizedS1(α, φ, j)
 end
 
@@ -103,8 +104,8 @@ function S1(α, φ, j)
 end
 
 function S2(α, φ, j)
-    #-inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
-    return (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
+    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
+    (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
 end
 
 """
