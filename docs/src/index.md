@@ -3,14 +3,20 @@ CurrentModule = Kang
 ```
 # Kang
 
-Documentation for [Kang](https://github.com/dchang10/Kang.jl).
-
 ## Pages
 ```@index
-Pages = [
-    "kerr_geodesics_summary.md",
-    "api.md",
-    ]
+    Pages=[
+        "Home" => "index.md",
+        "Getting Started" =>[
+            "getting_started.md",
+            "kerr_geodesic_summary.md",
+            "polarization.md",
+            "time_regularization.md",
+            ],
+        "Examples" => MD_FILES,
+        "Theory" => "kerr_geodesic_summary.md",
+        "api.md",
+    ],
 ```
 
 

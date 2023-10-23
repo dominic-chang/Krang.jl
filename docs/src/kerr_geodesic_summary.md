@@ -16,11 +16,11 @@ defined on a manifold with metric $g_{\mu\nu}$, which in the case of the Kerr, c
 \begin{equation}
 g_{\mu\nu}=\left(
 \begin{array}{cccc}
- \frac{r_s r}{\Sigma }-1 & 0 & 0 & -\frac{a^2 \sin ^2(\theta ) r_s r}{\Sigma } \\
+ \frac{r_s r}{\Sigma }-1 & 0 & 0 & -\frac{a^2   r_s r\sin ^2\theta}{\Sigma } \\
  0 & \frac{\Sigma }{\Delta } & 0 & 0 \\
  0 & 0 & \Sigma  & 0 \\
- -\frac{a^2 r \sin ^2(\theta ) r_s}{\Sigma } & 0 & 0 & \sin ^2(\theta ) \left(\frac{a^2
-   \sin ^2(\theta ) r_s r}{\Sigma }+a^2+r^2\right) \\
+ -\frac{a^2 r  r_s\sin ^2\theta }{\Sigma } & 0 & 0 & \sin ^2\theta  \left(\frac{a^2
+    r_s r\sin ^2\theta }{\Sigma }+a^2+r^2\right) \\
 \end{array}
 \right),
 \end{equation}
@@ -144,10 +144,6 @@ Thus for a given $t_f, r_f, \theta_f, \phi_f, \lambda$ and $\eta$, one can choos
 
 More details on this formalism and the solutions can be found in this review artivle by [Gralla & Lupsasca](https://doi.org/10.1103/PhysRevD.101.044032)[^GL]
 
-### Linear-Polarization
-
-The existence of the Penrose-Walker constant makes linear polarization directly derivable from a conserved quantity in Kerr spacetimes.
-
 
 ## References
 [^PW]: Walker, M., Penrose, R. On quadratic first integrals of the geodesic equations for type {22} spacetimes. Commun.Math. Phys. 18, 265–274 (1970).
@@ -156,4 +152,4 @@ The existence of the Penrose-Walker constant makes linear polarization directly 
 
 [^BL]: Robert H. Boyer, Richard W. Lindquist; Maximal Analytic Extension of the Kerr Metric. J. Math. Phys. 1 February 1967; 8 (2): 265–281.
 
-[^GL]: Samuel E. Gralla and Alexandru LupsascaPhys. Rev. D 101, 044032
+[^GL]: Samuel E. Gralla and Alexandru Lupsasca Phys. Rev. D 101, 044032
