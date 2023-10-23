@@ -4,3 +4,8 @@ Integrals = "de52edbc-65ea-441a-8357-d3a637375a31"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+FastGaussQuadrature = "0.5"
+Integrals = "3.9"
+Polynomials = "4.0"

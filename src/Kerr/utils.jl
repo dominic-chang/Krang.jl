@@ -644,7 +644,11 @@ function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
 
     I0_total = τ
     # Removed logarithmic divergence
-    I1_total = (a2 / go - b1) * τ - (Π1_o - Π1_s) 
+    I1_total = (a2 / go - b1) * τ - (Π1_o - Π1_s) + 1/2*log(
+        (16*(1 + go^2 - sqrt((1 + go^2)*(1 + go^2 - k4)))*(1 + go^2 - 
+   k4))/((C + D)^2*((1 + go^2)^2 - k4)*k4*(1 + sqrt(
+   1 - k4/(1 + go^2)))))
+
     # Removed linear divergence
     I2_total =
         ((a2 / go - b1)^2) * τ - 2(a2 / go - b1) * (Π1_o - Π1_s) + (Π2_o - Π2_s) -
@@ -812,7 +816,11 @@ function radial_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}, τ) where
 
     I0_total = τ
     # Removed logarithmic divergence
-    I1_total = (a2 / go - b1) * τ - (Π1_o - Π1_s)
+    I1_total = (a2 / go - b1) * τ - (Π1_o - Π1_s) + 1/2*log(
+        (16*(1 + go^2 - sqrt((1 + go^2)*(1 + go^2 - k4)))*(1 + go^2 - 
+   k4))/((C + D)^2*((1 + go^2)^2 - k4)*k4*(1 + sqrt(
+   1 - k4/(1 + go^2)))))
+
     # Removed linear divergence
     I2_total =
         ((a2 / go - b1)^2) * τ - 2(a2 / go - b1) * (Π1_o - Π1_s) + (Π2_o - Π2_s) -
