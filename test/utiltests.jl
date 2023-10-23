@@ -211,6 +211,56 @@
             end
         end
     end
+    @testset "Inclination Integrals" begin
+        a = 0.99
+        met = Kang.Kerr(a)
+        @testset "θo:$θo" for θo in [π / 4, 3π / 4]
+            @testset "Ordinary Geodesics" begin
+                α = 10.0
+                @testset "Gθ" begin
+                    @testset "isindir: $isindir" for isindir in [true, false]
+                        β = isindir ? 10.0 : -10.0
+                        β *= sign(cos(θo))
+                        tempη = η(met, α, β, θo)
+                        tempλ = λ(met, α, θo)
+                        a2 = met.spin^2
+                        Δθ = (1.0 - (tempη + tempλ^2) / a2) / 2
+                        Δθ2 = Δθ^2
+                        desc = √(Δθ2 + tempη / a2)
+                        up = Δθ + desc
 
+                        θturning = acos(√up) * (1 + 1e-10)
 
+                        @testset "θs:$θs" for θs in clamp.((1, 3) .* (acos(-√up) - acos(√up)) ./ 4 .+ acos(√up), 0.0, π)
+                            fθ(θ, p) = inv(√(Kang.θ_potential(met, tempη, tempλ, θ)))
+                            probts = IntegralProblem(fθ, θs, π / 2; nout=1)
+                            solθs = solve(probts, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+                            probto = IntegralProblem(fθ, θo, π / 2; nout=1)
+                            solθo = solve(probto, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+                            probt = IntegralProblem(fθ, θturning, π / 2; nout=1)
+                            solθt = solve(probt, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+
+                            τ = 0
+                            if isindir
+                                if sign(cos(θs) * cos(θo)) > 0
+                                    τ = abs(2solθt.u - (solθo.u + solθs.u))
+                                else
+                                    τ = abs(2solθt.u + solθs.u - solθo.u)
+                                end
+                            else
+                                if sign(cos(θs) * cos(θo)) > 0
+                                    τ = abs(solθo.u - solθs.u)
+                                else
+                                    τ = abs(solθo.u + solθs.u)
+                                end
+                            end
+                            tempGθ, _, _, _, _ = Kang.Gθ(met, α, β, θs, θo, isindir, 0)
+
+                            @test tempGθ / τ ≈ 1.0 atol = 1e-3
+                        end
+                    end
+                end
+            end
+        end
+    end
 end
