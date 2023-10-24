@@ -185,8 +185,8 @@ function emission_coordinates(metric::Kerr{T}, α, β, θs, θo, isindir, n) whe
     It = 4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) + 4 * I0 + 2 * I1 + I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
-    Gttemp, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
+    Gϕtemp, _, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
+    Gttemp, _, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
 
     emission_azimuth = (T(π) - Iϕ - λtemp * Gϕtemp + 4π) % T(2π)
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
@@ -246,8 +246,8 @@ function raytrace(metric::Kerr{T}, α, β, θo, τ) where {T}
     It = 4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) + 4 * I0 + 2 * I1 + I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
-    Gttemp, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
+    Gϕtemp, _, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
+    Gttemp, _, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
 
     emission_azimuth = (-Iϕ - λtemp * Gϕtemp)# % T(2π)
     emission_time_regularized = (It + a^2 * Gttemp)

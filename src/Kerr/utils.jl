@@ -1020,7 +1020,7 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     ans = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return ans, Gs, Ghat, isvortical
+    return ans, Gs, Go, Ghat, isvortical
 
 end
 
@@ -1030,7 +1030,7 @@ end
 
 function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
     a = metric.spin
-    Go, Gs, Ghat, minotime, isvortical = zero(T), zero(T), zero(T), zero(T), η < zero(T)
+    Go, Gs, Ghat, ans, isvortical = zero(T), zero(T), zero(T), zero(T), η < zero(T)
 
     isincone = abs(cos(θs)) < abs(cos(θo))
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
@@ -1072,11 +1072,11 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
         Go = tempfac * (JacobiElliptic.E(asin(argo), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
-        Gs = tempfac * (JacobiElliptic.E(asin(args), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
-        Ghat = 2tempfac * (JacobiElliptic.E(k) - JacobiElliptic.K(k)) / k
+        Gs = tempfac * (JacobiElliptic.E(asin(args), k) - JacobiElliptic.F(asin(args), k)) / (2k)
+        Ghat = tempfac * (JacobiElliptic.E(k) - JacobiElliptic.K(k)) / k
     end
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    minotime = real(isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return minotime, Gs, Ghat, isvortical
+    ans = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
+    return ans, Gs, Go, Ghat, isvortical
 end
