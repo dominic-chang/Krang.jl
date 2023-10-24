@@ -6,4 +6,4 @@ using Integrals
 
 include("utiltests.jl")
 include("polarizationtests.jl")
-
+include("raytracertests.jl")

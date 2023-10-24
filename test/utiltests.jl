@@ -50,38 +50,42 @@
         end
 
         @testset "Case 3" begin
-            for α in [1.0]
-                ηcase3 = η(met, α, 3.0, π / 4)
-                λcase3 = λ(met, α, π / 4)
-                roots = get_radial_roots(met, ηcase3, λcase3)
-                @test sum(Kang._isreal2.(roots)) == 2
-                rs = 1.1horizon(met)
-                τ3 = Ir(met, true, rs, ηcase3, λcase3)[1]
-                I0, I1, I2, Ip, Im = Kang.radial_integrals_case3(met, rs, roots, τ3)
-                @testset "I0/Ir" begin
-                    f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout=1)
-                    sol = solve(prob, HCubatureJL(); reltol=1e-5, abstol=1e-5)
-                    @test τ3 / sol.u ≈ 1.0 atol = 1e-5
-                end
-                @testset "I1" begin
-                    f1(r, p) = r * inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob1 = IntegralProblem(f1, rs, 1e6; nout=1)
-                    sol1 = solve(prob1, HCubatureJL(); reltol=1e-8, abstol=1e-8)
-                    @test I1 / (sol1.u - log(1e6)) ≈ 1.0 atol = 1e-5
-                end
-                @testset "I2" begin
-                    #Regularized Time            
-                    f2(r, p) = r^2 * inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob2 = IntegralProblem(f2, rs, 1e6; nout=1)
-                    sol2 = solve(prob2, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                    @test I2 / (sol2.u - 1e6) ≈ 1.0 atol = 1e-5
-                end
+            α = 1.0
+            β = 3.0
+            θo = π/4
+            ηcase3 = η(met, α, β, θo)
+            λcase3 = λ(met, α, θo)
+            roots = get_radial_roots(met, ηcase3, λcase3)
+            @test sum(Kang._isreal2.(roots)) == 2
+            rs = 1.1horizon(met)
+            τ3 = Ir(met, true, rs, ηcase3, λcase3)[1]
+            I0, I1, I2, Ip, Im = Kang.radial_integrals_case3(met, rs, roots, τ3)
+            @testset "I0/Ir" begin
+                f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
+                prob = IntegralProblem(f, rs, Inf; nout=1)
+                sol = solve(prob, HCubatureJL(); reltol=1e-5, abstol=1e-5)
+                @test τ3 / sol.u ≈ 1.0 atol = 1e-5
+            end
+            @testset "I1" begin
+                f1(r, p) = r * inv(√(r_potential(met, ηcase3, λcase3, r)))
+                prob1 = IntegralProblem(f1, rs, 1e6; nout=1)
+                sol1 = solve(prob1, HCubatureJL(); reltol=1e-8, abstol=1e-8)
+                @test I1 / (sol1.u - log(1e6)) ≈ 1.0 atol = 1e-5
+            end
+            @testset "I2" begin
+                #Regularized Time            
+                f2(r, p) = r^2 * inv(√(r_potential(met, ηcase3, λcase3, r)))
+                prob2 = IntegralProblem(f2, rs, 1e6; nout=1)
+                sol2 = solve(prob2, HCubatureJL(); reltol=1e-10, abstol=1e-10)
+                @test I2 / (sol2.u - 1e6) ≈ 1.0 atol = 1e-5
             end
         end
         @testset "Case 4" begin
-            ηcase4 = η(met, 0.1, 0.1, π / 4)
-            λcase4 = λ(met, 0.1, π / 4)
+            α = 0.1
+            β = 0.1
+            θo = π/4
+            ηcase4 = η(met, α, β, θo)
+            λcase4 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase4, λcase4)
             @test sum(Kang._isreal2.(roots)) == 0
             rs = 1.1horizon(met)
@@ -314,7 +318,7 @@
                             end
                             tempGt, tempGs, tempGo, _, _ = Kang.Gt(met, α, β, θs, θo, isindir, 0)
 
-                            @test tempGt/τ ≈ 1.0 atol = 1e-3
+                            @test tempGt / τ ≈ 1.0 atol = 1e-3
                         end
                     end
                 end
