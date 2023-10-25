@@ -65,7 +65,7 @@ Emission inclination for point originating at inclination rs whose nth order ima
 - `θo` : Observer Inclination
 - `τ` : Mino Time
 """
-function emission_inclination_radius_parameterized(metric::Kerr{T}, α, β, θo, rs, νr) where {T}
+function emission_inclination(metric::Kerr{T}, α, β, θo, rs, νr) where {T}
     τ = Ir(metric, νr, rs, η(metric, α, β, θo), λ(metric, α, θo))
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
@@ -81,7 +81,7 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
 - `θo` : Observer Inclination
 - `τ` : Mino Time
 """
-function emission_inclination_mino_time_parameterized(metric::Kerr{T}, α, β, θo, τ) where {T}
+function emission_inclination(metric::Kerr{T}, α, β, τ, θo) where {T}
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 

@@ -1,6 +1,6 @@
 @testset "Raytracer Functions" begin
 
-    @testset "Radial Emission" begin
+    @testset "Emission radius" begin
         a = 0.99
         met = Kang.Kerr(a)
 
@@ -48,4 +48,55 @@
             @test Kang.emission_radius(met, α, β, τ4, θo)[1] / rs ≈ 1 atol = 1e-5
         end
     end
+    @testset "Emission inclination" begin
+        a = 0.99
+        met = Kang.Kerr(a)
+
+        @test isnan(emission_radius(met, 10, 1.0, π/2, π/2, true, 2)[1])
+
+        @testset "Ordinary Geodesics" begin
+            α = 10.0
+            β = 10.0
+            θo = π / 4
+
+            @testset "n:$n" for n in 0:2
+                @testset "θs:$θs" for θs in (1:4).*π/5
+                    @testset "isindir:$isindir" for isindir in [true, false]
+                        ηcase1 = η(met, α, β, θo)
+                        λcase1 = λ(met, α, θo)
+                        roots = get_radial_roots(met, ηcase1, λcase1)
+                        _, _, _, root = roots
+                        τ1, _, _, _, _ = Kang.Gθ(met, α, β, θs, θo, isindir, n)
+                        testθs = Kang.emission_inclination(met, α, β, τ1, θo)[1]
+                        if !isnan(testθs)
+                            @test  testθs/ θs ≈ 1 atol = 1e-5
+                        end
+                    end
+                end
+            end
+        end
+
+        @testset "Vortical Geodesics" begin
+            α = 0.1
+            β = 0.1
+            θo = π / 4
+
+            @testset "n:$n" for n in 0:2
+                @testset "θs:$θs" for θs in (1:4).*π/5
+                    @testset "isindir:$isindir" for isindir in [true, false]
+                        ηcase1 = η(met, α, β, θo)
+                        λcase1 = λ(met, α, θo)
+                        roots = get_radial_roots(met, ηcase1, λcase1)
+                        _, _, _, root = roots
+                        τ1, _, _, _, _ = Kang.Gθ(met, α, β, θs, θo, isindir, n)
+                        testθs = Kang.emission_inclination(met, α, β, τ1, θo)[1]
+                        if !isnan(testθs)
+                            @test  testθs/ θs ≈ 1 atol = 1e-5
+                        end
+                    end
+                end
+            end
+        end
+    end
+
 end
