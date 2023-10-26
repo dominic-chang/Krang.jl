@@ -4,7 +4,7 @@ CurrentModule = Kang
 # Kang
 
 ## Pages
-```@index
+```@contents
     Pages=[
         "Home" => "index.md",
         "Getting Started" =>[

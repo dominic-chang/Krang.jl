@@ -60,7 +60,7 @@
             θo = π / 4
 
             @testset "n:$n" for n in 0:2
-                @testset "θs:$θs" for θs in (1:4).*π/5
+                @testset "θs:$θs" for θs in [π/5, π/4, π/3, π/2, 2π/3, 3π/4, 4π/5]
                     @testset "isindir:$isindir" for isindir in [true, false]
                         ηcase1 = η(met, α, β, θo)
                         λcase1 = λ(met, α, θo)
@@ -82,7 +82,7 @@
             θo = π / 4
 
             @testset "n:$n" for n in 0:2
-                @testset "θs:$θs" for θs in (1:4).*π/5
+                @testset "θs:$θs" for θs in [π/5, π/4, π/3, π/2, 2π/3, 3π/4, 4π/5]
                     @testset "isindir:$isindir" for isindir in [true, false]
                         ηcase1 = η(met, α, β, θo)
                         λcase1 = λ(met, α, θo)
@@ -98,5 +98,102 @@
             end
         end
     end
+    @testset "Emission Coordinates" begin
+        @testset "α:$α, β:$β, isindir:$isindir" for (α, β, isindir) in [(10.0, 10.0, true), (1.0, -1.0, false)]
+            θo = π/4
+            θs = π/3
+            a = 0.99
+            met = Kang.Kerr(a)
+            ηtemp = η(met, α, β, θo)
+            λtemp = λ(met, α, θo)
+            a2 = met.spin^2
+            Δθ = (1.0 - (ηtemp + λtemp^2) / a2) / 2
+            Δθ2 = Δθ^2
+            desc = √(Δθ2 + ηtemp / a2)
+            up = Δθ + desc
+            θturning = acos(√up) * (1 + 1e-10)
 
+            τ = Kang.Gθ(met, α, β, θs, θo, isindir, 0)[1]
+            ts, testrs, testθs, ϕs, νr, νθ = Kang.emission_coordinates(met, α, β, θs, θo, isindir, 0)
+            testrs2, testθs2, ϕs2, νr2, νθ2 = Kang.emission_coordinates_fast_light(met, α, β, θs, θo, isindir, 0)
+            ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Kang.raytrace(met, α, β, θo, τ)
+
+            testτ = Kang.Ir(met, isindir, testrs, ηtemp, λtemp)[1]
+            @testset "Consistency between raytracing methods" begin
+                @test testrs/testrs2 ≈ 1.0 atol = 1e-5
+                @test testθs/testθs2 ≈ 1.0 atol = 1e-5
+                @test ϕs2/ϕs ≈ 1.0 atol = 1e-5
+                @test νr == νr2
+                @test νθ == νθ2
+                @test testrs/testrs3 ≈ 1.0 atol = 1e-5
+                @test testθs/testθs3 ≈ 1.0 atol = 1e-5
+                @test ϕs/ϕs3 ≈ 1.0 atol = 1e-5
+                @test νr == νr3
+                @test νθ == νθ3
+
+                @test testθs/θs ≈ 1.0 atol = 1e-5
+                @test testτ/τ ≈ 1.0 atol = 1e-5
+            end
+
+            fϕ(r, p) = a * (2r - a * λtemp) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηtemp, λtemp, r)))
+            probϕ = IntegralProblem(fϕ, testrs, Inf; nout=1)
+            solϕ = solve(probϕ, HCubatureJL(); reltol=1e-8, abstol=1e-8)
+            Iϕ = solϕ.u
+
+            gϕ(θ, p) = csc(θ)^2 * inv(√(Kang.θ_potential(met, ηtemp, λtemp, θ)))
+            probϕs = IntegralProblem(gϕ, θs, π / 2; nout=1)
+            solθs = solve(probϕs, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+            probϕo = IntegralProblem(gϕ, θo, π / 2; nout=1)
+            solθo = solve(probϕo, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+            probϕ = IntegralProblem(gϕ, θturning, π / 2; nout=1)
+            solθt = solve(probϕ, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+
+            Gϕ = 0
+            if isindir
+                if sign(cos(θs) * cos(θo)) > 0
+                    Gϕ = abs(2solθt.u - (solθo.u + solθs.u))
+                else
+                    Gϕ = abs(2solθt.u + solθs.u - solθo.u)
+                end
+            else
+                if sign(cos(θs) * cos(θo)) > 0
+                    Gϕ = abs(solθo.u - solθs.u)
+                else
+                    Gϕ = abs(solθo.u + solθs.u)
+                end
+            end
+
+            @test -(Iϕ + λtemp*Gϕ)/ϕs ≈ 1.0 atol = 1e-3
+
+            ft(r, p) = ((r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λtemp)) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηtemp, λtemp, r))))
+            probt = IntegralProblem(ft, testrs, 1e6; nout=1)
+            solt = solve(probt, HCubatureJL(); reltol=1e-8, abstol=1e-8)
+            It = solt.u
+
+            gt(θ, p) = cos(θ)^2 * inv(√(Kang.θ_potential(met, ηtemp, λtemp, θ)))
+            probts = IntegralProblem(gt, θs, π / 2; nout=1)
+            solθs = solve(probts, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+            probto = IntegralProblem(gt, θo, π / 2; nout=1)
+            solθo = solve(probto, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+            probt = IntegralProblem(gt, θturning, π / 2; nout=1)
+            solθt = solve(probt, HCubatureJL(); reltol=1e-12, abstol=1e-12)
+
+            Gt = 0
+            if isindir
+                if sign(cos(θs) * cos(θo)) > 0
+                    Gt = abs(2solθt.u - (solθo.u + solθs.u))
+                else
+                    Gt = abs(2solθt.u + solθs.u - solθo.u)
+                end
+            else
+                if sign(cos(θs) * cos(θo)) > 0
+                    Gt = abs(solθo.u - solθs.u)
+                else
+                    Gt = abs(solθo.u + solθs.u)
+                end
+            end
+
+            @test ((It - 1e6 - 2log(1e6)) + a^2*Gt)/ts ≈ 1.0 atol = 1e-3
+        end
+    end
 end

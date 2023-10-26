@@ -99,7 +99,7 @@ for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light_inclination_parameterized(metric::Kerr{T}, α, β, θs, θo, isindir, n)::Tuple{Any, Any, Any, Bool, Bool} where {T}
+function emission_coordinates_fast_light(metric::Kerr{T}, α, β, θs, θo, isindir, n)::Tuple{Any, Any, Any, Bool, Bool} where {T}
     if cos(θs) > abs(cos(θo))
         αmin = αboundary(metric, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(metric, α, θo, θs) : zero(T))
@@ -188,7 +188,7 @@ function emission_coordinates(metric::Kerr{T}, α, β, θs, θo, isindir, n) whe
     Gϕtemp, _, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
     Gttemp, _, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
 
-    emission_azimuth = (T(π) - Iϕ - λtemp * Gϕtemp + 4π) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp) % T(2π)
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
@@ -209,7 +209,7 @@ Raytrace a point that appears at the screen coordinate (`α`, `β`) for an obser
 - `τ` : Mino Time
 """
 function raytrace(metric::Kerr{T}, α, β, θo, τ) where {T}
-    θs, τs, _, _, n, isindir = emission_inclination(metric, α, β, θo, τ)
+    θs, τs, _, _, n, isindir = emission_inclination(metric, α, β, τ, θo)
     νθ = τs > 0
 
     if cos(θs) > abs(cos(θo))
@@ -252,7 +252,7 @@ function raytrace(metric::Kerr{T}, α, β, θo, τ) where {T}
     emission_azimuth = (-Iϕ - λtemp * Gϕtemp)# % T(2π)
     emission_time_regularized = (It + a^2 * Gttemp)
 
-
+    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     return emission_time_regularized, emission_radius, θs, emission_azimuth, νr, νθ
 end
 
@@ -420,17 +420,11 @@ function _ϕs(metric::Kerr{T}, α, β, θs, θo, rs, τ, νr, roots, isindir, n)
     else
         Iϕ = Iϕ_case4(metric, roots, root_diffs, rs, τ, λtemp)
     end
-    Iϕ == T(Inf) && return zero(T)
+    (isnan(Iϕ) || !isfinite(Iϕ)) && return T(NaN)
 
     Gϕtemp, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
-    Gϕtemp == T(Inf) && return zero(T)
+    (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
 
-    if isnan(Iϕ) || Iϕ == T(Inf)
-        return zero(T)
-    end
-    if isnan(Gϕtemp) || Gϕtemp == T(Inf)
-        return zero(T)
-    end
-    return (T(π) - Iϕ - λtemp * Gϕtemp + 4π) % T(2π)
+    return -(Iϕ + λtemp * Gϕtemp) % T(2π)
 end
 

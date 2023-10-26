@@ -347,7 +347,7 @@ function Ir_case4(::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs) where 
     _, r31, r32, r41, r42, _ = root_diffs
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return zero(T)
+        return T(NaN)
     end
     C = √real(r31 * r42)
     D = √real(r32 * r41)
@@ -381,7 +381,7 @@ function Iϕ_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     k = r32 * r41 / (r31 * r42)
     x2_s = √((rs - r4) / (rs - r3) * r31 / r41)
     x2_o = √(r31 / r41)
-    !(-1 < x2_s < 1) && return zero(T)
+    !(-1 < x2_s < 1) && return T(NaN)
 
     #Fo = isnan(τo) ? 2 / √real(r31 * r42) * JacobiElliptic.F(asin(x2_o), k) : τo
     #Fs = 2 / √real(r31 * r42) * JacobiElliptic.F(asin(x2_s), k)
@@ -424,7 +424,7 @@ function Iϕ_case3(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return zero(T)
+        return T(NaN)
     end
     A, B = √A2, √B2
 
@@ -461,7 +461,7 @@ function Iϕ_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs,
     rm = one(T) - √(one(T) - a2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return zero(T)
+        return T(NaN)
     end
 
     C = √real(r31 * r42)
@@ -507,7 +507,7 @@ function It_case2(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
     x2_o = √abs(r31 / r41)
-    !(-1 < x2_s < 1) && return zero(T)
+    !(-1 < x2_s < 1) && return T(NaN)
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
@@ -569,7 +569,7 @@ function It_case3(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return zero(T)
+        return T(NaN)
     end
     A, B = √A2, √B2
 
@@ -611,7 +611,7 @@ function It_case4(metric::Kerr{T}, roots::NTuple{4}, root_diffs::NTuple{6}, rs, 
     rm = one(T) - √(one(T) - a^2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return zero(T)
+        return T(NaN)
     end
 
     C = √real(r31 * r42)
@@ -928,7 +928,7 @@ function Gs(metric::Kerr{T}, α, β, θo, τ) where {T}
 end
 
 function _Gs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
-    τ == T(Inf) && return T(Inf)
+    τ == T(NaN) && return T(NaN)
     a = metric.spin
     Go, Ghat, Ghat_2, isvortical = zero(T), zero(T), zero(T), η < zero(T)
 
@@ -977,10 +977,10 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
 
     isincone = abs(cos(θs)) < abs(cos(θo))
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), isvortical
+        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
     end
     if ((((signβ < zero(T)) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), isvortical
+        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
     end
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
@@ -998,7 +998,7 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         argo = (cos(θo)^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(NaN), Gs, Ghat, isvortical
+            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
         argn = (up - um) / (1 - um)
@@ -1010,7 +1010,7 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         argo = cos(θo) / √(up)
         #k = abs(m)
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(Inf), Gs, Ghat, isvortical
+            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
         end
         tempfac = inv(√abs(um * a^2))
         Go = tempfac * JacobiElliptic.Pi(up, asin(argo), k)
@@ -1021,7 +1021,6 @@ function _Gϕ(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     ans = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
     return ans, Gs, Go, Ghat, isvortical
-
 end
 
 function Gt(metric::Kerr{T}, α, β, θs, θo, isindir, n) where {T}
@@ -1034,10 +1033,10 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
 
     isincone = abs(cos(θs)) < abs(cos(θo))
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(Inf), T(Inf), T(Inf), isvortical
+        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
     end
     if ((((signβ < zero(T)) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(Inf), T(Inf), T(Inf), isvortical
+        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
     end
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
@@ -1055,7 +1054,7 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         argo = (cos(θo)^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(Inf), Gs, Ghat, isvortical
+            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
         end
         tempfac = √abs(um / a^2)
         argn = (up - um) / (1 - um)
@@ -1068,7 +1067,7 @@ function _Gt(metric::Kerr{T}, signβ, θs, θo, isindir, n, η, λ) where {T}
         argo = cos(θo) / √(up)
         #k = abs(m)
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(Inf), Gs, Ghat, isvortical
+            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
         Go = tempfac * (JacobiElliptic.E(asin(argo), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
