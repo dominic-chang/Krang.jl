@@ -1,7 +1,6 @@
 # Raytracing
 
-Light rays in this module can be parameterized in terms of either the cones ($\theta_i$), spheres ($r_i$), or the minotime ($\tau$).
-
+Light rays in this module can be parameterized in terms of either the cones ($\theta_s$), or the minotime ($\Delta\tau$).
 
 ## Raytracing conical surfaces 
 Surfaces of constant $\theta$ define spin axis centered cones whose apex lie at the origin of the coordinate system.

@@ -197,7 +197,7 @@ Radial potential of spacetime
 
 - `metric`: Kerr{T} metric
 - `η`  : Reduced Carter constant
-- `λ`  : Reduced azimuthal agular momentum
+- `λ`  : Reduced azimuthal angular momentum
 - `r`  : Boyer Lindquist radius
 """
 function r_potential(metric::Kerr{T}, η, λ, r) where {T}
@@ -213,7 +213,7 @@ Theta potential of a Kerr blackhole
 
 - `metric`: Kerr{T} metric
 - `η`  : Reduced Carter constant
-- `λ`  : Reduced azimuthal agular momentum
+- `λ`  : Reduced azimuthal angular momentum
 - `θ`  : Boyer Lindquist inclination
 """
 function θ_potential(metric::Kerr{T}, η, λ, θ) where {T}
@@ -231,7 +231,7 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
 
 - `metric`: Kerr{T} metric
 - `η`  : Reduced Carter constant
-- `λ`  : Reduced azimuthal agular momentum
+- `λ`  : Reduced azimuthal angular momentum
 """
 function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     a = metric.spin
@@ -274,7 +274,8 @@ end
 _get_root_diffs(r1, r2, r3, r4) = r2 - r1, r3 - r1, r3 - r2, r4 - r1, r4 - r2, r4 - r3
 
 """
-Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$
+Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$.
+See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
 
@@ -287,6 +288,19 @@ Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$
 function Ir(metric::Kerr, νr::Bool, θo, rs, α, β)
     return Ir(metric, νr, rs, η(metric, α, β, θo), λ(metric, α, θo))
 end
+
+"""
+Returns the antiderivative \$I_r=\\int\\frac{dr}{\\sqrt{\\mathcal{R(r)}}}\$.
+See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
+
+# Arguments
+
+- `metric`: Kerr{T} metric
+- `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
+- `θo` : Observer inclination
+- `η`  : Reduced Carter Constant
+- `λ`  : Reduced Azimuthal Angular Momentum
+"""
 function Ir(metric::Kerr{T}, νr::Bool, rs, η, λ) where {T}
     roots = get_radial_roots(metric, η, λ)
     root_diffs = _get_root_diffs(roots...)
@@ -852,7 +866,8 @@ function mino_time(metric::Kerr{T}, α, β, θs, θo, isindir, n) where {T}
 end
 
 """
-Returns the antiderivative \$G_\\theta=\\int\\frac{d\\theta}{\\sqrt{\\Theta(\\theta)}}\$
+Returns the antiderivative \$G_\\theta=\\int\\frac{d\\theta}{\\sqrt{\\Theta(\\theta)}}\$.
+See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 
 # Arguments 
 

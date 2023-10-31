@@ -160,8 +160,6 @@ function emission_coordinates(metric::Kerr{T}, α, β, θs, θo, isindir, n) whe
     end
     if isnan(τ)
         return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
-        #else
-        #println(νθ ≈ ((sign(cos(θs)) > 0)⊻(τs2< 0)))
     end
 
     roots = get_radial_roots(metric, ηtemp, λtemp)
