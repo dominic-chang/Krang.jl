@@ -26,14 +26,12 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Getting Started" =>[
-            "getting_started.md",
-            "kerr_geodesic_summary.md",
+        "Getting Started" => "getting_started.md",
+        "Examples" => MD_FILES,
+        "Theory" => ["kerr_geodesic_summary.md",
             "polarization.md",
             "time_regularization.md",
-            ],
-        "Examples" => MD_FILES,
-        "Theory" => "kerr_geodesic_summary.md",
+        ],
         "api.md",
     ],
 )

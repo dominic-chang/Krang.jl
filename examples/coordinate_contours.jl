@@ -1,4 +1,4 @@
-# # Raytracing with Kang.jl
+# # Raytracing with inclination
 
 # In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
@@ -13,7 +13,7 @@ using Kang
 # screen of the observer.
 model = Kang.Kerr(0.99);
 θo = π/4;
-sze = 100;
+sze = 500;
 rmin = Kang.horizon(model)
 rmax = 20;
 ρmax = 20;
@@ -65,8 +65,8 @@ recording = record(fig, "emission_coordinates.gif", range(0,π,length=180),frame
         end
     end
 
-    ax0 = Axis(fig[1, 1], aspect=1, title=L"\text{Radius increasing on emission}");
-    ax1 = Axis(fig[1, 3], aspect=1, title=L"\text{inclination increasing on emission}");
+    ax0 = Axis(fig[1, 1], aspect=1, title=L"\text{Regularized Time }(t_s)");
+    ax1 = Axis(fig[1, 3], aspect=1, title=L"\text{Radius }(r_s)");
     ax2 = Axis(fig[2, 1], aspect=1, title=L"\text{Opening angle } (\theta_s)");
     ax3 = Axis(fig[2, 3], aspect=1, title=L"\text{Azimuth } (\phi_s)");
 

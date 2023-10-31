@@ -186,7 +186,7 @@ function emission_coordinates(metric::Kerr{T}, α, β, θs, θo, isindir, n) whe
     Gϕtemp, _, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
     Gttemp, _, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
@@ -247,7 +247,7 @@ function raytrace(metric::Kerr{T}, α, β, θo, τ) where {T}
     Gϕtemp, _, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
     Gttemp, _, _, _, _ = Gt(metric, α, β, θs, θo, isindir, n)
 
-    emission_azimuth = (-Iϕ - λtemp * Gϕtemp)# % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
     emission_time_regularized = (It + a^2 * Gttemp)
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
@@ -423,6 +423,6 @@ function _ϕs(metric::Kerr{T}, α, β, θs, θo, rs, τ, νr, roots, isindir, n)
     Gϕtemp, _, _, _ = Gϕ(metric, α, β, θs, θo, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
 
-    return -(Iϕ + λtemp * Gϕtemp) % T(2π)
+    return -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
 end
 

@@ -23,7 +23,7 @@ Checks if a complex number is real to some tolerance
 """
 function _isreal2(num::Complex{T}) where T
     ren, imn = reim(num)
-    return abs(imn / ren) < eps(T)^(T(1 / 5))
+    return abs(imn / ren) < eps(T)^(T(1 / 2))
 end
 
 """
