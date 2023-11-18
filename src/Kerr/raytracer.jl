@@ -354,7 +354,7 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
     ans, k, argo, τs, τo, τhat = zero(T), zero(T), zero(T), zero(T), zero(T), zero(T)
     tempfac = one(T) / √abs(um * a^2)
     if isvortical
-        argo = (cos(θo)^2 - um) / (up - um)
+        argo = clamp((cos(θo)^2 - um) / (up - um), 0.0, 1.0)
         k = one(T) - m
         tempfac = inv(√abs(um * a^2))
         τo = tempfac * JacobiElliptic.F(asin(√argo), k)

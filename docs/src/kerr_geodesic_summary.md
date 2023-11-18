@@ -45,8 +45,8 @@ are the Christoffel symbols.
 ### Hamilton-Jacobi Equations
 
 The Kerr family of metrics belongs to the class of type-D (type-{2,2}) spacetimes.
-These spacetimes admit a Killing-Yano tensor [^PW] from which it is possible to define a Carter constant and Penrose-Walker constant. 
-The Carter constant, in particular, allows solutions of the geodesic equations to be expressed in terms of quadratures through the Hamilton-Jacobi approach[^Carter], whose equations are given by:
+These spacetimes admit a Killing tensor from which it is possible to define a Carter constant and Penrose-Walker constant.[^PW] 
+The Carter constant, in particular, allows solutions of the geodesic equations to be expressed in terms of quadratures through the Hamilton-Jacobi approach,[^Carter] with equations:
 
 ```math
 \begin{align}
@@ -59,7 +59,7 @@ p_\mu
 \end{align}
 ```
 
-The Carter constant is useful since it lets the Hamilton-Jacobi equations be seperable, resulting in a Hamiltonian principle function that takes the form,
+The Carter constant is useful since it allows for seperable solutions to the Hamilton-Jacobi equations, resulting in a Hamiltonian principle function that takes the form,
 
 ```math
 \begin{equation}
@@ -79,19 +79,19 @@ where $\kappa$ is the conserved four momentum magnitude, $E$ is the conserved en
 ```
 are the radial and inclination potentials that depend on the previously mentioned conserved quantities along with the Carter constant $C$.
 
-### Integral solutions
+### Solutions by Quadrature
 
-A noteworthy fact is that null geodesics, $\kappa=0$, only depend on the reduced Carter constant and angular momentum
+Null geodesics have $\kappa=0$; thus they are only dependent on the reduced Carter constant and angular momentum:
 
 ```math
 \begin{align}
-    \lambda
-        &=\frac{L}{E}\\
     \eta
-        &=\frac{C}{E^2}.
+        &=\frac{C}{E^2}\\
+    \lambda
+        &=\frac{L}{E}.
 \end{align}
 ```
-We use this freedom to fix $E=1$ and write the 
+We use this fact to fix $E=1$ and write the 
 radial and inclination potentials for null geodesics as,
 ```math
 \begin{align}
@@ -105,27 +105,27 @@ The Hamilton-Jacobi Equations then reduce to four first order differential equat
 
 ```math
 \begin{align}
-\frac{\Sigma}{E}\dot r
+\Sigma\dot r =\frac{d r}{d\tau}
     &= \sqrt{\mathcal R},\\
-\frac{\Sigma}{E}\dot \theta
+\Sigma\dot \theta=\frac{d \theta}{d\tau}
     &= \sqrt{\Theta},\\
-\frac{\Sigma}{E}\dot \phi
+\Sigma\dot \phi=\frac{d \phi}{d\tau}
     &= \frac{a}{\Delta}(r^2+a^2-a\lambda)+\frac{\lambda}{\sin^2\theta}-a,\\
-\frac{\Sigma}{E}\dot t
-    &= \frac{r^2+a^2}{\Delta}(r^2+a^2-a\lambda)+a(\lambda-a\sin^2\theta),\\
-
+\Sigma\dot t=\frac{d t}{d\tau}
+    &= \frac{r^2+a^2}{\Delta}(r^2+a^2-a\lambda)+a(\lambda-a\sin^2\theta),
 \end{align}
 ```
-a fact which follows from the relationship, $\dot x^\mu=p^\mu=g^{\mu\nu}\partial_\nu S$.
-Equations (15)-(18) define a 'Kepler-like' problem where a new parameter, known as the Mino time $\tau$, is defined in terms of an integral in $r$ or $\theta$, and acts similar to the Keplerian coordinate time in that problem.
-The Mino time is defined by its relationship to the affine parameter by $d\tau=d\tilde\tau/\Sigma$.
-Furthermore, Equations (15) and (16) imply that the Mino time can be written as a function of $r$ or $\theta$ through the relationships,
+where we have defined the Mino time by its relationship to the affine parameter; 
+$$d\tau=d\tilde\tau/\Sigma.$$
+
+Equations (15)-(18) define a 'Kepler-like' problem for photons in the Kerr spacetime.  
+The Mino time here acts similar to the Keplerian coordinate time in that problem, and can be expressed either in terms of $r$ or $\theta$ using equations (15) and (16);
 ```math
 \begin{align}
 \tau=\tau_r(r_f,r_i)
-    &=\oint\sqrt{R}\;dr,\text{ and}\\
+    &=\oint\frac{dr}{\sqrt{R}},\text{ and}\\
 \tau=\tau_\theta(\theta_f,\theta_i)
-    &=\oint\sqrt{\Theta}\;d\theta.
+    &=\oint\frac{d\theta}{\sqrt{\Theta}}.
 \end{align}
 ```
 
@@ -140,16 +140,15 @@ r_i
 \end{align}
 ```
 
-Thus for a given $t_f, r_f, \theta_f, \phi_f, \lambda$ and $\eta$, one can choose to parameterize the solutions of equations (15)-(18) by either $\Delta\tau,r_i$ or $\theta_i$.
+Thus for a given observer location, $(t_f, r_f, \theta_f, \phi_f)$, and observer screen coordinate $(\alpha(\lambda, \theta_f), \;\beta(\lambda,\eta,\theta_f))$, one can choose to parameterize the solutions of equations (15)-(18) by either $\Delta\tau,r_i$ or $\theta_i$.
 
-More details on this formalism and the solutions can be found in this review artivle by [Gralla & Lupsasca](https://doi.org/10.1103/PhysRevD.101.044032)[^GL]
-
+Details on the solutions to equations (15)-(18) can be found in this review article by [Gralla & Lupsasca](https://doi.org/10.1103/PhysRevD.101.044032)[^GL].
 
 ## References
-[^PW]: Walker, M., Penrose, R. On quadratic first integrals of the geodesic equations for type {22} spacetimes. Commun.Math. Phys. 18, 265–274 (1970).
+[^PW]: Walker, Martin, and Roger Penrose. ‘On Quadratic First Integrals of the Geodesic Equations for Type 22 Spacetimes’. Communications in Mathematical Physics, vol. 18, no. 4, Springer Science and Business Media LLC, Dec. 1970, pp. 265–274, https://doi.org10.1007/bf01649445.
 
-[^Carter]: Brandon Carter Phys. Rev. 174, 1559 – Published 25 October 1968
+[^Carter]: Carter, Brandon. ‘Global Structure of the Kerr Family of Gravitational Fields’. The Physical Review, vol. 174, no. 5, American Physical Society (APS), Oct. 1968, pp. 1559–1571, https://doi.org10.1103/physrev.174.1559.
 
-[^BL]: Robert H. Boyer, Richard W. Lindquist; Maximal Analytic Extension of the Kerr Metric. J. Math. Phys. 1 February 1967; 8 (2): 265–281.
+[^BL]: Robert H. Boyer, Richard W. Lindquist; Maximal Analytic Extension of the Kerr Metric. J. Math. Phys. 1 February 1967; 8 (2): 265–281. https://doi.org/10.1063/1.1705193
 
-[^GL]: Samuel E. Gralla and Alexandru Lupsasca Phys. Rev. D 101, 044032
+[^GL]: Gralla, Samuel E., and Alexandru Lupsasca. ‘Null Geodesics of the Kerr Exterior’. Physical Review. D. (2016), vol. 101, no. 4, American Physical Society (APS), Feb. 2020, https://doi.org10.1103/physrevd.101.044032.
