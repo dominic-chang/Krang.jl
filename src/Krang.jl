@@ -1,4 +1,4 @@
-module Kang
+module Krang
 using DocStringExtensions
 using StaticArrays
 using JacobiElliptic

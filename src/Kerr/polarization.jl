@@ -178,7 +178,7 @@ function calcPol(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, 
     ]
     f_temp_d = ((A - B * im) * (ri - a * cos(θs) * im)) * (f_bl_u)
     κ = sum(curr_p_bl_u .* f_temp_d)
-    κ = κ * Kang._pow(conj(κ) * κ, -T(0.5))
+    κ = κ * Krang._pow(conj(κ) * κ, -T(0.5))
 
     eα, eβ = screen_polarisation(metric, κ, θo, α, β) .* norm
 

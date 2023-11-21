@@ -1,7 +1,7 @@
 ```@meta
-CurrentModule = Kang
+CurrentModule = Krang
 ```
-# Kang
+# Krang
 
 ## Contents
 ```@contents

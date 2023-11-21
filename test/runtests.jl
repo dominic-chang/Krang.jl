@@ -1,4 +1,4 @@
-using Kang
+using Krang
 using Test
 using FastGaussQuadrature
 using LinearAlgebra

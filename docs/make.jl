@@ -1,4 +1,4 @@
-using Kang
+using Krang
 using Documenter
 using Glob
 using Literate
@@ -11,16 +11,16 @@ SOURCE_FILES = Glob.glob("*.jl", GENERATED)
 foreach(fn -> Literate.markdown(fn, OUTDIR, documenter=true), SOURCE_FILES)
 MD_FILES = [joinpath("examples", file) for file in readdir(OUTDIR)]
 
-DocMeta.setdocmeta!(Kang, :DocTestSetup, :(using Kang); recursive=true)
+DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
 
 makedocs(;
-    modules=[Kang],
+    modules=[Krang],
     authors="Dominic <dchang3419@hotmail.com> and contributors",
-    repo="https://github.com/dchang10/Kang.jl/blob/{commit}{path}#{line}",
-    sitename="Kang.jl",
+    repo="https://github.com/dchang10/Krang.jl/blob/{commit}{path}#{line}",
+    sitename="Krang.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://dchang10.github.io/Kang.jl",
+        canonical="https://dchang10.github.io/Krang.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -39,6 +39,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/dchang10/Kang.jl",
+    repo="github.com/dchang10/Krang.jl",
     devbranch="main",
 )

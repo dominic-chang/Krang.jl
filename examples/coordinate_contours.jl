@@ -4,17 +4,17 @@
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
 # source, at a fixed inclination angle from the blackhole's spin axis.
 #
-# First, let's import Kang and CairoMakie for plotting.
+# First, let's import Krang and CairoMakie for plotting.
 using CairoMakie
-using Kang
+using Krang
 #
 # We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
-model = Kang.Kerr(0.99);
+model = Krang.Kerr(0.99);
 θo = π/4;
 sze = 500;
-rmin = Kang.horizon(model)
+rmin = Krang.horizon(model)
 rmax = 20;
 ρmax = 20;
 
@@ -35,13 +35,13 @@ recording = record(fig, "emission_coordinates.gif", range(0,π,length=180),frame
     n = 1;
     Threads.@threads for i in 1:sze
         for j in 1:sze
-            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Kang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, true, n);
+            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Krang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, true, n);
             tvals[i, j] = (rmax > curr_rs > rmin) ? curr_ts : tvals[i, j];
             rvals[i, j] = (rmax > curr_rs > rmin) ? curr_rs : rvals[i, j];
             θvals[i, j] = (rmax > curr_rs > rmin) ? curr_θs : θvals[i, j];
             ϕvals[i, j] = (rmax > curr_rs > rmin) ? curr_ϕs : ϕvals[i, j];
 
-            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Kang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, false, n);
+            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Krang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, false, n);
             tvals[i, j] = (rmax > curr_rs > rmin && curr_ts != 0) ? curr_ts : tvals[i, j];
             rvals[i, j] = (rmax > curr_rs > rmin && curr_rs > 0) ? curr_rs : rvals[i, j];
             θvals[i, j] = (rmax > curr_rs > rmin && curr_θs > 0) ? curr_θs : θvals[i, j];
@@ -52,12 +52,12 @@ recording = record(fig, "emission_coordinates.gif", range(0,π,length=180),frame
     n = 0;
     Threads.@threads for i in 1:sze
         for j in 1:sze
-            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Kang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, true, n);
+            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Krang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, true, n);
             tvals[i, j] = (rmax > curr_rs > rmin) ? curr_ts : tvals[i, j];
             rvals[i, j] = (rmax > curr_rs > rmin) ? curr_rs : rvals[i, j];
             θvals[i, j] = (rmax > curr_rs > rmin) ? curr_θs : θvals[i, j];
             ϕvals[i, j] = (rmax > curr_rs > rmin) ? curr_ϕs : ϕvals[i, j];
-            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Kang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, false, n);
+            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Krang.emission_coordinates(model, αvals[i], βvals[j], θs, θo, false, n);
             tvals[i, j] = (rmax > curr_rs > rmin && curr_ts != 0) ? curr_ts : tvals[i, j];
             rvals[i, j] = (rmax > curr_rs > rmin && curr_rs > 0) ? curr_rs : rvals[i, j];
             θvals[i, j] = (rmax > curr_rs > rmin && curr_θs > 0) ? curr_θs : θvals[i, j];

@@ -2,7 +2,7 @@
 
     @testset "Emission radius" begin
         a = 0.99
-        met = Kang.Kerr(a)
+        met = Krang.Kerr(a)
 
         @test isnan(emission_radius(met, 10, 1.0, π/2, π/2, true, 2)[1])
 
@@ -15,10 +15,10 @@
             λcase1 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase1, λcase1)
             _, _, _, root = roots
-            @test sum(Kang._isreal2.(roots)) == 4
+            @test sum(Krang._isreal2.(roots)) == 4
             rs = 1.1 * real(root)
             τ1 = Ir(met, true, rs, ηcase1, λcase1)[1]
-            @test Kang.emission_radius(met, α, β, τ1, θo)[1] / rs ≈ 1 atol = 1e-5
+            @test Krang.emission_radius(met, α, β, τ1, θo)[1] / rs ≈ 1 atol = 1e-5
         end
 
         @testset "Case 3" begin
@@ -29,10 +29,10 @@
             ηcase3 = η(met, α, β, θo)
             λcase3 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase3, λcase3)
-            @test sum(Kang._isreal2.(roots)) == 2
+            @test sum(Krang._isreal2.(roots)) == 2
             rs = 1.1horizon(met)
             τ3 = Ir(met, true, rs, ηcase3, λcase3)[1]
-            @test Kang.emission_radius(met, α, β, τ3, θo)[1] / rs ≈ 1 atol = 1e-5
+            @test Krang.emission_radius(met, α, β, τ3, θo)[1] / rs ≈ 1 atol = 1e-5
         end
         @testset "Case 4" begin
             α = 0.1
@@ -42,15 +42,15 @@
             ηcase4 = η(met, α, β, θo)
             λcase4 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase4, λcase4)
-            @test sum(Kang._isreal2.(roots)) == 0
+            @test sum(Krang._isreal2.(roots)) == 0
             rs = 1.1horizon(met)
             τ4 = Ir(met, true, rs, ηcase4, λcase4)[1]
-            @test Kang.emission_radius(met, α, β, τ4, θo)[1] / rs ≈ 1 atol = 1e-5
+            @test Krang.emission_radius(met, α, β, τ4, θo)[1] / rs ≈ 1 atol = 1e-5
         end
     end
     @testset "Emission inclination" begin
         a = 0.99
-        met = Kang.Kerr(a)
+        met = Krang.Kerr(a)
 
         @test isnan(emission_radius(met, 10, 1.0, π/2, π/2, true, 2)[1])
 
@@ -66,8 +66,8 @@
                         λcase1 = λ(met, α, θo)
                         roots = get_radial_roots(met, ηcase1, λcase1)
                         _, _, _, root = roots
-                        τ1, _, _, _, _ = Kang.Gθ(met, α, β, θs, θo, isindir, n)
-                        testθs = Kang.emission_inclination(met, α, β, τ1, θo)[1]
+                        τ1, _, _, _, _ = Krang.Gθ(met, α, β, θs, θo, isindir, n)
+                        testθs = Krang.emission_inclination(met, α, β, τ1, θo)[1]
                         if !isnan(testθs)
                             @test  testθs/ θs ≈ 1 atol = 1e-5
                         end
@@ -88,8 +88,8 @@
                         λcase1 = λ(met, α, θo)
                         roots = get_radial_roots(met, ηcase1, λcase1)
                         _, _, _, root = roots
-                        τ1, _, _, _, _ = Kang.Gθ(met, α, β, θs, θo, isindir, n)
-                        testθs = Kang.emission_inclination(met, α, β, τ1, θo)[1]
+                        τ1, _, _, _, _ = Krang.Gθ(met, α, β, θs, θo, isindir, n)
+                        testθs = Krang.emission_inclination(met, α, β, τ1, θo)[1]
                         if !isnan(testθs)
                             @test  testθs/ θs ≈ 1 atol = 1e-5
                         end
@@ -103,7 +103,7 @@
             θo = π/4
             θs = π/3
             a = 0.99
-            met = Kang.Kerr(a)
+            met = Krang.Kerr(a)
             ηtemp = η(met, α, β, θo)
             λtemp = λ(met, α, θo)
             a2 = met.spin^2
@@ -113,12 +113,12 @@
             up = Δθ + desc
             θturning = acos(√up) * (1 + 1e-10)
 
-            τ = Kang.Gθ(met, α, β, θs, θo, isindir, 0)[1]
-            ts, testrs, testθs, ϕs, νr, νθ = Kang.emission_coordinates(met, α, β, θs, θo, isindir, 0)
-            testrs2, testθs2, ϕs2, νr2, νθ2 = Kang.emission_coordinates_fast_light(met, α, β, θs, θo, isindir, 0)
-            ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Kang.raytrace(met, α, β, θo, τ)
+            τ = Krang.Gθ(met, α, β, θs, θo, isindir, 0)[1]
+            ts, testrs, testθs, ϕs, νr, νθ = Krang.emission_coordinates(met, α, β, θs, θo, isindir, 0)
+            testrs2, testθs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(met, α, β, θs, θo, isindir, 0)
+            ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.raytrace(met, α, β, θo, τ)
 
-            testτ = Kang.Ir(met, isindir, testrs, ηtemp, λtemp)[1]
+            testτ = Krang.Ir(met, isindir, testrs, ηtemp, λtemp)[1]
             @testset "Consistency between raytracing methods" begin
                 @test testrs/testrs2 ≈ 1.0 atol = 1e-5
                 @test testθs/testθs2 ≈ 1.0 atol = 1e-5
@@ -140,7 +140,7 @@
             solϕ = solve(probϕ, HCubatureJL(); reltol=1e-8, abstol=1e-8)
             Iϕ = solϕ.u
 
-            gϕ(θ, p) = csc(θ)^2 * inv(√(Kang.θ_potential(met, ηtemp, λtemp, θ)))
+            gϕ(θ, p) = csc(θ)^2 * inv(√(Krang.θ_potential(met, ηtemp, λtemp, θ)))
             probϕs = IntegralProblem(gϕ, θs, π / 2; nout=1)
             solθs = solve(probϕs, HCubatureJL(); reltol=1e-12, abstol=1e-12)
             probϕo = IntegralProblem(gϕ, θo, π / 2; nout=1)
@@ -170,7 +170,7 @@
             solt = solve(probt, HCubatureJL(); reltol=1e-8, abstol=1e-8)
             It = solt.u
 
-            gt(θ, p) = cos(θ)^2 * inv(√(Kang.θ_potential(met, ηtemp, λtemp, θ)))
+            gt(θ, p) = cos(θ)^2 * inv(√(Krang.θ_potential(met, ηtemp, λtemp, θ)))
             probts = IntegralProblem(gt, θs, π / 2; nout=1)
             solθs = solve(probts, HCubatureJL(); reltol=1e-12, abstol=1e-12)
             probto = IntegralProblem(gt, θo, π / 2; nout=1)

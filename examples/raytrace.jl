@@ -3,12 +3,12 @@
 # ### Coordinate evolution as a function of τ.
 
 using CairoMakie
-using Kang
+using Krang
 
-model = Kang.Kerr(0.99);
+model = Krang.Kerr(0.99);
 θo = π/4;
 sze = 500;
-rmin = Kang.horizon(model)
+rmin = Krang.horizon(model)
 rmax = 20;
 ρmax = 20;
 # Let us now create a figure to plot the emission coordinates on,
@@ -26,7 +26,7 @@ recording = record(fig, "raytrace.gif", range(0,3,length=180),framerate=15) do �
 
     Threads.@threads for i in 1:sze
         for j in 1:sze
-            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Kang.raytrace(model, αvals[i], βvals[j], θo, τ);
+            curr_ts, curr_rs, curr_θs, curr_ϕs, νr, νθ = Krang.raytrace(model, αvals[i], βvals[j], θo, τ);
             tvals[i, j] = (rmax > curr_rs > rmin) ? curr_ts : tvals[i, j];
             rvals[i, j] = (rmax > curr_rs > rmin) ? curr_rs : rvals[i, j];
             θvals[i, j] = (rmax > curr_rs > rmin) ? curr_θs : θvals[i, j];

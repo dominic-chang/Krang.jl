@@ -33,9 +33,9 @@ jobs:
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
           using Documenter: DocMeta, doctest
-          using Kang
-          DocMeta.setdocmeta!(Kang, :DocTestSetup, :(using Kang); recursive=true)
-          doctest(Kang)
+          using Krang
+          DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
+          doctest(Krang)
           include("docs/make.jl")'
       after_success: skip
 after_success:
