@@ -11,6 +11,7 @@ using JacobiElliptic
 # Write your package code here.
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr.jl")
+include("Camera.jl")
 include("Kerr/raytracer.jl")
 include("Kerr/api.jl")
 include("Kerr/polarization.jl")

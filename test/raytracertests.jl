@@ -4,12 +4,14 @@
         a = 0.99
         met = Krang.Kerr(a)
 
-        @test isnan(emission_radius(met, 10, 1.0, π/2, π/2, true, 2)[1])
+        pix = Krang.BasicPixel(met, 10, 1.0, π/2)
+        @test isnan(emission_radius(met, pix, π/2, π/2, true, 2)[1])
 
         @testset "Case 2" begin
             α = 10.0
             β = 10.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
 
             ηcase1 = η(met, α, β, θo)
             λcase1 = λ(met, α, θo)
@@ -17,47 +19,51 @@
             _, _, _, root = roots
             @test sum(Krang._isreal2.(roots)) == 4
             rs = 1.1 * real(root)
-            τ1 = Ir(met, true, rs, ηcase1, λcase1)[1]
-            @test Krang.emission_radius(met, α, β, τ1, θo)[1] / rs ≈ 1 atol = 1e-5
+            τ1 = Ir(met, true, rs, pix)[1]
+            @test Krang.emission_radius(met, τ1, pix)[1] / rs ≈ 1 atol = 1e-5
         end
 
         @testset "Case 3" begin
             α = 1.0
             β = 1.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
 
             ηcase3 = η(met, α, β, θo)
             λcase3 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase3, λcase3)
             @test sum(Krang._isreal2.(roots)) == 2
             rs = 1.1horizon(met)
-            τ3 = Ir(met, true, rs, ηcase3, λcase3)[1]
-            @test Krang.emission_radius(met, α, β, τ3, θo)[1] / rs ≈ 1 atol = 1e-5
+            τ3 = Ir(met, true, rs, pix)[1]
+            @test Krang.emission_radius(met, τ3, pix)[1] / rs ≈ 1 atol = 1e-5
         end
         @testset "Case 4" begin
             α = 0.1
             β = 0.1
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
 
             ηcase4 = η(met, α, β, θo)
             λcase4 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase4, λcase4)
             @test sum(Krang._isreal2.(roots)) == 0
             rs = 1.1horizon(met)
-            τ4 = Ir(met, true, rs, ηcase4, λcase4)[1]
-            @test Krang.emission_radius(met, α, β, τ4, θo)[1] / rs ≈ 1 atol = 1e-5
+            τ4 = Ir(met, true, rs, pix)[1]
+            @test Krang.emission_radius(met, τ4, pix)[1] / rs ≈ 1 atol = 1e-5
         end
     end
     @testset "Emission inclination" begin
         a = 0.99
         met = Krang.Kerr(a)
 
-        @test isnan(emission_radius(met, 10, 1.0, π/2, π/2, true, 2)[1])
+
+        @test isnan(emission_radius(met, Krang.BasicPixel(met, 10.0, 1.0, π/2), π/2, π/2, true, 2)[1])
 
         @testset "Ordinary Geodesics" begin
             α = 10.0
             β = 10.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
 
             @testset "n:$n" for n in 0:2
                 @testset "θs:$θs" for θs in [π/5, π/4, π/3, π/2, 2π/3, 3π/4, 4π/5]
@@ -66,8 +72,8 @@
                         λcase1 = λ(met, α, θo)
                         roots = get_radial_roots(met, ηcase1, λcase1)
                         _, _, _, root = roots
-                        τ1, _, _, _, _ = Krang.Gθ(met, α, β, θs, θo, isindir, n)
-                        testθs = Krang.emission_inclination(met, α, β, τ1, θo)[1]
+                        τ1, _, _, _, _ = Krang.Gθ(met, pix, θs, θo, isindir, n)
+                        testθs = Krang.emission_inclination(met, pix, τ1, θo)[1]
                         if !isnan(testθs)
                             @test  testθs/ θs ≈ 1 atol = 1e-5
                         end
@@ -80,6 +86,7 @@
             α = 0.1
             β = 0.1
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
 
             @testset "n:$n" for n in 0:2
                 @testset "θs:$θs" for θs in [π/5, π/4, π/3, π/2, 2π/3, 3π/4, 4π/5]
@@ -88,8 +95,8 @@
                         λcase1 = λ(met, α, θo)
                         roots = get_radial_roots(met, ηcase1, λcase1)
                         _, _, _, root = roots
-                        τ1, _, _, _, _ = Krang.Gθ(met, α, β, θs, θo, isindir, n)
-                        testθs = Krang.emission_inclination(met, α, β, τ1, θo)[1]
+                        τ1, _, _, _, _ = Krang.Gθ(met, pix, θs, θo, isindir, n)
+                        testθs = Krang.emission_inclination(met, pix, τ1, θo)[1]
                         if !isnan(testθs)
                             @test  testθs/ θs ≈ 1 atol = 1e-5
                         end
@@ -112,13 +119,14 @@
             desc = √(Δθ2 + ηtemp / a2)
             up = Δθ + desc
             θturning = acos(√up) * (1 + 1e-10)
+            pix = Krang.BasicPixel(met, α, β, θo)
 
-            τ = Krang.Gθ(met, α, β, θs, θo, isindir, 0)[1]
-            ts, testrs, testθs, ϕs, νr, νθ = Krang.emission_coordinates(met, α, β, θs, θo, isindir, 0)
-            testrs2, testθs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(met, α, β, θs, θo, isindir, 0)
-            ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.raytrace(met, α, β, θo, τ)
+            τ = Krang.Gθ(met, pix, θs, θo, isindir, 0)[1]
+            ts, testrs, testθs, ϕs, νr, νθ = Krang.emission_coordinates(met, pix, θs, θo, isindir, 0)
+            testrs2, testθs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(met, pix, θs, θo, isindir, 0)
+            ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.raytrace(met, pix, θo, τ)
 
-            testτ = Krang.Ir(met, isindir, testrs, ηtemp, λtemp)[1]
+            testτ = Krang.Ir(met, isindir, testrs, pix)[1]
             @testset "Consistency between raytracing methods" begin
                 @test testrs/testrs2 ≈ 1.0 atol = 1e-5
                 @test testθs/testθs2 ≈ 1.0 atol = 1e-5

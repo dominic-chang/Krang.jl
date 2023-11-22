@@ -21,6 +21,7 @@
             α = 10.0
             β = 10.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase1 = η(met, α, β, θo)
             λcase1 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase1, λcase1)
@@ -28,8 +29,8 @@
             @test sum(Krang._isreal2.(roots)) == 4
 
             rs = 1.1 * real(root)
-            τ1 = Ir(met, true, θo, rs, α, β)[1]
-            I0, I1, I2, Ip, Im = Krang.radial_integrals_case2(met, rs, real.(roots), τ1, true)
+            τ1 = Ir(met, true, rs, pix)[1]
+            I0, I1, I2, Ip, Im = Krang.radial_integrals_case2(met, rs, pix, τ1, true)
             @testset "I0/Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase1, λcase1, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -56,13 +57,14 @@
             α = 1.0
             β = 3.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase3 = η(met, α, β, θo)
             λcase3 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase3, λcase3)
             @test sum(Krang._isreal2.(roots)) == 2
             rs = 1.1horizon(met)
-            τ3 = Ir(met, true, θo, rs, α, β)[1]
-            I0, I1, I2, Ip, Im = Krang.radial_integrals_case3(met, rs, roots, τ3)
+            τ3 = Ir(met, true, rs, pix)[1]
+            I0, I1, I2, Ip, Im = Krang.radial_integrals_case3(met, rs, pix, τ3)
             @testset "I0/Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -87,13 +89,14 @@
             α = 0.1
             β = 0.1
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase4 = η(met, α, β, θo)
             λcase4 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase4, λcase4)
             @test sum(Krang._isreal2.(roots)) == 0
             rs = 1.1horizon(met)
-            τ4 = Ir(met, true, θo, rs, α, β)[1]
-            I0, I1, I2, Ip, Im = Krang.radial_integrals_case4(met, rs, roots, τ4)
+            τ4 = Ir(met, true, rs, pix)[1]
+            I0, I1, I2, Ip, Im = Krang.radial_integrals_case4(met, rs, pix, τ4)
             @testset "I0/Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase4, λcase4, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -122,6 +125,7 @@
             α = 10.0
             β = 10.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase1 = η(met, α, β, θo)
             λcase1 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase1, λcase1)
@@ -129,7 +133,7 @@
             @test sum(Krang._isreal2.(roots)) == 4
 
             rs = 1.1 * real(root)
-            τ1 = Ir(met, true, θo, rs, α, β)[1]
+            τ1 = Ir(met, true, rs, pix)[1]
             @testset "Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase1, λcase1, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -141,7 +145,7 @@
                 fϕ(r, p) = a * (2r - a * λcase1) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase1, λcase1, r)))
                 probϕ = IntegralProblem(fϕ, rs, Inf; nout=1)
                 solϕ = solve(probϕ, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                Iϕ = Krang.Iϕ_case2(met, real.(roots), real.(Krang._get_root_diffs(roots...)), rs, τ1, true, λcase1)
+                Iϕ = Krang.Iϕ(met, pix, rs, θo, τ1, true)
                 @test Iϕ / solϕ.u ≈ 1.0 atol = 1e-5
             end
 
@@ -151,7 +155,7 @@
 
                 probt = IntegralProblem(ft, rs, 1e6; nout=1)
                 solt = solve(probt, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                It = Krang.It_case2(met, real.(roots), real.(Krang._get_root_diffs(roots...)), rs, τ1, true, λcase1)
+                It = Krang.It(met, pix, rs, θo, τ1, true)
                 @test It / (solt.u + 1e6 + 2log(1e6)) ≈ 1.0 atol = 1e-3
             end
         end
@@ -160,12 +164,13 @@
             α = 1.0
             β = 3.0
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase3 = η(met, α, β, θo)
             λcase3 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase3, λcase3)
             @test sum(Krang._isreal2.(roots)) == 2
             rs = 1.1horizon(met)
-            τ3 = Ir(met, true, θo, rs, α, β)[1]
+            τ3 = Ir(met, true, rs, pix)[1]
             @testset "Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -176,7 +181,7 @@
                 fϕ(r, p) = a * (2r - a * λcase3) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase3, λcase3, r)))
                 probϕ = IntegralProblem(fϕ, rs, Inf; nout=1)
                 solϕ = solve(probϕ, HCubatureJL(); reltol=1e-8, abstol=1e-8)
-                Iϕ = Krang.Iϕ_case3(met, roots, Krang._get_root_diffs(roots...), rs, τ3, λcase3)
+                Iϕ = Krang.Iϕ(met, pix, rs, θo, τ3, true)
                 @test Iϕ / (solϕ.u) ≈ 1.0 atol = 1e-5
             end
             @testset "It" begin
@@ -184,7 +189,7 @@
                 ft(r, p) = -((r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λcase3)) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase3, λcase3, r))))
                 probt = IntegralProblem(ft, rs, 1e6; nout=1)
                 solt = solve(probt, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                It = Krang.It_case3(met, roots, Krang._get_root_diffs(roots...), rs, τ3, λcase3)
+                It = Krang.It(met, pix, rs, θo, τ3, true)
                 #@test It ≈ solt.u + 1e6 + 2log(1e6) atol = 1e-3
                 @test It / (solt.u + 1e6 + 2log(1e6)) ≈ 1.0 atol = 1e-3
 
@@ -194,12 +199,13 @@
             α = 0.05
             β = 0.1
             θo = π / 4
+            pix = Krang.BasicPixel(met, α, β, θo)
             ηcase4 = η(met, α, β, θo)
             λcase4 = λ(met, α, θo)
             roots = get_radial_roots(met, ηcase4, λcase4)
             @test sum(Krang._isreal2.(roots)) == 0
             rs = 1.1horizon(met)
-            τ4 = Ir(met, true, θo, rs, α, β)[1]
+            τ4 = Ir(met, true, rs, pix)[1]
             @testset "Ir" begin
                 f(r, p) = inv(√(r_potential(met, ηcase4, λcase4, r)))
                 prob = IntegralProblem(f, rs, Inf; nout=1)
@@ -210,7 +216,7 @@
                 fϕ(r, p) = a * (2r - a * λcase4) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase4, λcase4, r)))
                 probϕ = IntegralProblem(fϕ, rs, Inf; nout=1)
                 solϕ = solve(probϕ, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                Iϕ = Krang.Iϕ_case4(met, roots, Krang._get_root_diffs(roots...), rs, τ4, λcase4)
+                Iϕ = Krang.Iϕ(met, pix, rs, θo, τ4, true)
                 @test Iϕ / solϕ.u ≈ 1.0 atol = 2e-2
             end
             @testset "It" begin
@@ -218,7 +224,7 @@
                 ft(r, p) = -((r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λcase4)) * inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase4, λcase4, r))))
                 probt = IntegralProblem(ft, rs, 1e6; nout=1)
                 solt = solve(probt, HCubatureJL(); reltol=1e-10, abstol=1e-10)
-                It = Krang.It_case4(met, roots, Krang._get_root_diffs(roots...), rs, τ4, λcase4)
+                It = Krang.It(met, pix, rs, θo, τ4, true)
 
                 @test It / (solt.u + 1e6 + 2log(1e6)) ≈ 1.0 atol = 1e-2
             end
@@ -233,6 +239,7 @@
                 @testset "isindir: $isindir" for isindir in [true, false]
                     β = isindir ? 10.0 : -10.0
                     β *= sign(cos(θo))
+                    pix = Krang.BasicPixel(met, α, β, θo)
                     tempη = η(met, α, β, θo)
                     tempλ = λ(met, α, θo)
                     a2 = met.spin^2
@@ -266,10 +273,10 @@
                                     τ = abs(solθo.u + solθs.u)
                                 end
                             end
-                            tempGθ, _, _, _, _ = Krang.Gθ(met, α, β, θs, θo, isindir, 0)
+                            tempGθ, _, _, _, _ = Krang.Gθ(met, pix, θs, θo, isindir, 0)
 
                             @test tempGθ / τ ≈ 1.0 atol = 1e-3
-                            @test Krang.Gs(met, α, β, θo, τ) / ((θs > π / 2 ? -1 : 1) * (solθs.u)) ≈ 1.0 atol = 1e-3
+                            @test Krang.Gs(met, pix, θo, τ) / ((θs > π / 2 ? -1 : 1) * (solθs.u)) ≈ 1.0 atol = 1e-3
                         end
                     end
                     @testset "Gϕ" begin
@@ -296,7 +303,7 @@
                                     τ = abs(solθo.u + solθs.u)
                                 end
                             end
-                            tempGϕ, _, _, _ = Krang.Gϕ(met, α, β, θs, θo, isindir, 0)
+                            tempGϕ, _, _, _ = Krang.Gϕ(met, pix, θs, θo, isindir, 0)
 
                             @test tempGϕ / τ ≈ 1.0 atol = 1e-3
                         end
@@ -325,7 +332,7 @@
                                     τ = abs(solθo.u + solθs.u)
                                 end
                             end
-                            tempGt, tempGs, tempGo, _, _ = Krang.Gt(met, α, β, θs, θo, isindir, 0)
+                            tempGt, tempGs, tempGo, _, _ = Krang.Gt(met, pix, θs, θo, isindir, 0)
 
                             @test tempGt / τ ≈ 1.0 atol = 1e-3
                         end
