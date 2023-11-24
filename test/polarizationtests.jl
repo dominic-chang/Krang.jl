@@ -4,10 +4,10 @@
         α = 5.0
         β = 5.0
         θo = π/4
-        pix = Krang.BasicPixel(metric, α, β, θo)
+        pix = Krang.SlowLightPixel(metric, α, β, θo)
         λtemp = λ(metric, 5.0, π/4)
         ηtemp = η(metric, 5.0, 5.0, π/4)
-        emrs,_,_ = emission_radius(metric, pix, π/4, π/5, true, 0)
+        emrs,_,_ = emission_radius(pix, π/5, true, 0)
         p_d = p_bl_d(metric, emrs, π/4, ηtemp, λtemp, true, true)
         met_uu = metric_uu(metric, emrs, π/4)
 
@@ -50,10 +50,10 @@
             θo = 0.01/180*π
             α = 5.0
             β = 5.0
-            pix = Krang.BasicPixel(metric, α, β, θo)
+            pix = Krang.SlowLightPixel(metric, α, β, θo)
             λtemp = λ(metric, α, θo)
             ηtemp = η(metric, α, β, θo)
-            rs,_,_ = emission_radius(metric, pix, θs, θo, true, 0)
+            rs,_,_ = emission_radius(pix, θs, true, 0)
 
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,.0]

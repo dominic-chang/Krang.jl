@@ -7,6 +7,7 @@ version = "1.0.0-DEV"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 JacobiElliptic = "2a8b799e-c098-4961-872a-356c768d184c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 DocStringExtensions = "0.9"
