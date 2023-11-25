@@ -13,7 +13,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{Any, Bool, Bool, Int} where {T}
+function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{Any, Bool, Bool, Any} where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
@@ -53,7 +53,7 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
 
     rh = one(T) + √(one(T) - a^2)
 
-    numreals = sum(_isreal2.(roots(pix)))
+    numreals = sum(Int.(_isreal2.(roots(pix))))
 
     if numreals == 4 #case 1 & 2
         ans, νr = _rs_case1_and_2(pix, rh, τ)

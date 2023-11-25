@@ -1887,8 +1887,7 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
     x4_s = (rh + b1) / a2
     coef = 2 / (C + D)
-    Ir_s_coef = JacobiElliptic.F(atan(x4_s) + atan(go), k4)
-    Ir_s = coef*Ir_s_coef
+    Ir_s = coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
     τ > Ir_s && return T(NaN), true
     fo = I0_inf(pix)
@@ -1932,12 +1931,12 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 - `n` : nth image ordered by minotime
 """
 function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
     signβ = sign(β)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
 
     a = met.spin
     a2 = a^2
@@ -1988,7 +1987,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     end
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    minotime = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
+    minotime = (isindir ? (n + 1) * Ghat - signβ * Go - (-1)^νθ * Gs : n * Ghat - signβ * Go - (-1)^νθ * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
     return minotime, Gs, Go, Ghat, isvortical
 end
 

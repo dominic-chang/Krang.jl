@@ -28,8 +28,9 @@ struct SlowLightPixel{T} <: AbstractPixel
     "Angular t antiderivative"
     absGto_Gthat::NTuple{2,T}
     "Half orbit of angular t antiderivative"
-
     θo::T
+    η::T
+    λ::T
     function SlowLightPixel(met::Kerr{T}, α, β, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
@@ -50,7 +51,7 @@ struct SlowLightPixel{T} <: AbstractPixel
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ), 
             Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ), 
             Krang._absGto_Gthat(met, θo, tempη, tempλ),
-            θo
+            θo, tempη, tempλ
         )
     end
 end

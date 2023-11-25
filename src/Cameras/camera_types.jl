@@ -19,6 +19,8 @@ Abstract Pixel Type
 """
 abstract type AbstractPixel end
 
+function η(pix::AbstractPixel) return pix.η end
+function λ(pix::AbstractPixel) return pix.λ end
 function roots(pix::AbstractPixel) return pix.roots end
 function screen_coordinate(pix::AbstractPixel) return pix.screen_coordinate end
 function metric(pix::AbstractPixel) return pix.metric end

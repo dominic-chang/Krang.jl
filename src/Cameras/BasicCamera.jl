@@ -17,6 +17,8 @@ struct BasicPixel{T} <: AbstractPixel
     Ghat::T
     "Inclination"
     θo::T
+    η::T
+    λ::T
     function BasicPixel(met::Kerr{T}, α, β, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
@@ -31,7 +33,7 @@ struct BasicPixel{T} <: AbstractPixel
             roots,
             Krang.Ir_inf(met, roots), 
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ)..., 
-            θo
+            θo, tempη, tempλ
         )
     end
 end
