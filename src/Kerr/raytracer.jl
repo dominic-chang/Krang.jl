@@ -13,7 +13,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{Any, Bool, Bool} where {T}
+function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{Any, Bool, Bool, Int} where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
@@ -22,18 +22,18 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{An
     if cosθs > abs(cosθo)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-        ((abs(β) + eps(T)) < βbound) && return (T(NaN), true, true)
+        ((abs(β) + eps(T)) < βbound) && return (T(NaN), true, true, 0)
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
-    (isnan(τ) || isinf(τ)) && return (T(NaN), true, true)
+    (isnan(τ) || isinf(τ)) && return (T(NaN), true, true, 0)
 
     # is θ̇s increasing or decreasing?
     νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
     # is ṙs increasing or decreasing?
-    rs, νr, _ = emission_radius(pix, τ)
+    rs, νr, numreals = emission_radius(pix, τ)
 
-    return rs, νr, νθ
+    return rs, νr, νθ, numreals
 end
 
 """

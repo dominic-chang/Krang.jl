@@ -22,8 +22,8 @@ end
 Checks if a complex number is real to some tolerance
 """
 function _isreal2(num::Complex{T}) where T
-    ren, imn = reim(num)
-    return abs(imn / ren) < sqrt(eps(T))
+    ren2, imn2 = reim(num).^2
+    return imn2 / (imn2+ren2) < eps(T)
 end
 
 """
@@ -1848,6 +1848,8 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
     r1, r2, r21 = real.((r1, r2, r21))
 
+
+    fo = I0_inf(pix)
     A = √real(r32 * r42)
     B = √real(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
@@ -1855,9 +1857,8 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     x3_s = ((one(T) - temprat) / (one(T) + temprat))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > Ir_s && return T(NaN), true
+    τ > (fo - Ir_s) && return T(NaN), true
 
-    fo = I0_inf(pix)
     X3 = √(A * B) * real(fo - τ)
     if X3 < zero(T)
         return T(NaN), true
