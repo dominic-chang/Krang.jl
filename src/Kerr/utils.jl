@@ -22,7 +22,9 @@ end
 Checks if a complex number is real to some tolerance
 """
 function _isreal2(num::Complex{T}) where T
-    ren2, imn2 = reim(num).^2
+    ren, imn = reim(num)
+    ren2 = ren^2
+    imn2 = imn^2
     return imn2 / (imn2+ren2) < eps(T)
 end
 
@@ -1403,8 +1405,8 @@ function radial_inf_integrals_case4(metric::Kerr{T}, roots::NTuple{4}) where {T}
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
+    C = √abs(r31 * r42)
+    D = √abs(r32 * r41)
     a2 = abs(imag(r1))
     b1 = real(r4)
     k4 = 4 * C * D / (C + D)^2
@@ -1563,8 +1565,8 @@ function radial_w_I0_terms_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
+    C = √abs(r31 * r42)
+    D = √abs(r32 * r41)
     a2 = abs(imag(r1))
     b1 = real(r4)
     k4 = 4 * C * D / (C + D)^2
@@ -1819,7 +1821,7 @@ function radial_integrals(pix::AbstractPixel, rs, τ, νr)
     return τ, I1_o-I1_s, I2_o-I2_s, Ip_o-Ip_s, Im_o-Im_s
 end
 
-function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T) where {T}
+function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T}
     radial_roots = real.(roots(pix))
     _, _, r3, r4 = radial_roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1876,8 +1878,8 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     root_diffs = _get_root_diffs(radial_roots...)
     _, r31, r32, r41, r42, _ = root_diffs
 
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
+    C = √abs(r31 * r42)
+    D = √abs(r32 * r41)
     k4 = 4C * D / (C + D)^2
     a2 = abs(imag(r1))
     b1 = real(r4)
@@ -2175,7 +2177,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)))
-            return Go
+            return T(NaN), T(NaN)
         end
         tempfac = one(T) / √abs(um * a2)
         Go = tempfac * JacobiElliptic.F(asin(√argo), k)
@@ -2184,7 +2186,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = cosθo / √(up)
         k = m
         if !(-one(T) < argo < one(T))
-            return Go
+            return T(NaN), T(NaN)
         end
         tempfac = one(T) / √abs(um * a^2)
         Go = tempfac * JacobiElliptic.F(asin(argo), k)

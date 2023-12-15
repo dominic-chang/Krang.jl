@@ -31,7 +31,7 @@ struct SlowLightPixel{T} <: AbstractPixel
     θo::T
     η::T
     λ::T
-    function SlowLightPixel(met::Kerr{T}, α, β, θo) where {T}
+    function SlowLightPixel(met::Kerr{T}, α::T, β::T, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
@@ -75,7 +75,7 @@ struct SlowLightScreen{T} <: AbstractScreen
         αvals = range(αmin, αmax, length=res)
         βvals = range(βmin, βmax, length=res)
         
-        for (iα, α) in enumerate(αvals)
+        Threads.@threads for (iα, α) in collect(enumerate(αvals))
             for (iβ, β) in enumerate(βvals)
                 screen[iα, iβ] = SlowLightPixel(met, α, β, θo)
             end

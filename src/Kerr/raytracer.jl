@@ -13,7 +13,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{Any, Bool, Bool, Any} where {T}
+function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
@@ -237,7 +237,7 @@ function raytrace(pix::AbstractPixel, τ::T) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+            return T(NaN), T(NaN), T(NaN), T(NaN), true, true
         end
     end
 
