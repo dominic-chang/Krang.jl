@@ -12,9 +12,7 @@ struct BasicPixel{T} <: AbstractPixel
     "Radial antiderivative"
     I0_inf::T
     "Angular antiderivative"
-    absGθ::T
-    "Half orbit of angular antiderivative"
-    Ghat::T
+    absGθo_Gθhat::NTuple{2,T}
     "Inclination"
     θo::T
     η::T
@@ -32,7 +30,7 @@ struct BasicPixel{T} <: AbstractPixel
             (α, β), 
             roots,
             Krang.Ir_inf(met, roots), 
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ)..., 
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ), 
             θo, tempη, tempλ
         )
     end
@@ -83,37 +81,37 @@ struct BasicCamera{T} <: AbstractCamera
     end
 end
 
-function Iϕ_inf(pix::BasicPixel)
-    λtemp = λ(pix.metric, pix.screen_coordinate[1], pix.θo)
-    return Iϕ_inf(pix.metric, pix.roots, λtemp)
-end
-
-function It_inf(pix::BasicPixel)
-    λtemp = λ(pix.metric, pix.screen_coordinate[1], pix.θo)
-    return It_inf(pix.metric, pix.roots, λtemp)
-end
-
-function radial_inf_integrals_m_I0_terms(pix::BasicPixel)
-    return radial_inf_integrals(metric(pix),roots(pix))
-end
-function absGθo_Gθhat(pix::BasicPixel)
-    @unpack metric, screen_coordinate, θo =  pix
-    α, β = screen_coordinate
-    ηtemp = η(metric, α, β, θo)
-    λtemp = λ(metric, α, θo)
-    return _absGθo_Gθhat(metric, θo, ηtemp, λtemp)
-end
-function absGϕo_Gϕhat(pix::BasicPixel)
-    @unpack metric, screen_coordinate, θo =  pix
-    α, β = screen_coordinate
-    ηtemp = η(metric, α, β, θo)
-    λtemp = λ(metric, α, θo)
-    return _absGϕo_Gϕhat(metric, θo, ηtemp, λtemp)
-end
-function absGto_Gthat(pix::BasicPixel)
-    @unpack metric, screen_coordinate, θo =  pix
-    α, β = screen_coordinate
-    ηtemp = η(metric, α, β, θo)
-    λtemp = λ(metric, α, θo)
-    return _absGto_Gthat(metric, θo, ηtemp, λtemp)
-end
+#function Iϕ_inf(pix::BasicPixel)
+#    λtemp = λ(pix.metric, pix.screen_coordinate[1], pix.θo)
+#    return Iϕ_inf(pix.metric, pix.roots, λtemp)
+#end
+#
+#function It_inf(pix::BasicPixel)
+#    λtemp = λ(pix.metric, pix.screen_coordinate[1], pix.θo)
+#    return It_inf(pix.metric, pix.roots, λtemp)
+#end
+#
+#function radial_inf_integrals_m_I0_terms(pix::BasicPixel)
+#    return radial_inf_integrals(metric(pix),roots(pix))
+#end
+#function absGθo_Gθhat(pix::BasicPixel)
+#    @unpack metric, screen_coordinate, θo =  pix
+#    α, β = screen_coordinate
+#    ηtemp = η(metric, α, β, θo)
+#    λtemp = λ(metric, α, θo)
+#    return _absGθo_Gθhat(metric, θo, ηtemp, λtemp)
+#end
+#function absGϕo_Gϕhat(pix::BasicPixel)
+#    @unpack metric, screen_coordinate, θo =  pix
+#    α, β = screen_coordinate
+#    ηtemp = η(metric, α, β, θo)
+#    λtemp = λ(metric, α, θo)
+#    return _absGϕo_Gϕhat(metric, θo, ηtemp, λtemp)
+#end
+#function absGto_Gthat(pix::BasicPixel)
+#    @unpack metric, screen_coordinate, θo =  pix
+#    α, β = screen_coordinate
+#    ηtemp = η(metric, α, β, θo)
+#    λtemp = λ(metric, α, θo)
+#    return _absGto_Gthat(metric, θo, ηtemp, λtemp)
+#end

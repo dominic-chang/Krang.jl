@@ -11,11 +11,11 @@ using Krang
 # We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
-metric = Krang.Kerr(0.99);
+metric = Krang.Kerr(1.0);
 sze = 500;
 rmin = Krang.horizon(metric)
-rmax = 20;
-ρmax = 20;
+rmax = 10;
+ρmax = 10;
 #observer = Krang.BasicCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
 # Let us now create a figure to plot the emission coordinates on,
@@ -27,9 +27,9 @@ fig = Figure(resolution=(600, 600), fontfamily="Computer Modern", fontface="bold
 #βvals = range(-ρmax, ρmax, length=sze);
 
 θs = π/2
-θo = 65π/180
+θo = 85π/180
 n = 0
-camera = Krang.SlowLightCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.BasicCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 CairoMakie.heatmap(
     [isnan(x[1]) || x[1] >10.0 ? 0.0 : x[1] for x in Krang.emission_radius.(camera.screen.pixels, θs, true, n)] .+ 
     [isnan(x[1]) || x[1] > 10.0 ? 0.0 : x[1] for x in Krang.emission_radius.(camera.screen.pixels, θs, false, n)]

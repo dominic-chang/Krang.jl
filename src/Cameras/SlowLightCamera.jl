@@ -100,3 +100,23 @@ struct SlowLightCamera{T} <: AbstractCamera
         new{T}(met, SlowLightScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
+
+
+
+function η(pix::SlowLightPixel) return pix.η end
+function λ(pix::SlowLightPixel) return pix.λ end
+function roots(pix::SlowLightPixel) return pix.roots end
+function screen_coordinate(pix::SlowLightPixel) return pix.screen_coordinate end
+function inclination(pix::SlowLightPixel) return pix.θo end
+function I0_inf(pix::SlowLightPixel) return pix.I0_inf end
+function Ir_inf(pix::SlowLightPixel) return pix.I0_inf end
+function I1_inf_m_I0_terms(pix::SlowLightPixel) return pix.I1_inf_m_I0_terms end
+function I2_inf_m_I0_terms(pix::SlowLightPixel) return pix.I2_inf_m_I0_terms end
+function Ip_inf_m_I0_terms(pix::SlowLightPixel) return pix.Ip_inf_m_I0_terms end
+function Im_inf_m_I0_terms(pix::SlowLightPixel) return pix.Im_inf_m_I0_terms end
+function radial_inf_integrals_m_I0_terms(pix::SlowLightPixel) return I1_inf_m_I0_terms(pix), I2_inf_m_I0_terms(pix), Ip_inf_m_I0_terms(pix), Im_inf_m_I0_terms(pix) end
+function Iϕ_inf(pix::SlowLightPixel) return pix.Iϕ_inf end
+function It_inf(pix::SlowLightPixel) return pix.It_inf end
+function absGθo_Gθhat(pix::SlowLightPixel) return pix.absGθo_Gθhat end
+function absGϕo_Gϕhat(pix::SlowLightPixel) return pix.absGϕo_Gϕhat end
+function absGto_Gthat(pix::SlowLightPixel) return pix.absGto_Gthat end

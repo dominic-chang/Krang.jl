@@ -19,24 +19,48 @@ Abstract Pixel Type
 """
 abstract type AbstractPixel end
 
-function η(pix::AbstractPixel) return pix.η end
-function λ(pix::AbstractPixel) return pix.λ end
-function roots(pix::AbstractPixel) return pix.roots end
 function screen_coordinate(pix::AbstractPixel) return pix.screen_coordinate end
 function metric(pix::AbstractPixel) return pix.metric end
 function inclination(pix::AbstractPixel) return pix.θo end
-function I0_inf(pix::AbstractPixel) return pix.I0_inf end
-function Ir_inf(pix::AbstractPixel) return pix.I0_inf end
-function I1_inf_m_I0_terms(pix::AbstractPixel) return pix.I1_inf_m_I0_terms end
-function I2_inf_m_I0_terms(pix::AbstractPixel) return pix.I2_inf_m_I0_terms end
-function Ip_inf_m_I0_terms(pix::AbstractPixel) return pix.Ip_inf_m_I0_terms end
-function Im_inf_m_I0_terms(pix::AbstractPixel) return pix.Im_inf_m_I0_terms end
-function radial_inf_integrals_m_I0_terms(pix::AbstractPixel) return I1_inf_m_I0_terms(pix), I2_inf_m_I0_terms(pix), Ip_inf_m_I0_terms(pix), Im_inf_m_I0_terms(pix) end
-function Iϕ_inf(pix::AbstractPixel) return pix.Iϕ_inf end
-function It_inf(pix::AbstractPixel) return pix.It_inf end
-function absGθo_Gθhat(pix::AbstractPixel) return pix.absGθo_Gθhat end
-function absGϕo_Gϕhat(pix::AbstractPixel) return pix.absGϕo_Gϕhat end
-function absGto_Gthat(pix::AbstractPixel) return pix.absGto_Gthat end
+
+function η(pix::AbstractPixel) 
+    met = metric(pix)
+    α, β = screen_coordinate(pix)
+    θo = inclination(pix)
+    return Krang.η(met, α, β, θo)
+end
+
+function λ(pix::AbstractPixel)
+    met = metric(pix)
+    α, _ = screen_coordinate(pix)
+    θo = inclination(pix)
+    return λ(met, α, θo)
+end
+function roots(pix::AbstractPixel) return get_radial_roots(metric(pix), η(pix), λ(pix)) end
+
+function I0_inf(pix::AbstractPixel) return Ir_inf(metric(pix), roots(pix)) end
+
+function Ir_inf(pix::AbstractPixel) return I0_inf(pix) end
+
+function I1_inf_m_I0_terms(pix::AbstractPixel) return radial_inf_integrals(metric(pix), roots(pix))[1] end
+
+function I2_inf_m_I0_terms(pix::AbstractPixel) return radial_inf_integrals(metric(pix), roots(pix))[2] end
+
+function Ip_inf_m_I0_terms(pix::AbstractPixel) return radial_inf_integrals(metric(pix), roots(pix))[3] end
+
+function Im_inf_m_I0_terms(pix::AbstractPixel) return radial_inf_integrals(metric(pix), roots(pix))[4] end
+
+function radial_inf_integrals_m_I0_terms(pix::AbstractPixel) return radial_inf_integrals(metric(pix), roots(pix)) end
+
+function Iϕ_inf(pix::AbstractPixel) return Iϕ_inf(metric(pix), roots(pix), λ(pix)) end
+
+function It_inf(pix::AbstractPixel) return It_inf(metric(pix), roots(pix), λ(pix)) end
+
+function absGθo_Gθhat(pix::AbstractPixel) return _absGθo_Gθhat(metric(pix), inclination(pix), η(pix), λ(pix)) end
+
+function absGϕo_Gϕhat(pix::AbstractPixel) return _absGϕo_Gϕhat(metric(pix), inclination(pix), η(pix), λ(pix)) end
+
+function absGto_Gthat(pix::AbstractPixel) return _absGto_Gthat(metric(pix), inclination(pix), η(pix), λ(pix)) end
 
 
 
