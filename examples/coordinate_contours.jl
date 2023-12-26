@@ -5,7 +5,7 @@
 # source, at a fixed inclination angle from the blackhole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
-using CairoMakie
+import CairoMakie as CMk
 using Krang
 #
 # We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
@@ -20,7 +20,7 @@ rmax = 10;
 
 camera = Krang.SlowLightCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
-curr_theme = Theme(
+curr_theme = CMk.Theme(
     fontsize=20,
     Axis=(
         xticksvisible=false,
@@ -35,14 +35,14 @@ curr_theme = Theme(
     ),
 )
 
-set_theme!(curr_theme)
+CMk.set_theme!(merge(curr_theme, CMk.theme_latexfonts()))
 
 # Let us now create a figure to plot the emission coordinates on,
-fig = Figure(resolution=(800, 300));
+fig = CMk.Figure(resolution=(800, 300));
 # and use this figure make an animation by looping over the inclination angle θs.
 # This loop will plot the emission coordinates for each θs.
-recording = record(fig, "emission_coordinates.gif", range(0, π, length=180), framerate=15) do θs
-    empty!(fig)
+recording = CMk.record(fig, "emission_coordinates.gif", range(0, π, length=180), framerate=15) do θs
+    CMk.empty!(fig)
 
     time, radius, inclination, azimuth = [size(camera.screen.pixels) |> zeros for i in 1:4]
 
@@ -73,23 +73,23 @@ recording = record(fig, "emission_coordinates.gif", range(0, π, length=180), fr
     end
 
     data = (time, radius, azimuth)
-    titles = (L"\text{Regularized Time }(t_s)", L"\text{Radius }(r_s)", L"\text{Azimuth } (\phi_s)")
+    titles = (CMk.L"\text{Regularized Time }(t_s)", CMk.L"\text{Radius }(r_s)", CMk.L"\text{Azimuth } (\phi_s)")
     colormaps = (:afmhot, :afmhot, :hsv)
     colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
     for i in 1:3
-        hm = heatmap!(
-            Axis(getindex(fig, 1, (2i)-1); aspect=1, title=titles[i]),
+        hm = CMk.heatmap!(
+            CMk.Axis(getindex(fig, 1, (2i)-1); aspect=1, title=titles[i]),
             data[i],
             colormap=colormaps[i],
             colorrange=colorrange[i]
         )
-        cb = Colorbar(fig[1, 2i], hm; ticklabelfont="Computer Modern", labelsize=30, ticklabelsize=20)
+        cb = CMk.Colorbar(fig[1, 2i], hm; labelsize=30, ticklabelsize=20)
     end
 
-    ax = Axis(fig[2, 3], height=60)
-    hidedecorations!(ax)
-    CairoMakie.text!(ax,0,100; text=L"θ_s=%$(Int(floor(θs*180/π)))^\circ")
+    ax = CMk.Axis(fig[2, 3], height=60)
+    CMk.hidedecorations!(ax)
+    CMk.text!(ax,0,100; text=CMk.L"θ_s=%$(Int(floor(θs*180/π)))^\circ")
 
     display(fig)
 end

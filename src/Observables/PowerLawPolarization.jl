@@ -139,7 +139,7 @@ evpa(fα, fβ) = atan(-fα, fβ)
 """
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function calcPol(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
+function polarizationPowerLaw(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
     ri <= horizon(metric) && return zero(T), zero(T), zero(T), zero(T)
 
     a = metric.spin
@@ -184,3 +184,48 @@ function calcPol(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, 
 
     return eα, eβ, inv(p_fluid_u[1]), abs(p_fluid_u[1] / p_fluid_u[4])
 end
+
+"""
+    $TYPEDEF
+  
+   Linear polarization observable from https://doi.org/10.3847/1538-4357/abf117
+"""
+struct PowerLawPolarization{T} <: AbstractObservable
+    magfield::SVector{3,T}
+    fluid_velocity::SVector{3,T}
+end
+
+"""
+    Functor for the NarayanPolarization observable
+"""
+function (linpol::PowerLawPolarization{T})(pix::AbstractPixel, rs, θs, νr, νθ) where {T}
+    return polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
+end
+
+struct Palumbo2022Polarization{T} <: AbstractObservable
+    polarization::PowerLawPolarization{T}
+    profile::Function
+
+    Palumbo2022Polarization(
+        magfield::SVector{3,T}, 
+        fluid_velocity::SVector{3,T},
+        profile::Function
+    ) where {T} = new{T}(PowerLawPolarization(magfield, fluid_velocity), profile)
+end
+
+function (linpol::Palumbo2022Polarization{T})(pix::AbstractPixel, rs, θs, νr, νθ; kwargs) where {T}
+    return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
+end
+
+struct IntensityProfile <: AbstractObservable
+    profile::Function
+
+    function IntensityProfile(profile)
+        return new(profile)
+    end
+end
+
+function (prof::IntensityProfile)(pix::AbstractPixel, rs, θs, νr, νθ; kwargs)
+    return prof.profile(rs; kwargs...)
+end
+

@@ -18,5 +18,9 @@ include("Cameras/BasicCamera.jl")
 include("Cameras/BasicGPUCamera.jl")
 include("Kerr/raytracer.jl")
 include("Kerr/api.jl")
-include("Kerr/polarization.jl")
+include("Observables/observable_types.jl")
+include("Observables/PowerLawPolarization.jl")
+#include("Observables/LensingBand.jl")
+include("Observables/observations.jl")
+
 end
