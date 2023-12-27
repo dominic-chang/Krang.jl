@@ -1,4 +1,4 @@
-# # Raytracing with inclination
+# # Rays parameterized with Mino time
 
 # In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
@@ -13,7 +13,7 @@ using Krang
 # screen of the observer.
 metric = Krang.Kerr(0.99);
 θo = 85 * π / 180;
-sze = 500;
+sze = 50;
 rmin = Krang.horizon(metric)
 rmax = 10;
 ρmax = 10;
@@ -79,7 +79,7 @@ recording = record(fig, "raytrace.gif", range(0.1, 3, length=290), framerate=15)
     rowgap!(fig.layout, 1, Fixed(0))
     #rowsize!(fig.layout, 1, Auto(0))
 
-    display(fig)
+    #display(fig);
 end
 
 # ![image](emission_coordinates.gif)

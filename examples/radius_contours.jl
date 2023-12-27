@@ -1,4 +1,4 @@
-# # Raytracing with inclination
+# # Raytracing a Cone
 
 # In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
@@ -12,7 +12,7 @@ using Krang
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 metric = Krang.Kerr(1.0);
-sze = 500;
+sze = 50;
 rmin = Krang.horizon(metric)
 rmax = 10;
 ρmax = 10;
