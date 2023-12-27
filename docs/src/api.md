@@ -66,14 +66,12 @@ Krang.polarizationPowerLaw
 ```@docs
 Krang._isreal2
 Krang.regularized_Pi
-Krang.EmptyGeometry
 Krang.radial_m_I0_terms_integrals_case3 
 Krang.radial_inf_integrals_case4 
 Krang.It_m_I0_terms 
 Krang.It_w_I0_terms 
 Krang.Ir_inf 
 Krang.emission_azimuth 
-Krang.AbstractCompositeGeometry
 Krang.ConeGeometry
 Krang.Iϕ 
 Krang.SlowLightIntensityIntensityCamera
@@ -87,7 +85,6 @@ Krang.AbstractPixel
 Krang.radial_w_I0_terms_integrals_case2 
 Krang.SlowLightIntensityIntensityScreen
 Krang.radial_w_I0_terms_integrals_case4 
-Krang.AddGeometry
 Krang.radial_integrals 
 Krang.AbstractCamera
 Krang.IntensityScreen
@@ -96,7 +93,6 @@ Krang.IntensityPixel
 Krang.Iϕ_m_I0_terms 
 Krang.PowerLawPolarization
 Krang.AbstractMaterial
-Krang.SphereGeometry
 Krang.AbstractScreen
 Krang.radial_w_I0_terms_integrals_case3 
 Krang.IntensityCamera

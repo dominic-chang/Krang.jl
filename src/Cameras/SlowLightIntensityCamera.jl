@@ -101,8 +101,6 @@ struct SlowLightIntensityIntensityCamera{T} <: AbstractCamera
     end
 end
 
-
-
 function η(pix::SlowLightIntensityIntensityPixel) return pix.η end
 function λ(pix::SlowLightIntensityIntensityPixel) return pix.λ end
 function roots(pix::SlowLightIntensityIntensityPixel) return pix.roots end

@@ -12,7 +12,6 @@ using JacobiElliptic
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr.jl")
 include("Geometries/geometry_types.jl")
-include("Geometries/misc.jl")
 include("Cameras/camera_types.jl")
 include("Cameras/SlowLightIntensityCamera.jl")
 include("Cameras/IntensityCamera.jl")
