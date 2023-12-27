@@ -5,6 +5,6 @@ using LinearAlgebra
 using Integrals
 using StaticArrays
 
-include("utiltests.jl")
-include("polarizationtests.jl")
-include("raytracertests.jl")
+include("kerr_misc_tests.jl")
+include("polarization_tests.jl")
+include("raytracer_tests.jl")

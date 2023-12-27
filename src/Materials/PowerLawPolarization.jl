@@ -1,4 +1,4 @@
-export p_bl_d, penrose_walker, screen_polarisation, calcPol, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
+export p_bl_d, penrose_walker, screen_polarisation, polarizationPowerLaw, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
 ##----------------------------------------------------------------------------------------------------------------------
 #Polarization stuff
 ##----------------------------------------------------------------------------------------------------------------------
@@ -188,21 +188,21 @@ end
 """
     $TYPEDEF
   
-   Linear polarization observable from https://doi.org/10.3847/1538-4357/abf117
+   Linear polarization material from https://doi.org/10.3847/1538-4357/abf117
 """
-struct PowerLawPolarization{T} <: AbstractObservable
+struct PowerLawPolarization{T} <: AbstractMaterial
     magfield::SVector{3,T}
     fluid_velocity::SVector{3,T}
 end
 
 """
-    Functor for the NarayanPolarization observable
+    Functor for the NarayanPolarization material
 """
 function (linpol::PowerLawPolarization{T})(pix::AbstractPixel, rs, θs, νr, νθ) where {T}
     return polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
 end
 
-struct Palumbo2022Polarization{T} <: AbstractObservable
+struct Palumbo2022Polarization{T} <: AbstractMaterial
     polarization::PowerLawPolarization{T}
     profile::Function
 
@@ -217,7 +217,7 @@ function (linpol::Palumbo2022Polarization{T})(pix::AbstractPixel, rs, θs, νr, 
     return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
 end
 
-struct IntensityProfile <: AbstractObservable
+struct IntensityProfile <: AbstractMaterial
     profile::Function
 
     function IntensityProfile(profile)

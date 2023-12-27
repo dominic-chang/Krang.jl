@@ -2,7 +2,6 @@ module Krang
 using DocStringExtensions
 using StaticArrays
 using JacobiElliptic
-using UnPack
 @template (FUNCTIONS, METHODS, MACROS) =
     """
     $(TYPEDSIGNATURES)
@@ -12,15 +11,15 @@ using UnPack
 # Write your package code here.
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr.jl")
+include("Geometries/geometry_types.jl")
+include("Geometries/misc.jl")
 include("Cameras/camera_types.jl")
-include("Cameras/SlowLightCamera.jl")
-include("Cameras/BasicCamera.jl")
-include("Cameras/BasicGPUCamera.jl")
+include("Cameras/SlowLightIntensityCamera.jl")
+include("Cameras/IntensityCamera.jl")
 include("Kerr/raytracer.jl")
 include("Kerr/api.jl")
-include("Observables/observable_types.jl")
-include("Observables/PowerLawPolarization.jl")
-#include("Observables/LensingBand.jl")
-include("Observables/observations.jl")
+include("Materials/material_types.jl")
+include("Materials/PowerLawPolarization.jl")
+include("Materials/observations.jl")
 
 end

@@ -4,7 +4,7 @@
         α = 5.0
         β = 5.0
         θo = π/4
-        pix = Krang.SlowLightPixel(metric, α, β, θo)
+        pix = Krang.SlowLightIntensityIntensityPixel(metric, α, β, θo)
         λtemp = λ(metric, 5.0, π/4)
         ηtemp = η(metric, 5.0, 5.0, π/4)
         emrs,_,_ = emission_radius(pix, π/5, true, 0)
@@ -50,14 +50,14 @@
             θo = 0.01/180*π
             α = 5.0
             β = 5.0
-            pix = Krang.SlowLightPixel(metric, α, β, θo)
+            pix = Krang.SlowLightIntensityIntensityPixel(metric, α, β, θo)
             λtemp = λ(metric, α, θo)
             ηtemp = η(metric, α, β, θo)
             rs,_,_ = emission_radius(pix, θs, true, 0)
 
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,.0]
-            eα, eβ, redshift, lp = calcPol(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
+            eα, eβ, redshift, lp = polarizationPowerLaw(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
             @test evpa(eα, eβ) ≈ -3π/4 atol = 1e-3
         end
     end

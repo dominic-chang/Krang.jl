@@ -1,5 +1,6 @@
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DisplayAs = "0b91fe84-8a4c-11e9-3e1d-67c38462b6d6"
+ImageFiltering = "6a3955dd-da59-5b1f-98d4-e7296123deb5"
 Krang = "54806c32-d51a-438d-8447-e0041be2fbfb"
 Metal = "dde4c033-4e86-420c-a63e-0dd931031962"

@@ -33,10 +33,10 @@ rmin = Krang.horizon(metric)
 rmax = 10;
 ρmax = 10;
 
-camera = Krang.SlowLightCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.SlowLightIntensityIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 magfield = Krang.SVector(0.0, 0.0, 1.0);
 vel = Krang.SVector(0.0, 0.1, 0.0);
-observable = Krang.PowerLawPolarization(magfield, vel);
+material = Krang.PowerLawPolarization(magfield, vel);
 
 θs = 45 * π / 180
 geometry1 = Krang.ConeGeometry(θs)
@@ -47,15 +47,15 @@ p2 = 3
 
 profile(r) = (r/R)^p1/(1+(r/R)^(p1+p2))
 
-iquv = Krang.observe(geometry1, observable, camera; subimgs=[0], profile = profile)
+iquv = Krang.observe(geometry1, material, camera; subimgs=[0], profile = profile)
 i_vals = [i[1] for i in iquv]
-iquv = Krang.observe(geometry2, observable, camera; subimgs=[0], profile = profile)
+iquv = Krang.observe(geometry2, material, camera; subimgs=[0], profile = profile)
 i_vals += [i[1] for i in iquv]
 
 hm = heatmap!(ax,i_vals, colormap=:afmhot)
 
-iquv1 = Krang.observe(geometry1, observable, camera; subimgs=[1,], profile = profile)
-iquv2 = Krang.observe(geometry1, observable, camera; subimgs=[1,], profile = profile)
+iquv1 = Krang.observe(geometry1, material, camera; subimgs=[1,], profile = profile)
+iquv2 = Krang.observe(geometry1, material, camera; subimgs=[1,], profile = profile)
 i1_vals = Vector{Float64}()
 for (i,j,k) in zip(iquv1, iquv2, i_vals)
     if i[1] + j[1] > k

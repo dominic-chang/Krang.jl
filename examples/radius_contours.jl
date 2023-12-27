@@ -16,7 +16,7 @@ sze = 500;
 rmin = Krang.horizon(metric)
 rmax = 10;
 ρmax = 10;
-#observer = Krang.BasicCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+#observer = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
 # Let us now create a figure to plot the emission coordinates on,
 
@@ -29,7 +29,7 @@ fig = Figure(resolution=(600, 600), fontfamily="Computer Modern", fontface="bold
 θs = π/2
 θo = 85π/180
 n = 0
-camera = Krang.BasicCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 CairoMakie.heatmap(
     [isnan(x[1]) || x[1] >10.0 ? 0.0 : x[1] for x in Krang.emission_radius.(camera.screen.pixels, θs, true, n)] .+ 
     [isnan(x[1]) || x[1] > 10.0 ? 0.0 : x[1] for x in Krang.emission_radius.(camera.screen.pixels, θs, false, n)]

@@ -1,20 +1,23 @@
-using Metal
-
-export BasicCamera
+export IntensityCamera
 """
     $TYPEDEF
 
-Basic Pixel Type.
+Intensity Pixel Type.
 """
-struct BasicGPUPixel{T} <: AbstractPixel
+struct IntensityPixel{T} <: AbstractPixel
     metric::Kerr{T}
     screen_coordinate::NTuple{2, T}
     "Radial roots"
     roots::NTuple{4,Complex{T}}
+    "Radial antiderivative"
+    I0_inf::T
+    "Angular antiderivative"
+    absGθo_Gθhat::NTuple{2,T}
+    "Inclination"
     θo::T
     η::T
     λ::T
-    function BasicGPUPixel(met::Kerr{T}, α, β, θo) where {T}
+    function IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
@@ -26,6 +29,8 @@ struct BasicGPUPixel{T} <: AbstractPixel
             met,
             (α, β), 
             roots,
+            Krang.Ir_inf(met, roots), 
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ), 
             θo, tempη, tempλ
         )
     end
@@ -34,9 +39,9 @@ end
 """
     $TYPEDEF
 
-Screen made of Basic Pixels.
+Screen made of Intensity Pixels.
 """
-struct BasicGPUScreen{T} <: AbstractScreen
+struct IntensityScreen{T} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
     αrange::NTuple{2, T}
 
@@ -44,18 +49,18 @@ struct BasicGPUScreen{T} <: AbstractScreen
     βrange::NTuple{2, T}
 
     "Data type that stores screen pixel information"
-    pixels::MtlMatrix{BasicGPUPixel{T}}
-    function BasicGPUScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
-        screen = Matrix{BasicGPUPixel}(undef, res, res)
+    pixels::Matrix{IntensityPixel{T}}
+    function IntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+        screen = Matrix{IntensityPixel}(undef, res, res)
         αvals = range(αmin, αmax, length=res)
         βvals = range(βmin, βmax, length=res)
         
         for (iα, α) in enumerate(αvals)
             for (iβ, β) in enumerate(βvals)
-                screen[iα, iβ] = BasicGPUPixel(met, α, β, θo)
+                screen[iα, iβ] = IntensityPixel(met, α, β, θo)
             end
         end
-        new{T}((αmin, αmax), (βmin, βmax), MtlArray([i for i in screen]))
+        new{T}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -65,13 +70,13 @@ end
 Observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct BasicGPUCamera{T} <: AbstractCamera
+struct IntensityCamera{T} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
-    screen::BasicGPUScreen{T}
+    screen::IntensityScreen{T}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function BasicGPUCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
-        new{T}(met, BasicGPUScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+    function IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
+        new{T}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
