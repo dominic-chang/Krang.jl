@@ -1891,8 +1891,8 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     coef = 2 / (C + D)
     Ir_s = coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
-    τ > Ir_s && return T(NaN), true
     fo = I0_inf(pix)
+    τ > (fo-Ir_s) && return T(NaN), true
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
