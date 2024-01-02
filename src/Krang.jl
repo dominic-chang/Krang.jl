@@ -20,5 +20,5 @@ include("metrics/Kerr/api.jl")
 include("materials/material_types.jl")
 include("materials/PowerLawPolarization.jl")
 include("materials/observations.jl")
-
+include("raytracer_api.jl")
 end

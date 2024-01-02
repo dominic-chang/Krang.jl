@@ -12,11 +12,11 @@ using Krang
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 metric = Krang.Kerr(0.99);
-θo = 85 * π / 180;
-sze = 50;
+θo = 45 * π / 180;
+sze = 100;
 rmin = Krang.horizon(metric)
 rmax = 10;
-ρmax = 10;
+ρmax = 15;
 
 camera = Krang.SlowLightIntensityIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
