@@ -13,14 +13,14 @@ using Krang
 # screen of the observer.
 metric = Krang.Kerr(0.99);
 θo = 85 * π / 180;
-sze = 50;
+sze = 200;
 rmin = Krang.horizon(metric)
 rmax = 10;
-ρmax = 10;
+ρmax = 5;
 
 n = 0
 
-camera = Krang.SlowLightIntensityIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
 curr_theme = Theme(
     fontsize=20,

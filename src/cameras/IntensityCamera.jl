@@ -80,3 +80,12 @@ struct IntensityCamera{T} <: AbstractCamera
         new{T}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
+
+function η(pix::IntensityPixel) return pix.η end
+function λ(pix::IntensityPixel) return pix.λ end
+function roots(pix::IntensityPixel) return pix.roots end
+function screen_coordinate(pix::IntensityPixel) return pix.screen_coordinate end
+function inclination(pix::IntensityPixel) return pix.θo end
+function I0_inf(pix::IntensityPixel) return pix.I0_inf end
+function Ir_inf(pix::IntensityPixel) return pix.I0_inf end
+function absGθo_Gθhat(pix::IntensityPixel) return pix.absGθo_Gθhat end

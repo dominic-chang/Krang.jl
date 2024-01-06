@@ -4,7 +4,7 @@
         α = 5.0
         β = 5.0
         θo = π/4
-        pix = Krang.SlowLightIntensityIntensityPixel(metric, α, β, θo)
+        pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
         λtemp = λ(metric, 5.0, π/4)
         ηtemp = η(metric, 5.0, 5.0, π/4)
         emrs,_,_ = emission_radius(pix, π/5, true, 0)
@@ -50,7 +50,7 @@
             θo = 0.01/180*π
             α = 5.0
             β = 5.0
-            pix = Krang.SlowLightIntensityIntensityPixel(metric, α, β, θo)
+            pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
             λtemp = λ(metric, α, θo)
             ηtemp = η(metric, α, β, θo)
             rs,_,_ = emission_radius(pix, θs, true, 0)

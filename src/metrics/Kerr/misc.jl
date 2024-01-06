@@ -1772,7 +1772,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
 
-- `pix`: SlowLightIntensityIntensityPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -1792,7 +1792,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
 
-- `pix`: SlowLightIntensityIntensityPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -1809,7 +1809,7 @@ end
 """
 Return the radial integrals
 
-- `pix`: SlowLightIntensityIntensityPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -2153,7 +2153,7 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
-# SlowLightIntensityIntensityCachedPixel utility functions
+# SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
 function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
