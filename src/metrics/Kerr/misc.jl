@@ -271,7 +271,7 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     r4 = (sqrtξ02 + det2) / 2
 
     roots = (r1, r2, r3, r4)
-    if (sum(_isreal2.(roots)) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
+    if (sum(_isreal2.(roots)) == 2) && (abs(imag(roots[4])) < sqrt(eps(T))*10)
         roots = (roots[1], roots[4], roots[2], roots[3])
     end
     return roots 
@@ -733,7 +733,7 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     rm4 = rm - r4
 
     k = r32 * r41 / (r31 * r42)
-    x2_s = √((rs - r4) / (rs - r3) * r31 / r41)
+    x2_s = √(eps(T)+(rs - r4) / (rs - r3) * r31 / r41)
     !(-1 < x2_s < 1) && return T(NaN)
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
@@ -1834,7 +1834,10 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T
     fo = I0_inf(pix)
     horizonτ = fo - Ir_s 
 
-    r4 < rh && τ > horizonτ && return T(NaN), true# invalid case2
+    a = metric(pix).spin
+    if a ≤ one(T)
+        r4 < rh && τ > horizonτ && return T(NaN), true# invalid case2
+    end
 
     X2 = √(r31 * r42) * (fo - τ) / 2
     if τ > 2fo
@@ -1850,21 +1853,29 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
     r1, r2, r21 = real.((r1, r2, r21))
 
+    a = metric(pix).spin
 
     fo = I0_inf(pix)
     A = √real(r32 * r42)
     B = √real(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
-    temprat = B * (rh - r2) / (A * (rh - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
     coef = one(T) * √inv(A * B)
-    Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > (fo - Ir_s) && return T(NaN), true
 
-    X3 = √(A * B) * real(fo - τ)
-    if X3 < zero(T)
-        return T(NaN), true
+    if a ≤ one(T)
+        temprat = B * (rh - r2) / (A * (rh - r1))
+        x3_s = ((one(T) - temprat) / (one(T) + temprat))
+        Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
+        τ > (fo - Ir_s) && return T(NaN), true
+    else
+        if τ > 2fo
+            return T(NaN), true
+        end
+
     end
+    X3 = √(A * B) * real(fo - τ)
+    #if X3 < zero(T)
+    #    return T(NaN), true
+    #end
     cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
     den = -A + B + (A + B) * cn

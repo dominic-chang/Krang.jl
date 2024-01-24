@@ -17,9 +17,10 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    cosθs = cos(θs)
-    cosθo = cos(θo)
-    if cosθs > abs(cosθo)
+    #cosθs = cos(θs)
+    #cosθo = cos(θo)
+    isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
+    if !isincone#cosθs > abs(cosθo)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
         ((abs(β) + eps(T)) < βbound) && return (T(NaN), true, true, 0)
@@ -29,11 +30,12 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     (isnan(τ) || isinf(τ)) && return (T(NaN), true, true, 0)
 
     # is θ̇s increasing or decreasing?
-    νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    #νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
     # is ṙs increasing or decreasing?
     rs, νr, numreals = emission_radius(pix, τ)
 
-    return rs, νr, νθ, numreals
+    return rs, νr, νθ, numreals, abs(τ)
 end
 
 """
@@ -51,7 +53,7 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
     ans = zero(T)
     νr = true
 
-    rh = one(T) + √(one(T) - a^2)
+    rh = one(T) + √abs(one(T) - a^2)
 
     numreals = sum(Int.(_isreal2.(roots(pix))))
 
@@ -63,6 +65,7 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
         ans, νr = _rs_case4(pix, rh, τ)
     end
     return ans, νr, numreals
+    return numreals+1, νr, numreals
 end
 
 """
@@ -131,13 +134,13 @@ for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, θs, isindir, n)::Tuple{Any, Any, Any, Bool, Bool} where {T}
+function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T, T, T, Bool, Bool} where {T}
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
     if cos(θs) > abs(cos(θo))
-        αmin = αboundary(metric, θs)
-        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(metric, α, θo, θs) : zero(T))
+        αmin = αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
         if (abs(β) + eps(T)) < βbound
             return T(NaN), T(NaN), T(NaN), false, false
         end
