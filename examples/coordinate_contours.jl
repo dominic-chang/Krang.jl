@@ -18,7 +18,7 @@ rmin = Krang.horizon(metric)
 rmax = 10;
 ρmax = 15;
 
-camera = Krang.SlowLightIntensityIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
 curr_theme = CMk.Theme(
     fontsize=20,
