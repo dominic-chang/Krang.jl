@@ -189,7 +189,7 @@ end
 
 """
     $TYPEDEF
-  
+
    Linear polarization material from https://doi.org/10.3847/1538-4357/abf117
 """
 struct PowerLawPolarization <: AbstractMaterial end
@@ -199,7 +199,7 @@ struct PowerLawPolarization <: AbstractMaterial end
 """
 #function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,Tuple{SVector{3,T}, SVector{3,T}, NTuple{3,Int}, Function, T, T}}) where {T}
 function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
-    magfield, fluid_velocity, subimgs, profile, σ, σζ = geometry.attriributes 
+    magfield, fluid_velocity, subimgs, profile, σ, σζ = geometry.attriributes
 
     θs = geometry.opening_angle
     θo = inclination(pix)
@@ -213,7 +213,7 @@ function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeomet
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
             rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
             eα, eβ, redshift, lp = polarizationPowerLaw(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
-        
+
             prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
             q = T(-(eα^2 - eβ^2)*lp*prof + eps(T))
             u = T(-2*eα*eβ*lp*prof + eps(T))
@@ -235,7 +235,7 @@ end
 #    profile::Function
 #
 #    Palumbo2022Polarization(
-#        magfield::SVector{3,T}, 
+#        magfield::SVector{3,T},
 #        fluid_velocity::SVector{3,T},
 #        profile::Function
 #    ) where {T} = new{T}(PowerLawPolarization(magfield, fluid_velocity), profile)
@@ -245,8 +245,8 @@ end
 #    return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
 #end
 
-struct IntensityProfile <: AbstractMaterial
-    profile::Function
+struct IntensityProfile{F} <: AbstractMaterial
+    profile::F
 
     function IntensityProfile(profile)
         return new(profile)
@@ -256,4 +256,3 @@ end
 function (prof::IntensityProfile)(pix::AbstractPixel, rs, θs, νr, νθ; kwargs)
     return prof.profile(rs; kwargs...)
 end
-

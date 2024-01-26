@@ -34,20 +34,19 @@ Disk() = ConeGeometry(π/2)
 
 Geometry that is comprised of the union of two geometries.
 """
-struct UnionGeometry <: AbstractGeometry
-    geometry1::AbstractGeometry
-    geometry2::AbstractGeometry
+struct UnionGeometry{G1,G2} <: AbstractGeometry
+    geometry1::G1
+    geometry2::G2
 end
 
-function ⊕(geometry1::AbstractGeometry, geometry2::AbstractGeometry) 
+function ⊕(geometry1::AbstractGeometry, geometry2::AbstractGeometry)
     return UnionGeometry(geometry1, geometry2)
 end
 
 """
     $TYPEDEF
 """
-struct Mesh 
-    geometry::AbstractGeometry
-    material::AbstractMaterial
+struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
+    geometry::G
+    material::M
 end
-
