@@ -6,7 +6,7 @@
         α = 10.0
         β = 1.0
         θo = π/2
-        @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+        @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
             @test isnan(emission_radius(pix, π/2, true, 2)[1])
 
@@ -14,7 +14,7 @@
                 α = 10.0
                 β = 10.0
                 θo = π / 4
-                @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+                @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                     ηcase1 = η(met, α, β, θo)
@@ -33,7 +33,7 @@
                 β = 1.0
                 θo = π / 4
 
-                @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+                @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                     ηcase3 = η(met, α, β, θo)
@@ -49,7 +49,7 @@
                 α = 0.1
                 β = 0.1
                 θo = π / 4
-                @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+                @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                     ηcase4 = η(met, α, β, θo)
@@ -68,13 +68,13 @@
         met = Krang.Kerr(a)
 
 
-        @test isnan(emission_radius(Krang.SlowLightPixel(met, 10.0, 1.0, π/2), π/2, true, 2)[1])
+        @test isnan(emission_radius(Krang.SlowLightIntensityPixel(met, 10.0, 1.0, π/2), π/2, true, 2)[1])
 
         @testset "Ordinary Geodesics" begin
             α = 10.0
             β = 10.0
             θo = π / 4
-            @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+            @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                 @testset "n:$n" for n in 0:2
@@ -99,7 +99,7 @@
             α = 0.1
             β = 0.1
             θo = π / 4
-            @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+            @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                 @testset "n:$n" for n in 0:2
@@ -134,7 +134,7 @@
             desc = √(Δθ2 + ηtemp / a2)
             up = Δθ + desc
             θturning = acos(√up) * (1 + 1e-10)
-            @testset "$pixtype" for (pixtype, pix) in [("Basic Pixel", Krang.BasicPixel(met, α, β, θo)), ("Cached Slow Light Pixel", Krang.SlowLightPixel(met, α, β, θo))] 
+            @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
 
                 τ = Krang.Gθ(pix, θs, isindir, 0)[1]

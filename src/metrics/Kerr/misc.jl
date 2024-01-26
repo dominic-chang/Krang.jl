@@ -205,7 +205,7 @@ Radial potential of spacetime
 function r_potential(metric::Kerr{T}, η, λ, r) where {T}
     a = metric.spin
     λ2 = λ^2
-    a * (a * (r * (r + 2) - η) - 4 * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
+    return a * (a * (r * (r + 2) - η) - 4 * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
 end
 
 """
@@ -220,7 +220,7 @@ Theta potential of a Kerr blackhole
 """
 function θ_potential(metric::Kerr{T}, η, λ, θ) where {T}
     a = metric.spin
-    η + a^2 * cos(θ)^2 - λ^2 * cot(θ)^2
+    return η + a^2 * cos(θ)^2 - λ^2 * cot(θ)^2
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     ωp = _pow(-Q / T(2) + _pow(-Δ3 / T(108), T(0.5)) + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
-    C = (T(-0.4999999999999999) + T(0.8660254037844387)im, T(-0.5000000000000002) - T(0.8660254037844385)im, one(T) + zero(T)im) .* ωp
+    C = (-T(1/2) + T(√3/2)im, -T(1/2) - T(√3/2)im, one(T) + zero(T)im) .* ωp
 
     v = -P .* _pow.(T(3) .* C, -one(T))
 
@@ -1772,7 +1772,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
 
-- `pix`: SlowLightPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -1792,7 +1792,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
 
-- `pix`: SlowLightPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -1809,7 +1809,7 @@ end
 """
 Return the radial integrals
 
-- `pix`: SlowLightPixel
+- `pix`: SlowLightIntensityPixel
 - `rs` : Emission radius
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
@@ -1891,8 +1891,8 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     coef = 2 / (C + D)
     Ir_s = coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
-    τ > Ir_s && return T(NaN), true
     fo = I0_inf(pix)
+    τ > (fo-Ir_s) && return T(NaN), true
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
@@ -2153,7 +2153,7 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
-# SlowLightCachedPixel utility functions
+# SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
 function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}

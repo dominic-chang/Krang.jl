@@ -1,15 +1,15 @@
-export p_bl_d, penrose_walker, screen_polarisation, calcPol, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
+export p_bl_d, penrose_walker, screen_polarisation, polarizationPowerLaw, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
 ##----------------------------------------------------------------------------------------------------------------------
 #Polarization stuff
 ##----------------------------------------------------------------------------------------------------------------------
 """
     Returns the momentum form in the Boyer-Lindquist basis.
 """
-function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr, νθ) where {T}
-    @SVector [
+function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr::Bool, νθ::Bool) where {T}
+    return @SVector[
         -one(T),
-        (νr ? one(T) : -one(T)) * √abs(r_potential(metric, η, λ, r)) / Δ(metric, r),
-        (νθ ? one(T) : -one(T)) * √abs(θ_potential(metric, η, λ, θ)),
+        (νr ? one(T) : -one(T))* √max(zero(T), r_potential(metric, η, λ, r)) / Δ(metric, r),
+        (νθ ? one(T) : -one(T))* √max(zero(T), θ_potential(metric, η, λ, θ)),
         λ
     ]
 end
@@ -140,7 +140,7 @@ evpa(fα, fβ) = atan(-fα, fβ)
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
 function polarizationPowerLaw(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
-    ri <= horizon(metric) && return zero(T), zero(T), zero(T), zero(T)
+
 
     a = metric.spin
     βv = βfluid[1]
@@ -149,6 +149,8 @@ function polarizationPowerLaw(metric::Kerr{T}, α, β, ri, θs, θo, magfield::S
 
     ηtemp = η(metric, α, β, θo)
     λtemp = λ(metric, α, θo)
+
+
     curr_p_bl_d = p_bl_d(metric, ri, θs, ηtemp, λtemp, νr, θsign)
 
     curr_p_bl_u = metric_uu(metric, ri, θs) * curr_p_bl_d
@@ -188,36 +190,62 @@ end
 """
     $TYPEDEF
   
-   Linear polarization observable from https://doi.org/10.3847/1538-4357/abf117
+   Linear polarization material from https://doi.org/10.3847/1538-4357/abf117
 """
-struct PowerLawPolarization{T} <: AbstractObservable
-    magfield::SVector{3,T}
-    fluid_velocity::SVector{3,T}
-end
+struct PowerLawPolarization <: AbstractMaterial end
 
 """
-    Functor for the NarayanPolarization observable
+    Functor for the NarayanPolarization material
 """
-function (linpol::PowerLawPolarization{T})(pix::AbstractPixel, rs, θs, νr, νθ) where {T}
-    return polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
+#function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,Tuple{SVector{3,T}, SVector{3,T}, NTuple{3,Int}, Function, T, T}}) where {T}
+function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
+    magfield, fluid_velocity, subimgs, profile, σ, σζ = geometry.attriributes 
+
+    θs = geometry.opening_angle
+    θo = inclination(pix)
+    met = metric(pix)
+    α, β = screen_coordinate(pix)
+
+    observation = @SVector[zero(T), zero(T), zero(T), zero(T)]
+
+    for n in subimgs
+        for isindir in (true, false)
+            νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+            rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
+            eα, eβ, redshift, lp = polarizationPowerLaw(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
+        
+            prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
+            q = T(-(eα^2 - eβ^2)*lp*prof + eps(T))
+            u = T(-2*eα*eβ*lp*prof + eps(T))
+            i = profile(rs)*T(hypot(q, u)^(one(T)+σζ))
+            nan2zero = x -> isnan(x) ? zero(T) : x
+            observation += @SVector[nan2zero(i), nan2zero(q), nan2zero(u), zero(T)]
+        end
+    end
+    return observation
 end
 
-struct Palumbo2022Polarization{T} <: AbstractObservable
-    polarization::PowerLawPolarization{T}
-    profile::Function
-
-    Palumbo2022Polarization(
-        magfield::SVector{3,T}, 
-        fluid_velocity::SVector{3,T},
-        profile::Function
-    ) where {T} = new{T}(PowerLawPolarization(magfield, fluid_velocity), profile)
+function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::UnionGeometry)
+    #return @SVector[0f0, 0f0, 0f0, 0f0]
+    return linpol(pix, geometry.geometry1) .+ linpol(pix, geometry.geometry2)
 end
 
-function (linpol::Palumbo2022Polarization{T})(pix::AbstractPixel, rs, θs, νr, νθ; kwargs) where {T}
-    return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
-end
+#struct Palumbo2022Polarization{T} <: AbstractMaterial
+#    polarization::PowerLawPolarization{T}
+#    profile::Function
+#
+#    Palumbo2022Polarization(
+#        magfield::SVector{3,T}, 
+#        fluid_velocity::SVector{3,T},
+#        profile::Function
+#    ) where {T} = new{T}(PowerLawPolarization(magfield, fluid_velocity), profile)
+#end
+#
+#function (linpol::Palumbo2022Polarization{T})(pix::AbstractPixel, rs, θs, νr, νθ; kwargs) where {T}
+#    return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
+#end
 
-struct IntensityProfile <: AbstractObservable
+struct IntensityProfile <: AbstractMaterial
     profile::Function
 
     function IntensityProfile(profile)

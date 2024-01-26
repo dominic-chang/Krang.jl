@@ -1,4 +1,4 @@
-# # Raytracing with inclination
+# # Slow Light Raytracing Cones
 
 # In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
@@ -12,13 +12,13 @@ using Krang
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 metric = Krang.Kerr(0.99);
-θo = 85 * π / 180;
-sze = 500;
+θo = 45 * π / 180;
+sze = 100;
 rmin = Krang.horizon(metric)
 rmax = 10;
-ρmax = 10;
+ρmax = 15;
 
-camera = Krang.SlowLightCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
 curr_theme = CMk.Theme(
     fontsize=20,
@@ -91,7 +91,7 @@ recording = CMk.record(fig, "emission_coordinates.gif", range(0, π, length=180)
     CMk.hidedecorations!(ax)
     CMk.text!(ax,0,100; text=CMk.L"θ_s=%$(Int(floor(θs*180/π)))^\circ")
 
-    display(fig)
+    #display(fig);
 end
 
 # ![image](emission_coordinates.gif)

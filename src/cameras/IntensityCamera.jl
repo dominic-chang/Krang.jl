@@ -1,10 +1,10 @@
-export BasicCamera
+export IntensityCamera
 """
     $TYPEDEF
 
-Basic Pixel Type.
+Intensity Pixel Type.
 """
-struct BasicPixel{T} <: AbstractPixel
+struct IntensityPixel{T} <: AbstractPixel
     metric::Kerr{T}
     screen_coordinate::NTuple{2, T}
     "Radial roots"
@@ -17,7 +17,7 @@ struct BasicPixel{T} <: AbstractPixel
     θo::T
     η::T
     λ::T
-    function BasicPixel(met::Kerr{T}, α, β, θo) where {T}
+    function IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
@@ -39,9 +39,9 @@ end
 """
     $TYPEDEF
 
-Screen made of Basic Pixels.
+Screen made of Intensity Pixels.
 """
-struct BasicScreen{T} <: AbstractScreen
+struct IntensityScreen{T} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
     αrange::NTuple{2, T}
 
@@ -49,15 +49,15 @@ struct BasicScreen{T} <: AbstractScreen
     βrange::NTuple{2, T}
 
     "Data type that stores screen pixel information"
-    pixels::Matrix{BasicPixel{T}}
-    function BasicScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
-        screen = Matrix{BasicPixel}(undef, res, res)
+    pixels::Matrix{IntensityPixel{T}}
+    function IntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+        screen = Matrix{IntensityPixel}(undef, res, res)
         αvals = range(αmin, αmax, length=res)
         βvals = range(βmin, βmax, length=res)
         
         for (iα, α) in enumerate(αvals)
             for (iβ, β) in enumerate(βvals)
-                screen[iα, iβ] = BasicPixel(met, α, β, θo)
+                screen[iα, iβ] = IntensityPixel(met, α, β, θo)
             end
         end
         new{T}((αmin, αmax), (βmin, βmax), screen)
@@ -70,13 +70,22 @@ end
 Observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct BasicCamera{T} <: AbstractCamera
+struct IntensityCamera{T} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
-    screen::BasicScreen{T}
+    screen::IntensityScreen{T}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function BasicCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
-        new{T}(met, BasicScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+    function IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
+        new{T}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
+
+function η(pix::IntensityPixel) return pix.η end
+function λ(pix::IntensityPixel) return pix.λ end
+function roots(pix::IntensityPixel) return pix.roots end
+function screen_coordinate(pix::IntensityPixel) return pix.screen_coordinate end
+function inclination(pix::IntensityPixel) return pix.θo end
+function I0_inf(pix::IntensityPixel) return pix.I0_inf end
+function Ir_inf(pix::IntensityPixel) return pix.I0_inf end
+function absGθo_Gθhat(pix::IntensityPixel) return pix.absGθo_Gθhat end

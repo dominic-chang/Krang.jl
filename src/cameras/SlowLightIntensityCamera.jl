@@ -1,11 +1,11 @@
-export SlowLightCamera
+export SlowLightIntensityCamera
 
 """
     $TYPEDEF
 
-Basic Pixel Type.
+Intensity Pixel Type.
 """
-struct SlowLightPixel{T} <: AbstractPixel
+struct SlowLightIntensityPixel{T} <: AbstractPixel
     metric::Kerr{T}
     "Pixel screen_coordinate"
     screen_coordinate::NTuple{2, T}
@@ -31,7 +31,7 @@ struct SlowLightPixel{T} <: AbstractPixel
     θo::T
     η::T
     λ::T
-    function SlowLightPixel(met::Kerr{T}, α::T, β::T, θo) where {T}
+    function SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
@@ -59,9 +59,9 @@ end
 """
     $TYPEDEF
 
-Screen made of Basic Pixels.
+Screen made of Intensity Pixels.
 """
-struct SlowLightScreen{T} <: AbstractScreen
+struct SlowLightIntensityScreen{T} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
     αrange::NTuple{2, T}
 
@@ -69,15 +69,15 @@ struct SlowLightScreen{T} <: AbstractScreen
     βrange::NTuple{2, T}
 
     "Data type that stores screen pixel information"
-    pixels::Matrix{SlowLightPixel{T}}
-    function SlowLightScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
-        screen = Matrix{SlowLightPixel}(undef, res, res)
+    pixels::Matrix{SlowLightIntensityPixel{T}}
+    function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+        screen = Matrix{SlowLightIntensityPixel}(undef, res, res)
         αvals = range(αmin, αmax, length=res)
         βvals = range(βmin, βmax, length=res)
         
         Threads.@threads for (iα, α) in collect(enumerate(αvals))
             for (iβ, β) in enumerate(βvals)
-                screen[iα, iβ] = SlowLightPixel(met, α, β, θo)
+                screen[iα, iβ] = SlowLightIntensityPixel(met, α, β, θo)
             end
         end
         new{T}((αmin, αmax), (βmin, βmax), screen)
@@ -90,33 +90,31 @@ end
 Observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct SlowLightCamera{T} <: AbstractCamera
+struct SlowLightIntensityCamera{T} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
-    screen::SlowLightScreen{T}
+    screen::SlowLightIntensityScreen{T}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function SlowLightCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
-        new{T}(met, SlowLightScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+    function SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
+        new{T}(met, SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
 
-
-
-function η(pix::SlowLightPixel) return pix.η end
-function λ(pix::SlowLightPixel) return pix.λ end
-function roots(pix::SlowLightPixel) return pix.roots end
-function screen_coordinate(pix::SlowLightPixel) return pix.screen_coordinate end
-function inclination(pix::SlowLightPixel) return pix.θo end
-function I0_inf(pix::SlowLightPixel) return pix.I0_inf end
-function Ir_inf(pix::SlowLightPixel) return pix.I0_inf end
-function I1_inf_m_I0_terms(pix::SlowLightPixel) return pix.I1_inf_m_I0_terms end
-function I2_inf_m_I0_terms(pix::SlowLightPixel) return pix.I2_inf_m_I0_terms end
-function Ip_inf_m_I0_terms(pix::SlowLightPixel) return pix.Ip_inf_m_I0_terms end
-function Im_inf_m_I0_terms(pix::SlowLightPixel) return pix.Im_inf_m_I0_terms end
-function radial_inf_integrals_m_I0_terms(pix::SlowLightPixel) return I1_inf_m_I0_terms(pix), I2_inf_m_I0_terms(pix), Ip_inf_m_I0_terms(pix), Im_inf_m_I0_terms(pix) end
-function Iϕ_inf(pix::SlowLightPixel) return pix.Iϕ_inf end
-function It_inf(pix::SlowLightPixel) return pix.It_inf end
-function absGθo_Gθhat(pix::SlowLightPixel) return pix.absGθo_Gθhat end
-function absGϕo_Gϕhat(pix::SlowLightPixel) return pix.absGϕo_Gϕhat end
-function absGto_Gthat(pix::SlowLightPixel) return pix.absGto_Gthat end
+function η(pix::SlowLightIntensityPixel) return pix.η end
+function λ(pix::SlowLightIntensityPixel) return pix.λ end
+function roots(pix::SlowLightIntensityPixel) return pix.roots end
+function screen_coordinate(pix::SlowLightIntensityPixel) return pix.screen_coordinate end
+function inclination(pix::SlowLightIntensityPixel) return pix.θo end
+function I0_inf(pix::SlowLightIntensityPixel) return pix.I0_inf end
+function Ir_inf(pix::SlowLightIntensityPixel) return pix.I0_inf end
+function I1_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.I1_inf_m_I0_terms end
+function I2_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.I2_inf_m_I0_terms end
+function Ip_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.Ip_inf_m_I0_terms end
+function Im_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.Im_inf_m_I0_terms end
+function radial_inf_integrals_m_I0_terms(pix::SlowLightIntensityPixel) return I1_inf_m_I0_terms(pix), I2_inf_m_I0_terms(pix), Ip_inf_m_I0_terms(pix), Im_inf_m_I0_terms(pix) end
+function Iϕ_inf(pix::SlowLightIntensityPixel) return pix.Iϕ_inf end
+function It_inf(pix::SlowLightIntensityPixel) return pix.It_inf end
+function absGθo_Gθhat(pix::SlowLightIntensityPixel) return pix.absGθo_Gθhat end
+function absGϕo_Gϕhat(pix::SlowLightIntensityPixel) return pix.absGϕo_Gϕhat end
+function absGto_Gthat(pix::SlowLightIntensityPixel) return pix.absGto_Gthat end
