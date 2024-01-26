@@ -53,7 +53,7 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
     ans = zero(T)
     νr = true
 
-    rh = one(T) + √abs(one(T) - a^2)
+    rh = one(T) + √(one(T) - a^2)
 
     numreals = sum(Int.(_isreal2.(roots(pix))))
 
@@ -65,7 +65,6 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
         ans, νr = _rs_case4(pix, rh, τ)
     end
     return ans, νr, numreals
-    return numreals+1, νr, numreals
 end
 
 """
