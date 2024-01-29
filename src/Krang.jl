@@ -2,6 +2,7 @@ module Krang
 using DocStringExtensions
 using StaticArrays
 using JacobiElliptic
+using PolarizedTypes
 @template (FUNCTIONS, METHODS, MACROS) =
     """
     $(TYPEDSIGNATURES)
@@ -18,7 +19,7 @@ include("cameras/IntensityCamera.jl")
 include("metrics/Kerr/raytracer.jl")
 include("metrics/Kerr/api.jl")
 include("materials/material_types.jl")
-include("materials/PowerLawPolarization.jl")
+include("materials/ElectronSynchrotronPowerLawPolarization.jl")
 include("materials/observations.jl")
 include("raytracer_api.jl")
 end

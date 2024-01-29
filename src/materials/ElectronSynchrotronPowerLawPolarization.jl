@@ -1,4 +1,4 @@
-export p_bl_d, penrose_walker, screen_polarisation, polarizationPowerLaw, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
+export p_bl_d, penrose_walker, screen_polarisation, PowerLaw, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
 ##----------------------------------------------------------------------------------------------------------------------
 #Polarization stuff
 ##----------------------------------------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ evpa(fα, fβ) = atan(-fα, fβ)
 """
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function polarizationPowerLaw(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
+function electronSynchrotronPowerLawPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
 
 
     a = metric.spin
@@ -193,7 +193,7 @@ end
 
    Linear polarization material from https://doi.org/10.3847/1538-4357/abf117
 """
-struct PowerLawPolarization <: AbstractMaterial end
+struct ElectronSynchrotronPowerLawPolarization <: AbstractMaterial end
 
 function nan2zero(x)
     return isnan(x) ? zero(eltype(x)) : x
@@ -202,7 +202,7 @@ end
 """
     Functor for the NarayanPolarization material
 """
-function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
+function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
     magfield, fluid_velocity, subimgs, profile, σ, σζ = geometry.attriributes
 
     θs = geometry.opening_angle
@@ -210,42 +210,42 @@ function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeomet
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    observation = @SVector[zero(T), zero(T), zero(T), zero(T)]
+    observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
 
     for n in subimgs
         for isindir in (true, false)
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
             rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
-            eα, eβ, redshift, lp = polarizationPowerLaw(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
+            eα, eβ, redshift, lp = electronSynchrotronPowerLawPolarization(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
             prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
             q = T(-(eα^2 - eβ^2) + eps(T))
             u = T(-2*eα*eβ + eps(T))
             i = hypot(q, u)^(1+σζ)*lp*prof
-            observation += @SVector[nan2zero(i), nan2zero(q), nan2zero(u), zero(T)]
+            observation += StokesParams(nan2zero(i), nan2zero(q), nan2zero(u), zero(T))
         end
     end
     return observation
 end
 
-function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::UnionGeometry)
+function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::UnionGeometry)
     #return @SVector[0f0, 0f0, 0f0, 0f0]
     return linpol(pix, geometry.geometry1) + linpol(pix, geometry.geometry2)
 end
 
 #struct Palumbo2022Polarization{T} <: AbstractMaterial
-#    polarization::PowerLawPolarization{T}
+#    polarization::ElectronSynchrotronPowerLawPolarization{T}
 #    profile::Function
 #
 #    Palumbo2022Polarization(
 #        magfield::SVector{3,T},
 #        fluid_velocity::SVector{3,T},
 #        profile::Function
-#    ) where {T} = new{T}(PowerLawPolarization(magfield, fluid_velocity), profile)
+#    ) where {T} = new{T}(ElectronSynchrotronPowerLawPolarization(magfield, fluid_velocity), profile)
 #end
 #
 #function (linpol::Palumbo2022Polarization{T})(pix::AbstractPixel, rs, θs, νr, νθ; kwargs) where {T}
-#    return linpol.profile(rs; kwargs...)*polarizationPowerLaw(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
+#    return linpol.profile(rs; kwargs...)*electronSynchrotronPowerLawPolarization(metric(pix), screen_coordinate(pix)..., rs, θs, inclination(pix), linpol.magfield, linpol.fluid_velocity, νr, νθ)
 #end
 
 struct IntensityProfile{F} <: AbstractMaterial

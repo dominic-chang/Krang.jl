@@ -2,7 +2,7 @@ function observe(geometry::AbstractGeometry, material::AbstractMaterial, observe
    error("Observations by type $(typeof(observer)) on type $(typeof(material)) is not defined for geometry type $(typeof(geometry)).") 
 end
 
-#function observe(geometry::ConeGeometry, material::PowerLawPolarization{T}, observer::AbstractCamera; α=one(T), subimgs=[0,], profile=x->one(T)) where T
+#function observe(geometry::ConeGeometry, material::ElectronSynchrotronPolarizationn{T}, observer::AbstractCamera; α=one(T), subimgs=[0,], profile=x->one(T)) where T
 #    observation = Array{Union{Missing, Vector{T}}}(missing, size(observer.screen.pixels))
 #    θs = geometry.opening_angle
 #    θo = inclination(observer.screen.pixels[1])

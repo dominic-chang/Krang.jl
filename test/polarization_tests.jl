@@ -57,7 +57,7 @@
 
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,.0]
-            eα, eβ, redshift, lp = polarizationPowerLaw(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
+            eα, eβ, redshift, lp = electronSynchrotronPowerLawPolarizationn(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
             @test evpa(eα, eβ) ≈ -3π/4 atol = 1e-3
         end
     end
