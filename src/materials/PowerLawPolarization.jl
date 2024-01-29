@@ -128,8 +128,9 @@ function screen_polarisation(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}
     κ2 = imag(κ)
 
     μ = -(α + a * sin(θ))
-    fα = (β * κ2 - μ * κ1) / (μ^2 + β^2)
-    fβ = (β * κ1 + μ * κ2) / (μ^2 + β^2)
+    norm = sqrt(μ^2 + β^2)
+    fα = (β * κ2 - μ * κ1) / norm
+    fβ = (β * κ1 + μ * κ2) / norm 
 
     return fα, fβ
 end
@@ -194,10 +195,13 @@ end
 """
 struct PowerLawPolarization <: AbstractMaterial end
 
+function nan2zero(x)
+    return isnan(x) ? zero(eltype(x)) : x
+end
+
 """
     Functor for the NarayanPolarization material
 """
-#function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,Tuple{SVector{3,T}, SVector{3,T}, NTuple{3,Int}, Function, T, T}}) where {T}
 function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
     magfield, fluid_velocity, subimgs, profile, σ, σζ = geometry.attriributes
 
@@ -215,10 +219,9 @@ function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeomet
             eα, eβ, redshift, lp = polarizationPowerLaw(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
             prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
-            q = T(-(eα^2 - eβ^2)*lp*prof + eps(T))
-            u = T(-2*eα*eβ*lp*prof + eps(T))
-            i = profile(rs)*T(hypot(q, u)^(one(T)+σζ))
-            nan2zero = x -> isnan(x) ? zero(T) : x
+            q = T(-(eα^2 - eβ^2) + eps(T))
+            u = T(-2*eα*eβ + eps(T))
+            i = hypot(q, u)^(1+σζ)*lp*prof
             observation += @SVector[nan2zero(i), nan2zero(q), nan2zero(u), zero(T)]
         end
     end
@@ -227,7 +230,7 @@ end
 
 function (linpol::PowerLawPolarization)(pix::AbstractPixel, geometry::UnionGeometry)
     #return @SVector[0f0, 0f0, 0f0, 0f0]
-    return linpol(pix, geometry.geometry1) .+ linpol(pix, geometry.geometry2)
+    return linpol(pix, geometry.geometry1) + linpol(pix, geometry.geometry2)
 end
 
 #struct Palumbo2022Polarization{T} <: AbstractMaterial
@@ -249,7 +252,7 @@ struct IntensityProfile{F} <: AbstractMaterial
     profile::F
 
     function IntensityProfile(profile)
-        return new(profile)
+        return new{F}(profile)
     end
 end
 
