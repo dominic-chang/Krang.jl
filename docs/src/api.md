@@ -59,8 +59,7 @@ Krang.jac_zamo_d_bl_u
 Krang.jac_fluid_u_zamo_d
 Krang.screen_polarisation
 Krang.penrose_walker
-Krang.electronSynchrotronPowerLawPolarization
-```
+Krang.synchrotronPolarization```
 
 ### Misc
 ```@docs

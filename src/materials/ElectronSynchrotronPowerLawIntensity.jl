@@ -35,8 +35,10 @@ function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geomet
 
     observation = zero(T)
 
-    for n in subimgs
-        for isindir in (true, false)
+    isindir = false
+    for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
+        isindir ⊻= true
+        for n in subimgs
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
             rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
             if rs ≤ horizon(met)
@@ -54,6 +56,5 @@ function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geomet
 end
 
 function (linpol::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geometry::UnionGeometry)
-    #return @SVector[0f0, 0f0, 0f0, 0f0]
     return linpol(pix, geometry.geometry1) + linpol(pix, geometry.geometry2)
 end

@@ -9,7 +9,7 @@ OUTDIR = joinpath(@__DIR__, "src", "examples")
 
 SOURCE_FILES = Glob.glob("*.jl", GENERATED)
 foreach(fn -> Literate.markdown(fn, OUTDIR, documenter=true), SOURCE_FILES)
-MD_FILES = [joinpath("examples", file) for file in readdir(OUTDIR)]
+MD_FILES = filter(x-> !occursin("gpu", x), [joinpath("examples", file) for file in readdir(OUTDIR)])
 
 DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
 
