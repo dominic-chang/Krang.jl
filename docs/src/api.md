@@ -65,9 +65,9 @@ Krang.synchrotronPolarization
 
 ### Raytracing API Related Functions
 ```@docs
-    Krang.Mesh
-    Krang.ElectronSynchrotronPowerLawPolarization
-    Krang.UnionGeometry
+Krang.Mesh
+Krang.ElectronSynchrotronPowerLawPolarization
+Krang.UnionGeometry
 ```
 
 ### Misc

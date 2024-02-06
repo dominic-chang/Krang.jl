@@ -74,4 +74,4 @@ zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals]) .|> x->heatmap!(x[1], x[
 
 save("polarization_example.png", fig)
 
-# ![image](polarization_example.gif)
+# ![image](polarization_example.png)
