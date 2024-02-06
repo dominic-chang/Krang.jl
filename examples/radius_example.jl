@@ -33,7 +33,6 @@ set_theme!(merge!(curr_theme, theme_latexfonts()))
 # We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
-#observation = Observable(zeros(size(camera.screen.pixels));)
 
 # Create the material
 fig = Figure(resolution=(700, 300), fontfamily="Computer Modern", fontface="bold");
