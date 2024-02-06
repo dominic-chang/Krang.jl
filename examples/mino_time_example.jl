@@ -49,7 +49,6 @@ recording = record(fig, "raytrace.gif", range(0.1, 3, length=290), framerate=15)
     time, radius, inclination, azimuth = [size(camera.screen.pixels) |> zeros for i in 1:4]
 
     Threads.@threads for I in CartesianIndices(time)
-        #coordinates = Krang.emission_coordinates(camera.screen.pixels[I], θs, true, n)
         coordinates = Krang.raytrace(camera.screen.pixels[I], τ)
         if !any(isnan.(coordinates[1:4])) && coordinates[2] < rmax
             time[I], radius[I], inclination[I], azimuth[I] = coordinates
@@ -82,4 +81,4 @@ recording = record(fig, "raytrace.gif", range(0.1, 3, length=290), framerate=15)
     #display(fig);
 end
 
-# ![image](emission_coordinates.gif)
+# ![image](raytrace.gif)

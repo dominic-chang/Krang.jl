@@ -10,7 +10,6 @@ function synchrotronIntensity(metric::Kerr{T}, α, β, ri, θs, θo, magfield::S
     ηtemp = η(metric, α, β, θo)
     λtemp = λ(metric, α, θo)
 
-
     curr_p_bl_d = p_bl_d(metric, ri, θs, ηtemp, λtemp, νr, θsign)
 
     curr_p_bl_u = metric_uu(metric, ri, θs) * curr_p_bl_d
@@ -25,7 +24,7 @@ function synchrotronIntensity(metric::Kerr{T}, α, β, ri, θs, θo, magfield::S
 end
 struct ElectronSynchrotronPowerLawIntensity <: AbstractMaterial end
 
-function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
+function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
     magfield, fluid_velocity, subimgs, profile, σ = geometry.attriributes
 
     θs = geometry.opening_angle
@@ -40,14 +39,14 @@ function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geomet
         isindir ⊻= true
         for n in subimgs
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
+            rs, νr, _ = emission_radius(pix, geometry.opening_angle, isindir, n)
             if rs ≤ horizon(met)
                 continue
             end
             norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
-            prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
-            i = norm^(1+σ)*lp*prof
+            prof = profile(rs) * max(redshift, eps(T))^(T(3) + σ)
+            i = norm^(1 + σ) * lp * prof
             observation += nan2zero(i)
             #observation += nan2zero(rs)
         end

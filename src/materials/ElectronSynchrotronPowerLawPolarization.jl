@@ -9,7 +9,7 @@ function screen_polarisation(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}
     μ = -(α + a * sin(θ))
     norm = sqrt(μ^2 + β^2)
     fα = (β * κ2 - μ * κ1) / norm
-    fβ = (β * κ1 + μ * κ2) / norm 
+    fβ = (β * κ1 + μ * κ2) / norm
 
     return fα, fβ
 end
@@ -21,7 +21,6 @@ Calculates the polarization of a photon emitted from a fluid particle with momen
 """
 function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
 
-
     a = metric.spin
     βv = βfluid[1]
     θz = βfluid[2]
@@ -29,7 +28,6 @@ function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magfield
 
     ηtemp = η(metric, α, β, θo)
     λtemp = λ(metric, α, θo)
-
 
     curr_p_bl_d = p_bl_d(metric, ri, θs, ηtemp, λtemp, νr, θsign)
 
@@ -81,7 +79,7 @@ end
 """
     Functor for the NarayanPolarization material
 """
-function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
+function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
     magfield, fluid_velocity, subimgs, profile, σ = geometry.attriributes
 
     θs = geometry.opening_angle
@@ -96,13 +94,13 @@ function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, g
         isindir ⊻= true
         for n in subimgs
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            rs, νr, _ =  emission_radius(pix, geometry.opening_angle, isindir, n)
+            rs, νr, _ = emission_radius(pix, geometry.opening_angle, isindir, n)
             eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
-            prof = profile(rs)*max(redshift , eps(T))^(T(3)+σ)
+            prof = profile(rs) * max(redshift, eps(T))^(T(3) + σ)
             q = T(-(eα^2 - eβ^2) + eps(T))
-            u = T(-2*eα*eβ + eps(T))
-            i = hypot(q, u)^(1+σ)*lp*prof
+            u = T(-2 * eα * eβ + eps(T))
+            i = hypot(q, u)^(1 + σ) * lp * prof
             observation += StokesParams(nan2zero(i), nan2zero(q), nan2zero(u), zero(T))
         end
     end

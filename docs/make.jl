@@ -13,17 +13,19 @@ MD_FILES = filter(x-> !occursin("gpu", x), [joinpath("examples", file) for file 
 
 DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
 
+format = Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://dchang10.github.io/Krang.jl",
+        edit_link="main",
+        assets=String[],
+    )
+
 makedocs(;
     modules=[Krang],
     authors="Dominic <dchang3419@hotmail.com> and contributors",
     repo="https://github.com/dchang10/Krang.jl/blob/{commit}{path}#{line}",
     sitename="Krang.jl",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://dchang10.github.io/Krang.jl",
-        edit_link="main",
-        assets=String[],
-    ),
+    format=format,
     pages=[
         "Home" => "index.md",
         "Getting Started" => "getting_started.md",
