@@ -76,9 +76,6 @@ recording = record(fig, "raytrace.gif", range(0.1, 3, length=290), framerate=15)
     hidedecorations!(ax)
     CairoMakie.text!(ax,0,100; text=L"θ_o=%$(Int(floor(θo*180/π)))^\circ")
     rowgap!(fig.layout, 1, Fixed(0))
-    #rowsize!(fig.layout, 1, Auto(0))
-
-    #display(fig);
 end
 
 # ![image](raytrace.gif)
