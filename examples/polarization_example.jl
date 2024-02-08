@@ -29,16 +29,16 @@ sze = 400;
 rmin = Krang.horizon(metric)
 rmax = 10.0;
 ρmax = 10.0;
-χ = 2.7242920822576653;
-η1 = 0.01817958773540323;
-ι = 1.0113763707982746;
-βv = 0.3096525555378556;
-σ = -0.34430247937749187;
+χ = -1.705612782769303
+ι = 0.5807355065517938
+βv = 0.8776461626924748
+σ = 0.7335172899224874
+η1 = 2.6444786738735804
 
 function profile(r)
-    R = 5.59261856012756
-    p1 = 0.158968560099307
-    p2 = 4.192568509151882
+    R = 3.3266154761905455
+    p1 = 4.05269835622511
+    p2 = 4.411852974336667
     return (r/R)^p1/(1+(r/R)^(p1+p2))
 end
 
@@ -69,8 +69,9 @@ ax1 = Axis(fig[1, 1], aspect=1, title="I")
 ax2 = Axis(fig[1, 2], aspect=1, title="Q")
 ax3 = Axis(fig[2, 1], aspect=1, title="U")
 ax4 = Axis(fig[2, 2], aspect=1, title="V")
+colormaps = [:afmhot, :redsblues, :redsblues, :redsblues]
 
-zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals]) .|> x->heatmap!(x[1], x[2], colormap=:afmhot)
+zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals], colormaps) .|> x->heatmap!(x[1], x[2], colormap=x[3])
 
 save("polarization_example.png", fig)
 
