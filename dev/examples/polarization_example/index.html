@@ -17,16 +17,16 @@ sze = 400;
 rmin = Krang.horizon(metric)
 rmax = 10.0;
 ρmax = 10.0;
-χ = 2.7242920822576653;
-η1 = 0.01817958773540323;
-ι = 1.0113763707982746;
-βv = 0.3096525555378556;
-σ = -0.34430247937749187;
+χ = -1.705612782769303
+ι = 0.5807355065517938
+βv = 0.8776461626924748
+σ = 0.7335172899224874
+η1 = 2.6444786738735804
 
 function profile(r)
-    R = 5.59261856012756
-    p1 = 0.158968560099307
-    p2 = 4.192568509151882
+    R = 3.3266154761905455
+    p1 = 4.05269835622511
+    p2 = 4.411852974336667
     return (r/R)^p1/(1+(r/R)^(p1+p2))
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">profile (generic function with 1 method)</code></pre><p>Create the material</p><pre><code class="language-julia hljs">camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 η2 = π-η1
@@ -53,8 +53,9 @@ ax1 = Axis(fig[1, 1], aspect=1, title=&quot;I&quot;)
 ax2 = Axis(fig[1, 2], aspect=1, title=&quot;Q&quot;)
 ax3 = Axis(fig[2, 1], aspect=1, title=&quot;U&quot;)
 ax4 = Axis(fig[2, 2], aspect=1, title=&quot;V&quot;)
+colormaps = [:afmhot, :redsblues, :redsblues, :redsblues]
 
-zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals]) .|&gt; x-&gt;heatmap!(x[1], x[2], colormap=:afmhot)
+zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals], colormaps) .|&gt; x-&gt;heatmap!(x[1], x[2], colormap=x[3])
 
 save(&quot;polarization_example.png&quot;, fig)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CairoMakie.Screen{IMAGE}
-</code></pre><p><img src="../polarization_example.png" alt="image"/></p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../mino_time_example/">« Rays parameterized with Mino time</a><a class="docs-footer-nextpage" href="../radius_example/">Raytracing with inclination »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Wednesday 7 February 2024 00:13">Wednesday 7 February 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p><img src="../polarization_example.png" alt="image"/></p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../mino_time_example/">« Rays parameterized with Mino time</a><a class="docs-footer-nextpage" href="../radius_example/">Raytracing with inclination »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Thursday 8 February 2024 04:36">Thursday 8 February 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
