@@ -8,4 +8,6 @@
 .vscode
 Manifest.toml
 .DS_Store
-
+*.gif
+*.png
+docs/node_modules
