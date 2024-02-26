@@ -2,7 +2,8 @@ export IntensityCamera
 """
     $TYPEDEF
 
-Intensity Pixel Type.
+Intensity Pixel Type. 
+Each Pixel is associated with a single ray, and caches some information about the ray.
 """
 struct IntensityPixel{T} <: AbstractPixel
     metric::Kerr{T}

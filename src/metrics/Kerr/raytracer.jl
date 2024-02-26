@@ -1,4 +1,4 @@
-include("./misc.jl")
+#include("./misc.jl")
 # Follows the Formalism of Gralla & Lupsasca (https://arxiv.org/pdf/1910.12881.pdf)
 export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates
 
