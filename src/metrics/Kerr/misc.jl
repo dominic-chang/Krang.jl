@@ -332,8 +332,8 @@ function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
 
     r1, r2, r21 = real.((r1, r2, r21))
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs(r32 * r42)
+    B2 = abs(r31 * r41)
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
@@ -1851,8 +1851,8 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
 
 
     fo = I0_inf(pix)
-    A = √real(r32 * r42)
-    B = √real(r31 * r41)
+    A = √abs(r32 * r42)
+    B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
     temprat = B * (rh - r2) / (A * (rh - r1))
     x3_s = ((one(T) - temprat) / (one(T) + temprat))
