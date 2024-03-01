@@ -412,7 +412,7 @@ function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) / (A * (rs - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
 
@@ -1855,7 +1855,7 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
     temprat = B * (rh - r2) / (A * (rh - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
     τ > (fo - Ir_s) && return T(NaN), true
