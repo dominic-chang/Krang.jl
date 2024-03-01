@@ -3,13 +3,13 @@
 export λ, η, α, β, αboundary, βboundary, r_potential, θ_potential, get_radial_roots, 
 Ir,Gθ
 
-function _pow(z::Complex{T}, i) where {T}
+@inline function _pow(z::Complex{T}, i) where {T}
     zabs = abs(z)
     zangle = angle(z)
     return (zabs^i) * (cos(zangle * i) + sin(zangle * i) * one(T)im)
 end
 
-function _pow(z::T, i) where {T<:Real}
+@inline function _pow(z::T, i) where {T<:Real}
     zabs = abs(z)
     if sign(z) < zero(T)
         return (zabs^i) * (cos(T(π) * i) + sin(T(π) * i)im)
