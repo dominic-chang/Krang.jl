@@ -34,7 +34,7 @@ jobs:
       - name: Install JacobiElliptic
         run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Install docs dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git"), PackageSpec(path="https://github.com/LuxDL/DocumenterVitepress.jl.git")]); Pkg.instantiate()'
       - name: Install examples dependencies
         run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
       - name: Instantiate NPM
