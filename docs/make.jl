@@ -25,7 +25,7 @@ format=DocumenterVitepress.MarkdownVitepress(
     repo = "https://dchang10.github.io/Krang.jl", # this must be the full URL!
     devbranch = "main",
     devurl = "dev",
-    #clean_md_output = true
+    clean_md_output = true
     ;
 )
 
