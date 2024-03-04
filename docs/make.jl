@@ -15,17 +15,11 @@ MD_FILES = [joinpath("examples", file) for file in readdir(OUTDIR)]
 
 Documenter.DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
 
-format = Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://dchang10.github.io/Krang.jl",
-        edit_link="main",
-        assets=String[],
-    )
 format=DocumenterVitepress.MarkdownVitepress(
-    repo = "https://dchang10.github.io/Krang.jl", # this must be the full URL!
+    repo = "https://github.com/dchang10/Krang.jl", # this must be the full URL!
     devbranch = "main",
     devurl = "dev",
-    clean_md_output = true
+    #clean_md_output = true
     ;
 )
 
@@ -36,6 +30,8 @@ makedocs(;
     repo="https://github.com/dchang10/Krang.jl/blob/{commit}{path}#{line}",
     format=format,
     draft = false,
+    source = "src",
+    build = "build",
     pages=[
         "Home" => "index.md",
         "Getting Started" => "getting_started.md",

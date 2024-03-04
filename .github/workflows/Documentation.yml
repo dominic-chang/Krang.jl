@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node # This is still useful because it caches the node_modules so we don't constantly re-install.  You don't technically need this, though.
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
             node-version: 20
             cache: npm 
@@ -48,4 +48,3 @@ jobs:
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
           JULIA_DEBUG: "Documenter"
           DATADEPS_ALWAYS_ACCEPT: true
-        #run: julia --project=docs/ docs/make.jl
