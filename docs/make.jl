@@ -55,5 +55,6 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/dchang10/Krang.jl",
+    target = "build", # this is where Vitepress stores its output
     devbranch="main",
 )
