@@ -276,22 +276,19 @@
 
                                 τ = 0
                                 if isindir
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(2solθt.u - (solθo.u + solθs.u))
-                                    else
-                                        τ = abs(2solθt.u + solθs.u - solθo.u)
-                                    end
+                                    τ = 2solθt.u - abs(solθo.u + solθs.u)
                                 else
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(solθo.u - solθs.u)
-                                    else
-                                        τ = abs(solθo.u + solθs.u)
-                                    end
+                                    τ = abs(solθo.u - solθs.u)
                                 end
-                                tempGθ, _, _, _, _ = Krang.Gθ(pix, θs, isindir, 0)
+                                tempGθ, tempGs, tempGo, tempGhat, _ = Krang.Gθ(pix, θs, isindir, 0)
 
                                 @test tempGθ / τ ≈ 1.0 atol = 1e-3
-                                @test Krang.Gs(pix, τ) / ((θs > π / 2 ? -1 : 1) * (solθs.u)) ≈ 1.0 atol = 1e-3
+                                @test tempGs / solθs.u ≈ 1.0 atol = 1e-3
+                                @test tempGo / solθo.u ≈ 1.0 atol = 1e-3
+                                @test tempGhat / (2solθt.u) ≈ 1.0 atol = 1e-3
+
+
+                                #@test Krang.Gs(pix, τ) / tempGs ≈ 1.0 atol = 1e-3
                             end
                         end
                         @testset "Gϕ" begin
@@ -306,21 +303,17 @@
 
                                 τ = 0
                                 if isindir
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(2solθt.u - (solθo.u + solθs.u))
-                                    else
-                                        τ = abs(2solθt.u + solθs.u - solθo.u)
-                                    end
+                                    τ = 2solθt.u - abs(solθo.u + solθs.u)
                                 else
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(solθo.u - solθs.u)
-                                    else
-                                        τ = abs(solθo.u + solθs.u)
-                                    end
+                                    τ = abs(solθo.u - solθs.u)
                                 end
-                                tempGϕ, _, _, _ = Krang.Gϕ(pix, θs, isindir, 0)
+                                tempGϕ, tempGs, tempGo, tempGhat,_ = Krang.Gϕ(pix, θs, isindir, 0)
 
                                 @test tempGϕ / τ ≈ 1.0 atol = 1e-3
+                                @test tempGs / solθs.u ≈ 1.0 atol = 1e-3
+                                @test tempGo / solθo.u ≈ 1.0 atol = 1e-3
+                                @test tempGhat / (2solθt.u) ≈ 1.0 atol = 1e-3
+
                             end
                         end
                         @testset "Gt" begin
@@ -335,21 +328,17 @@
 
                                 τ = 0
                                 if isindir
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(2solθt.u - (solθo.u + solθs.u))
-                                    else
-                                        τ = abs(2solθt.u + solθs.u - solθo.u)
-                                    end
+                                    τ = 2solθt.u - abs(solθo.u + solθs.u)
                                 else
-                                    if sign(cos(θs) * cos(θo)) > 0
-                                        τ = abs(solθo.u - solθs.u)
-                                    else
-                                        τ = abs(solθo.u + solθs.u)
-                                    end
+                                    τ = abs(solθo.u - solθs.u)
                                 end
-                                tempGt, tempGs, tempGo, _, _ = Krang.Gt(pix, θs, isindir, 0)
+
+                                tempGt, tempGs, tempGo, tempGhat, _ = Krang.Gt(pix, θs, isindir, 0)
 
                                 @test tempGt / τ ≈ 1.0 atol = 1e-3
+                                @test tempGs / solθs.u ≈ 1.0 atol = 1e-3
+                                @test tempGo / solθo.u ≈ 1.0 atol = 1e-3
+                                @test tempGhat / (2solθt.u) ≈ 1.0 atol = 1e-3
                             end
                         end
                     end
