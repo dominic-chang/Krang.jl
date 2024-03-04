@@ -35,6 +35,7 @@ makedocs(;
     modules=[Krang],
     repo="https://github.com/dchang10/Krang.jl/blob/{commit}{path}#{line}",
     format=format,
+    draft = false,
     pages=[
         "Home" => "index.md",
         "Getting Started" => "getting_started.md",
