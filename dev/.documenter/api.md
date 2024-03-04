@@ -103,7 +103,7 @@ Emission radius for point originating at inclination θs whose nth order image a
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L5)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L5)
 
 
 
@@ -125,7 +125,7 @@ Emission radius for point originating at at Mino time τ whose image appears at 
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L41)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L41)
 
 </div>
 <br>
@@ -152,7 +152,7 @@ Emission inclination for point originating at inclination rs whose nth order ima
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L70)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L70)
 
 
 
@@ -174,7 +174,7 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L83)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L83)
 
 </div>
 <br>
@@ -208,7 +208,7 @@ Emission radius and azimuthal angle for point originating at inclination θs who
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L125)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L125)
 
 </div>
 <br>
@@ -242,7 +242,7 @@ Emission radius and azimuthal angle for point originating at inclination θs who
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L160)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L160)
 
 </div>
 <br>
@@ -267,7 +267,7 @@ Raytrace a point that appears at the screen coordinate (`α`, `β`) for an obser
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L221)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L221)
 
 </div>
 <br>
@@ -294,7 +294,7 @@ Mino time of trajectory between an observer at infinity and point at radius rs
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L283)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L283)
 
 
 
@@ -317,7 +317,7 @@ Mino time of trajectory between two inclinations for a given screen coordinate
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1906)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1906)
 
 </div>
 <br>
@@ -337,7 +337,7 @@ abstract type AbstractMetric
 Abstract Metric Type
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/AbstractMetric.jl#L1)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/AbstractMetric.jl#L1)
 
 </div>
 <br>
@@ -359,7 +359,7 @@ Kerr Metric in Boyer Lindquist Coordinates
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L3)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L3)
 
 </div>
 <br>
@@ -378,7 +378,7 @@ metric_uu(metric::Krang.AbstractMetric, args...) -> Any
 Returns the inverse metric in some representation (usually as an nxn matrix).
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/AbstractMetric.jl#L15)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/AbstractMetric.jl#L15)
 
 
 
@@ -391,7 +391,7 @@ metric_uu(metric::Kerr{T}, r, θ) -> Any
 Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L47)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L47)
 
 
 
@@ -410,7 +410,7 @@ Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L65)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L65)
 
 </div>
 <br>
@@ -429,7 +429,7 @@ metric_dd(metric::Krang.AbstractMetric, args...) -> Any
 Returns the metric in some representation (usually as an nxn matrix).
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/AbstractMetric.jl#L8)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/AbstractMetric.jl#L8)
 
 
 
@@ -442,7 +442,7 @@ metric_dd(metric::Kerr{T}, r, θ) -> Any
 Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L78)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L78)
 
 
 
@@ -461,7 +461,7 @@ Kerr metric in Boyer Lindquist (BL) coordinates.
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L98)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L98)
 
 </div>
 <br>
@@ -480,7 +480,7 @@ horizon(metric::Kerr{T}) -> Any
 Outer Horizon for the Kerr metric.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/Kerr.jl#L20)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/Kerr.jl#L20)
 
 </div>
 <br>
@@ -507,7 +507,7 @@ Energy reduced azimuthal angular momentum
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L112)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L112)
 
 </div>
 <br>
@@ -536,7 +536,7 @@ Energy reduced Carter integral
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L125)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L125)
 
 </div>
 <br>
@@ -567,7 +567,7 @@ Radial potential of spacetime
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L194)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L194)
 
 </div>
 <br>
@@ -594,7 +594,7 @@ Returns roots of $r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η$
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L228)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L228)
 
 </div>
 <br>
@@ -621,7 +621,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$. See [`r_p
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1754)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1754)
 
 </div>
 <br>
@@ -652,7 +652,7 @@ Theta potential of a Kerr blackhole
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L210)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L210)
 
 </div>
 <br>
@@ -690,7 +690,7 @@ Returns the antiderivative $G_\theta=\int\frac{d\theta}{\sqrt{\Theta(\theta)}}$.
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1921)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1921)
 
 </div>
 <br>
@@ -719,7 +719,7 @@ Horizontal Bardeen Screen Coordinate
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L139)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L139)
 
 </div>
 <br>
@@ -748,7 +748,7 @@ Horizontal Bardeen Screen Coordinate
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L152)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L152)
 
 </div>
 <br>
@@ -773,7 +773,7 @@ Defines a horizontal boundary on the assmyptotic observers screen where emission
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L166)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L166)
 
 </div>
 <br>
@@ -802,7 +802,7 @@ Defines a vertical boundary on the Assyptotic observers screen where emission th
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L178)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L178)
 
 </div>
 <br>
@@ -834,7 +834,7 @@ Returns the momentum form in the Boyer-Lindquist basis.
 
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L5)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L5)
 
 </div>
 <br>
@@ -853,7 +853,7 @@ jac_bl_u_zamo_d(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts ZAMO vector to a Boyer-Lindquist basis
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L71)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L71)
 
 </div>
 <br>
@@ -872,7 +872,7 @@ jac_zamo_u_bl_d(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts Boyer-Lindquist vector to a ZAMO basis
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L53)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L53)
 
 </div>
 <br>
@@ -891,7 +891,7 @@ jac_bl_d_zamo_u(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts ZAMO covector to a Boyer-Lindquist basis
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L35)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L35)
 
 </div>
 <br>
@@ -910,7 +910,7 @@ jac_zamo_d_bl_u(metric::Kerr{T}, r, θ) -> Any
 Returns the Jacobian which converts a Boyer-Lindquist covector to ZAMO basis.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L17)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L17)
 
 </div>
 <br>
@@ -929,7 +929,7 @@ jac_fluid_u_zamo_d(_::Kerr{T}, β, θ, φ) -> Any
 Jacobian which expreases ZAMO vector in the fluid frame
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L89)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L89)
 
 </div>
 <br>
@@ -954,7 +954,7 @@ screen_polarisation(
 Returns the screen polarization associated with a killing spinor κ as seen seen by an assymptotic observer.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L1)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L1)
 
 </div>
 <br>
@@ -979,7 +979,7 @@ penrose_walker(
 Returns the Penrose walker constant for a photon with momentum p_u emitted from a fluid particle with momentum f_u.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/physicsUtils.jl#L107)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/physicsUtils.jl#L107)
 
 </div>
 <br>
@@ -1009,7 +1009,7 @@ synchrotronIntensity(
 Calculates the intensity of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L1)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L1)
 
 </div>
 <br>
@@ -1039,7 +1039,7 @@ synchrotronPolarization(
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L19)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L19)
 
 </div>
 <br>
@@ -1057,7 +1057,7 @@ struct Mesh{G<:Krang.AbstractGeometry, M<:Krang.AbstractMaterial}
 
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/geometries/geometry_types.jl#L46)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/geometries/geometry_types.jl#L46)
 
 </div>
 <br>
@@ -1075,7 +1075,7 @@ struct ElectronSynchrotronPowerLawPolarization <: Krang.AbstractMaterial
 Linear polarization material from https://doi.org/10.3847/1538-4357/abf117
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L68)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L68)
 
 </div>
 <br>
@@ -1093,7 +1093,7 @@ struct UnionGeometry{G1, G2} <: Krang.AbstractGeometry
 Geometry that is comprised of the union of two geometries.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/geometries/geometry_types.jl#L32)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/geometries/geometry_types.jl#L32)
 
 </div>
 <br>
@@ -1114,7 +1114,7 @@ _isreal2(num::Complex{T}) -> Any
 Checks if a complex number is real to some tolerance
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L20)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L20)
 
 </div>
 <br>
@@ -1141,7 +1141,7 @@ Regularized elliptic integral of the third kind
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L30)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L30)
 
 </div>
 <br>
@@ -1164,7 +1164,7 @@ radial_m_I0_terms_integrals_case3(
 Returns the radial integrals for the case where there are two real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1662)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1662)
 
 </div>
 <br>
@@ -1186,7 +1186,7 @@ radial_inf_integrals_case4(
 Returns the radial integrals for the case where there are no real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1397)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1397)
 
 </div>
 <br>
@@ -1221,7 +1221,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1148)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1148)
 
 </div>
 <br>
@@ -1257,7 +1257,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L982)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L982)
 
 </div>
 <br>
@@ -1282,7 +1282,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$ evaluated 
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L296)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L296)
 
 </div>
 <br>
@@ -1321,7 +1321,7 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/raytracer.jl#L99)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/raytracer.jl#L99)
 
 </div>
 <br>
@@ -1339,7 +1339,7 @@ struct ConeGeometry{T, A} <: Krang.AbstractGeometry
 Cone Geometry with half opening angle `opening_angle`.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/geometries/geometry_types.jl#L18)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/geometries/geometry_types.jl#L18)
 
 </div>
 <br>
@@ -1368,7 +1368,7 @@ Returns the antiderivative $I_ϕ=\int\frac{a(2Mr-a\lambda)}{\sqrt{\Delta\mathcal
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1768)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1768)
 
 </div>
 <br>
@@ -1386,7 +1386,7 @@ struct SlowLightIntensityCamera{T} <: Krang.AbstractCamera
 Observer sitting at radial infinity. The frame of this observer is alligned with the Boyer-Lindquist frame.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/SlowLightIntensityCamera.jl#L87)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/SlowLightIntensityCamera.jl#L87)
 
 </div>
 <br>
@@ -1417,7 +1417,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L699)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L699)
 
 </div>
 <br>
@@ -1435,7 +1435,7 @@ struct SlowLightIntensityPixel{T} <: Krang.AbstractPixel
 Intensity Pixel Type.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/SlowLightIntensityCamera.jl#L3)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/SlowLightIntensityCamera.jl#L3)
 
 </div>
 <br>
@@ -1458,7 +1458,7 @@ radial_m_I0_terms_integrals_case4(
 Returns the radial integrals for the case where there are no real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1707)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1707)
 
 </div>
 <br>
@@ -1487,7 +1487,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L444)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L444)
 
 </div>
 <br>
@@ -1511,7 +1511,7 @@ radial_m_I0_terms_integrals_case2(
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1612)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1612)
 
 </div>
 <br>
@@ -1533,7 +1533,7 @@ radial_inf_integrals_case3(
 Returns the radial integrals for the case where there are two real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1359)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1359)
 
 </div>
 <br>
@@ -1551,7 +1551,7 @@ abstract type AbstractPixel
 Abstract Pixel Type
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/camera_types.jl#L15)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/camera_types.jl#L15)
 
 </div>
 <br>
@@ -1576,7 +1576,7 @@ radial_w_I0_terms_integrals_case2(
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1457)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1457)
 
 </div>
 <br>
@@ -1594,7 +1594,7 @@ struct SlowLightIntensityScreen{T} <: Krang.AbstractScreen
 Screen made of Intensity Pixels.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/SlowLightIntensityCamera.jl#L59)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/SlowLightIntensityCamera.jl#L59)
 
 </div>
 <br>
@@ -1618,7 +1618,7 @@ radial_w_I0_terms_integrals_case4(
 Returns the radial integrals for the case where there are no real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1556)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1556)
 
 </div>
 <br>
@@ -1650,7 +1650,7 @@ Return the radial integrals
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1808)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1808)
 
 </div>
 <br>
@@ -1668,7 +1668,7 @@ abstract type AbstractCamera
 Abstract Observer Type
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/camera_types.jl#L1)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/camera_types.jl#L1)
 
 </div>
 <br>
@@ -1686,7 +1686,7 @@ struct IntensityScreen{T} <: Krang.AbstractScreen
 Screen made of Intensity Pixels.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/IntensityCamera.jl#L40)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/IntensityCamera.jl#L40)
 
 </div>
 <br>
@@ -1715,7 +1715,7 @@ Returns the antiderivative $I_t=\int\frac{a(2Mr-a\lambda)}{\sqrt{\Delta\mathcal{
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1788)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1788)
 
 </div>
 <br>
@@ -1733,7 +1733,7 @@ struct IntensityPixel{T} <: Krang.AbstractPixel
 Intensity Pixel Type.  Each Pixel is associated with a single ray, and caches some information about the ray.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/IntensityCamera.jl#L2)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/IntensityCamera.jl#L2)
 
 </div>
 <br>
@@ -1764,7 +1764,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L570)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L570)
 
 </div>
 <br>
@@ -1782,7 +1782,7 @@ abstract type AbstractMaterial
 Abstract Material
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/materials/material_types.jl#L1)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/materials/material_types.jl#L1)
 
 </div>
 <br>
@@ -1800,7 +1800,7 @@ abstract type AbstractScreen
 Abstract Screen Type
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/camera_types.jl#L8)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/camera_types.jl#L8)
 
 </div>
 <br>
@@ -1824,7 +1824,7 @@ radial_w_I0_terms_integrals_case3(
 Returns the radial integrals for the case where there are two real roots in the radial potential
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1509)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1509)
 
 </div>
 <br>
@@ -1842,7 +1842,7 @@ struct IntensityCamera{T} <: Krang.AbstractCamera
 Observer sitting at radial infinity. The frame of this observer is alligned with the Boyer-Lindquist frame.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/cameras/IntensityCamera.jl#L68)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/cameras/IntensityCamera.jl#L68)
 
 </div>
 <br>
@@ -1869,7 +1869,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$. See [`r_p
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L368)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L368)
 
 </div>
 <br>
@@ -1887,7 +1887,7 @@ abstract type AbstractGeometry
 Abstract Geometry
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/geometries/geometry_types.jl#L2)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/geometries/geometry_types.jl#L2)
 
 </div>
 <br>
@@ -1909,7 +1909,7 @@ radial_inf_integrals_case2(
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L1321)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L1321)
 
 </div>
 <br>
@@ -1942,7 +1942,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-[source](https://github.com/dchang10/Krang.jl/blob/733825c15b7887a65d30a0b70f8fef4f4caa8d62/src/metrics/Kerr/misc.jl#L828)
+[source](https://github.com/dchang10/Krang.jl/blob/96bf68136663fb41adf27984e491b18e02b971df/src/metrics/Kerr/misc.jl#L828)
 
 </div>
 <br>

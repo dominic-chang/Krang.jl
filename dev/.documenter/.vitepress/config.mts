@@ -5,7 +5,7 @@ import footnote from "markdown-it-footnote";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: '/dev/',// TODO: replace this in makedocs!
+  base: '/Krang.jl/',// TODO: replace this in makedocs!
   title: 'Krang.jl',
   description: "A VitePress Site",
   lastUpdated: true,
