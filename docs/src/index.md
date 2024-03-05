@@ -34,5 +34,3 @@ features:
     details: Explore the possibilities with VUE components
 ---
 ```
-
-# What is Krang.jl
