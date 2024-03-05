@@ -22,9 +22,9 @@ Cone Geometry with half opening angle `opening_angle`.
 """
 struct ConeGeometry{T, A} <: AbstractGeometry
     opening_angle::T
-    attriributes::A
+    attributes::A
     ConeGeometry(opening_angle::T) where {T} = new{T, Nothing}(opening_angle)
-    ConeGeometry(opening_angle::T, attriributes::A) where {T,A} = new{T, A}(opening_angle,attriributes)
+    ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
 end
 
 Disk(;attributes=nothing) = ConeGeometry(π/2;attributes=attributes)

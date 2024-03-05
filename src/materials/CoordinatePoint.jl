@@ -1,7 +1,7 @@
 struct CoordinatePoint<: AbstractMaterial end
 
 function (prof::CoordinatePoint)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
-    n, rmin, rmax = geometry.attriributes
+    n, rmin, rmax = geometry.attributes
     θs = geometry.opening_angle
 
     observation = zeros(T, 4)

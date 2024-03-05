@@ -25,7 +25,7 @@ end
 struct ElectronSynchrotronPowerLawIntensity <: AbstractMaterial end
 
 function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
-    magfield, fluid_velocity, subimgs, profile, σ = geometry.attriributes
+    magfield, fluid_velocity, subimgs, profile, σ = geometry.attributes
 
     θs = geometry.opening_angle
     θo = inclination(pix)

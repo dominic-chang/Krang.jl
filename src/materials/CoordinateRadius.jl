@@ -1,7 +1,7 @@
 struct CoordinateRadius<: AbstractMaterial end
 
 function (prof::CoordinateRadius)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T, A}
-    n, rmin, rmax = geometry.attriributes
+    n, rmin, rmax = geometry.attributes
     observation = zero(T)
 
     isindir = false
