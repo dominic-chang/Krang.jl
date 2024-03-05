@@ -270,7 +270,7 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     r4 = (sqrtξ02 + det2) / 2
 
     roots = (r1, r2, r3, r4)
-    if (sum(_isreal2.(roots)) == 2) && (abs(imag(roots[4])) < T(0.0001))#sqrt(eps(T)))
+    if (sum(_isreal2.(roots)) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
         roots = (roots[1], roots[4], roots[2], roots[3])
     end
     return roots 
