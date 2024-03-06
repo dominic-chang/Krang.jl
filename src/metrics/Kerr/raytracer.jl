@@ -1,4 +1,4 @@
-include("./misc.jl")
+#include("./misc.jl")
 # Follows the Formalism of Gralla & Lupsasca (https://arxiv.org/pdf/1910.12881.pdf)
 export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates
 
@@ -17,8 +17,6 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    #cosθs = cos(θs)
-    #cosθo = cos(θo)
     isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
     if !isincone#cosθs > abs(cosθo)
         αmin = αboundary(met, θs)
@@ -27,11 +25,13 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
-    (isnan(τ) || isinf(τ)) && return (T(NaN), true, true, 0)
 
     # is θ̇s increasing or decreasing?
-    #νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    #νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = !isindir
+    if isincone 
+        νθ = (θo > θs) ⊻ (n % 2 == 1) 
+    end
     # is ṙs increasing or decreasing?
     rs, νr, numreals = emission_radius(pix, τ)
 

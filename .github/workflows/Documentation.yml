@@ -17,20 +17,34 @@ jobs:
   build:
     permissions:
       contents: write
+      pages: write
+      id-token: write
+      statuses: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node # This is still useful because it caches the node_modules so we don't constantly re-install.  You don't technically need this, though.
+        uses: actions/setup-node@v4
+        with:
+            node-version: 20
+            cache: npm 
+            cache-dependency-path: 'docs/package-lock.json' # this should be a package-lock.json file
+      - run: cd docs/; rm package-lock.json; npm install; cd ..
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
         with:
           version: '1.10'
-      - name: Install JacobiElliptic
-        run: julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
+      - name: Pull Julia cache
+        uses: julia-actions/cache@v1
       - name: Install docs dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/LuxDL/DocumenterVitepress.jl.git")]); Pkg.instantiate()'
       - name: Install examples dependencies
-        run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/dchang10/JacobiElliptic.jl.git")]); Pkg.instantiate()'
+        run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()),]); Pkg.instantiate()'
       - name: Build and deploy
+        uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
-        run: julia --project=docs/ docs/make.jl
+          JULIA_DEBUG: "Documenter"
+          DATADEPS_ALWAYS_ACCEPT: true

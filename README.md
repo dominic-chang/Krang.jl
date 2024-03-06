@@ -2,7 +2,6 @@
 
 Kerr Raytracer for Analytic Null Geodesics
 ## Documentation
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://dchang10.github.io/Krang.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://dchang10.github.io/Krang.jl/dev/)
 ## Repo Status
 [![Build Status](https://github.com/dchang10/Krang.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/dchang10/Krang.jl/actions/workflows/CI.yml?query=branch%3Amain)

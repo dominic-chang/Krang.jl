@@ -1,16 +1,15 @@
 # Miscellaneous functions
 ##----------------------------------------------------------------------------------------------------------------------
 export λ, η, α, β, αboundary, βboundary, r_potential, θ_potential, get_radial_roots, 
-Ir,
-Gθ
+Ir,Gθ
 
-function _pow(z::Complex{T}, i) where {T}
+@inline function _pow(z::Complex{T}, i) where {T}
     zabs = abs(z)
     zangle = angle(z)
     return (zabs^i) * (cos(zangle * i) + sin(zangle * i) * one(T)im)
 end
 
-function _pow(z::T, i) where {T<:Real}
+@inline function _pow(z::T, i) where {T<:Real}
     zabs = abs(z)
     if sign(z) < zero(T)
         return (zabs^i) * (cos(T(π) * i) + sin(T(π) * i)im)
@@ -205,7 +204,7 @@ Radial potential of spacetime
 function r_potential(metric::Kerr{T}, η, λ, r) where {T}
     a = metric.spin
     λ2 = λ^2
-    a * (a * (r * (r + 2) - η) - 4 * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
+    return a * (a * (r * (r + 2) - η) - 4 * λ * r) + r * ((η + η) + (λ2 + λ2) + r * (-η - λ2 + r^2)) # Eq 7 PhysRevD.101.044032
 end
 
 """
@@ -220,7 +219,7 @@ Theta potential of a Kerr blackhole
 """
 function θ_potential(metric::Kerr{T}, η, λ, θ) where {T}
     a = metric.spin
-    η + a^2 * cos(θ)^2 - λ^2 * cot(θ)^2
+    return η + a^2 * cos(θ)^2 - λ^2 * cot(θ)^2
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
@@ -251,7 +250,7 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     ωp = _pow(-Q / T(2) + _pow(-Δ3 / T(108), T(0.5)) + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
-    C = (T(-0.4999999999999999) + T(0.8660254037844387)im, T(-0.5000000000000002) - T(0.8660254037844385)im, one(T) + zero(T)im) .* ωp
+    C = (-T(1/2) + T(√3/2)im, -T(1/2) - T(√3/2)im, one(T) + zero(T)im) .* ωp
 
     v = -P .* _pow.(T(3) .* C, -one(T))
 
@@ -333,8 +332,8 @@ function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
 
     r1, r2, r21 = real.((r1, r2, r21))
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs(r32 * r42)
+    B2 = abs(r31 * r41)
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
@@ -413,7 +412,7 @@ function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) / (A * (rs - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
 
@@ -1856,26 +1855,19 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     a = metric(pix).spin
 
     fo = I0_inf(pix)
-    A = √real(r32 * r42)
-    B = √real(r31 * r41)
+    A = √abs(r32 * r42)
+    B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
+    temprat = B * (rh - r2) / (A * (rh - r1))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
+    Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
+    τ > (fo - Ir_s) && return T(NaN), true
 
-    if a ≤ one(T)
-        temprat = B * (rh - r2) / (A * (rh - r1))
-        x3_s = ((one(T) - temprat) / (one(T) + temprat))
-        Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-        τ > (fo - Ir_s) && return T(NaN), true
-    else
-        if τ > 2fo
-            return T(NaN), true
-        end
-
-    end
     X3 = √(A * B) * real(fo - τ)
-    #if X3 < zero(T)
-    #    return T(NaN), true
-    #end
+    if X3 < zero(T)
+        return T(NaN), true
+    end
     cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
     den = -A + B + (A + B) * cn
