@@ -160,7 +160,7 @@ Horizontal Bardeen Screen Coordinate
 - `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
-    return sqrt(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2)
+    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2), 0)
 end
 
 """
@@ -2162,7 +2162,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
 
     Δθ = (one(T) - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
-    desc = √(Δθ2 + η / a2)
+    desc = √max(Δθ2 + η / a2, 0)
     up = Δθ + desc
     um = Δθ - desc
     m = up / um
