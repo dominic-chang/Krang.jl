@@ -72,8 +72,8 @@ end
 """
 struct ElectronSynchrotronPowerLawPolarization <: AbstractMaterial end
 
-function nan2zero(x)
-    return isnan(x) ? zero(eltype(x)) : x
+function inf2zero(x)
+    return isinf(x) ? zero(eltype(x)) : x
 end
 
 """
@@ -101,7 +101,7 @@ function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, g
             q = T(-(eα^2 - eβ^2) + eps(T))
             u = T(-2 * eα * eβ + eps(T))
             i = hypot(q, u)^(1 + σ) * lp * prof
-            observation += StokesParams(nan2zero(i), nan2zero(q), nan2zero(u), zero(T))
+            observation += StokesParams(inf2zero(i), inf2zero(q), inf2zero(u), zero(T))
         end
     end
     return observation

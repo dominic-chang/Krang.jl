@@ -4,7 +4,7 @@ export emission_radius, emission_inclination, emission_coordinates_fast_light, e
 
 """
 Emission radius for point originating at inclination θs whose nth order image appears at the screen coordinate (`α`, `β`). 
-Returns NaN if the emission coordinates do not exist for that screen coordinate.
+Returns Inf if the emission coordinates do not exist for that screen coordinate.
 
 # Arguments
 
@@ -21,7 +21,7 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     if !isincone#cosθs > abs(cosθo)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-        ((abs(β) + eps(T)) < βbound) && return (T(NaN), true, true, 0)
+        ((abs(β) + eps(T)) < βbound) && return (T(Inf), true, true, 0)
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
@@ -40,7 +40,7 @@ end
 
 """
 Emission radius for point originating at at Mino time τ whose image appears at the screen coordinate (`α`, `β`). 
-Returns NaN if the emission coordinates do not exist for that screen coordinate.
+Returns Inf if the emission coordinates do not exist for that screen coordinate.
 
 # Arguments
 
@@ -114,10 +114,10 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     α, _ = pix.screen_coordinate
     λtemp = λ(met, α, θo)
     Iϕ = Krang.Iϕ(pix, rs, τ, νr)
-    (isnan(Iϕ) || !isfinite(Iϕ)) && return T(NaN)
+    (isinf(Iϕ) || !isfinite(Iϕ)) && return T(Inf)
 
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
-    (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
+    (isinf(Gϕtemp) || !isfinite(Gϕtemp)) && return T(Inf)
 
     return -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
 end
@@ -141,13 +141,13 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), false, false
+            return T(Inf), T(Inf), T(Inf), false, false
         end
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
-    if isnan(τ)
-        return T(NaN), T(NaN), T(NaN), false, false
+    if isinf(τ)
+        return T(Inf), T(Inf), T(Inf), false, false
     end
 
     rs, νr, _ = emission_radius(pix, τ)
@@ -179,7 +179,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), T(NaN), false, false
+            return T(Inf), T(Inf), T(Inf), T(Inf), false, false
         end
     end
 
@@ -193,8 +193,8 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     if (abs(cosθs) < abs(cosθo))
         isindir = ((sign(β) > 0) ⊻ (θo > π / 2))
     end
-    if isnan(τ)
-        return T(NaN), T(NaN), T(NaN), T(NaN), false, false
+    if isinf(τ)
+        return T(Inf), T(Inf), T(Inf), T(Inf), false, false
     end
 
     rs, νr, _ = emission_radius(pix, τ)
@@ -239,7 +239,7 @@ function raytrace(pix::AbstractPixel, τ::T) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), T(NaN), true, true
+            return T(Inf), T(Inf), T(Inf), T(Inf), true, true
         end
     end
 
