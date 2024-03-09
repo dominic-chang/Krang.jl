@@ -58,7 +58,7 @@ function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magfield
     ]
     f_temp_d = ((A - B * im) * (ri - a * cos(θs) * im)) * (f_bl_u)
     κ = sum(curr_p_bl_u .* f_temp_d)
-    κ = κ * Krang._pow(conj(κ) * κ, -T(0.5))
+    κ = κ * inv(sqrt((conj(κ) * κ)))
 
     eα, eβ = screen_polarisation(metric, κ, θo, α, β) .* norm
 
