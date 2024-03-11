@@ -1,6 +1,7 @@
 using Revise
 using Krang
 using Enzyme
+using ForwardDiff
 Enzyme.API.printall!(false)
 Enzyme.Compiler.RunAttributor[] = false
 Enzyme.Compiler.CheckNan[] = true
@@ -49,7 +50,7 @@ function test(α, β)
     p1 = 4.0
     σ = 3.0
     p2 = 3.0
-    θo = π/4
+    θo = π/4.0
     metric = Krang.Kerr(a);
     η2 = 1f0π-η1
     magfield1 = Krang.SVector(sin(ι)*cos(η1), sin(ι)*sin(η1), cos(ι));
@@ -88,22 +89,38 @@ curr_theme = Theme(
 )
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 fig = Figure()
-ax = Axis(fig[1,2], aspect=1, title="Gradient")
-Ivals = []
-for β in -10:0.11:10
-    for α in -10:0.11:10
-        append!(Ivals, hypot(autodiff(Enzyme.Reverse, test, Active, Active(α), Active(β))[1]...))
-    end
-end
-heatmap!(ax, reshape(Ivals, 182, 182))
-display(fig)
-Ivals = []
 
-ax2 = Axis(fig[1,1], aspect=1, title="Intensity")
+Ivals = []
+ax1 = Axis(fig[1,1], aspect=1, title="Intensity")
 for β in -10:0.11:10
     for α in -10:0.11:10
         append!(Ivals, test(α,β))
     end
 end
+heatmap!(ax1, reshape(Ivals, 182, 182))
+display(fig)
+
+Ivals = []
+ax2 = Axis(fig[1,2], aspect=1, title="Enzyme (Reverse)")
+for β in -10:0.11:10
+    for α in -10:0.11:10
+        append!(Ivals, hypot(autodiff(Enzyme.Reverse, test, Active, Active(α), Active(β))[1]...))
+    end
+end
 heatmap!(ax2, reshape(Ivals, 182, 182))
+display(fig)
+
+Ivals2 = []
+ax3 = Axis(fig[2,1], aspect=1, title="ForwardDiff")
+for β in -10:0.11:10
+    for α in -10:0.11:10
+        append!(Ivals2, hypot(ForwardDiff.gradient((a)->test(a[1],a[2]),[α,β])...))
+    end
+end
+heatmap!(ax3, reshape(Ivals2, 182, 182))
+display(fig)
+
+
+ax4 = Axis(fig[2,2], aspect=1, title="Difference")
+heatmap!(ax4, reshape((Ivals .- Ivals2) ./ Ivals, 182, 182))
 display(fig)
