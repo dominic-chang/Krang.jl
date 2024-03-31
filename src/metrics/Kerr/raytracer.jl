@@ -25,6 +25,9 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
+    if isinf(τ)
+        return (T(Inf), true, true, 0)
+    end
 
     # is θ̇s increasing or decreasing?
     #νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
