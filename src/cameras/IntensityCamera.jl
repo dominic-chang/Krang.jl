@@ -5,20 +5,20 @@ export IntensityCamera
 Intensity Pixel Type. 
 Each Pixel is associated with a single ray, and caches some information about the ray.
 """
-struct IntensityPixel{T, A} <: AbstractPixel
+struct IntensityPixel{T} <: AbstractPixel
     metric::Kerr{T}
-    screen_coordinate::NTuple{2, A}
+    screen_coordinate::NTuple{2, T}
     "Radial roots"
-    roots::NTuple{4,Complex{A}}
+    roots::NTuple{4,Complex{T}}
     "Radial antiderivative"
     I0_inf::A
     "Angular antiderivative"
-    absGθo_Gθhat::NTuple{2,A}
+    absGθo_Gθhat::NTuple{2,T}
     "Inclination"
     θo::T
-    η::A
-    λ::A
-    function IntensityPixel(met::Kerr{T}, α::A, β::A, θo::T) where {T, A}
+    η::T
+    λ::T
+    function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
@@ -26,7 +26,7 @@ struct IntensityPixel{T, A} <: AbstractPixel
         if (numreals == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
-        new{T, A}(
+        new{T}(
             met,
             (α, β), 
             roots,
