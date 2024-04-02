@@ -40,11 +40,9 @@ function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geomet
         for n in subimgs
             νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
             rs, νr, _ = emission_radius(pix, geometry.opening_angle, isindir, n)
-
             if rs ≤ horizon(met) || isnan(rs)
                 continue
             end
-            #return rs
             norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
             prof = profile(rs) * max(redshift, eps(T))^(T(3) + σ)

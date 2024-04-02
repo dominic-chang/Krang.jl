@@ -160,7 +160,7 @@ Horizontal Bardeen Screen Coordinate
 - `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
-    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2, 0))
+    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2), 0)
 end
 
 """

@@ -23,7 +23,7 @@
         @test Krang.inclination(intpix) == θo
         @test Krang.η(intpix) == Krang.η(met, α, β, θo)
         @test Krang.λ(intpix) == Krang.λ(met, α, θo)
-        @test max((abs.(Krang.roots(intpix) .- crit_roots))...) ≈ 0.0 = 1e-5
+        @test max((abs.(Krang.roots(intpix) .- crit_roots))...) ≈ 0.0
         @test isnan(Krang.I0_inf(intpix)) ≈ isnan(Krang.Ir_inf(met, crit_roots))
         @test isnan(Krang.Ir_inf(intpix)) ≈ isnan(Krang.Ir_inf(met, crit_roots))
     end

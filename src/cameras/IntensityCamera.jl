@@ -11,14 +11,14 @@ struct IntensityPixel{T} <: AbstractPixel
     "Radial roots"
     roots::NTuple{4,Complex{T}}
     "Radial antiderivative"
-    I0_inf::A
+    I0_inf::T
     "Angular antiderivative"
     absGθo_Gθhat::NTuple{2,T}
     "Inclination"
     θo::T
     η::T
     λ::T
-    function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
+    function IntensityPixel(met::Kerr{T}, α, β, θo::T) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
