@@ -17,6 +17,10 @@ struct Kerr{T} <: AbstractMetric
     end
 end
 
+function Base.convert(::Type{Krang.Kerr{A}}, met::Krang.Kerr{M}) where {M,A}
+    return Krang.Kerr(convert(A,met.spin))
+end
+
 """
 Outer Horizon for the Kerr metric.
 """

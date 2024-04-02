@@ -1,8 +1,8 @@
 """
 Calculates the intensity of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function synchrotronIntensity(metric::Kerr{T}, α, β, ri, θs, θo, magfield::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
-
+function synchrotronIntensity(metric::Kerr{K}, α, β, ri, θs, θo, magfield::SVector{3,A}, βfluid::SVector{3,B}, νr::Bool, θsign::Bool) where {K, A, B}
+    T = promote_type(K, A, B)
     βv = βfluid[1]
     θz = βfluid[2]
     ϕz = βfluid[3]
