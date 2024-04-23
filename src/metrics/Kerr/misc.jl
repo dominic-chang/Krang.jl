@@ -1,22 +1,7 @@
 # Miscellaneous functions
 ##----------------------------------------------------------------------------------------------------------------------
 export λ, η, α, β, αboundary, βboundary, r_potential, θ_potential, get_radial_roots, 
-Ir,
-Gθ
-
-function _pow(z::Complex{T}, i) where {T}
-    zabs = abs(z)
-    zangle = angle(z)
-    return (zabs^i) * (cos(zangle * i) + sin(zangle * i) * one(T)im)
-end
-
-function _pow(z::T, i) where {T<:Real}
-    zabs = abs(z)
-    if sign(z) < zero(T)
-        return (zabs^i) * (cos(T(π) * i) + sin(T(π) * i)im)
-    end
-    return zabs^i + zero(T)im
-end
+Ir,Gθ
 
 """
 Checks if a complex number is real to some tolerance
@@ -161,7 +146,7 @@ Horizontal Bardeen Screen Coordinate
 - `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
-    return sqrt(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2)
+    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2, 0))
 end
 
 """
@@ -248,22 +233,22 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B * B / T(8)
 
     Δ3 = -T(4) * P * P * P - T(27) * Q * Q
-    ωp = _pow(-Q / T(2) + _pow(-Δ3 / T(108), T(0.5)) + zero(T)im, T(1 / 3))
+    ωp = ^(-Q / T(2) + sqrt(-Δ3 / T(108)) + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1/2) + T(√3/2)im, -T(1/2) - T(√3/2)im, one(T) + zero(T)im) .* ωp
 
-    v = -P .* _pow.(T(3) .* C, -one(T))
+    v = -P .* inv.(T(3) .* C)
 
     ξ0 = argmax(real, (C .+ v)) - A / T(3)
     ξ02 = ξ0 + ξ0
 
     predet1 = A2 + ξ02
-    predet2 = (√T(2) * B) * _pow(ξ0, T(-0.5))
-    det1 = _pow(-(predet1 - predet2), T(0.5))
-    det2 = _pow(-(predet1 + predet2), T(0.5))
+    predet2 = (√T(2) * B) * inv(sqrt(ξ0))
+    det1 = sqrt(-(predet1 - predet2))
+    det2 = sqrt(-(predet1 + predet2))
 
-    sqrtξ02 = _pow(ξ02, T(0.5))
+    sqrtξ02 = sqrt(ξ02)
 
     r1 = (-sqrtξ02 - det1) / 2
     r2 = (-sqrtξ02 + det1) / 2
@@ -333,8 +318,8 @@ function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
 
     r1, r2, r21 = real.((r1, r2, r21))
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs(r32 * r42)
+    B2 = abs(r31 * r41)
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
@@ -413,7 +398,7 @@ function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) / (A * (rs - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
 
@@ -641,8 +626,8 @@ function Iϕ_m_I0_terms_case3(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
-    temprat = B * (rs - r2) * real(_pow(A * (rs - r1), -one(T)))
-    x3_s = clamp(((one(T) - temprat) * real(_pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * real(inv(A * (rs - r1)))
+    x3_s = clamp(((one(T) - temprat) * real(inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -770,8 +755,8 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
-    temprat = B * (rs - r2) * real(_pow(A * (rs - r1), -one(T)))
-    x3_s = clamp(((one(T) - temprat) * real(_pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * real(inv(A * (rs - r1)))
+    x3_s = clamp(((one(T) - temprat) * real(inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1075,8 +1060,8 @@ function It_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
 
     k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
 
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = clamp(real(((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = clamp(real(((one(T) - temprat) * inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1239,8 +1224,8 @@ function It_m_I0_terms_case3(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {T
 
     k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
 
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = clamp(real(((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = clamp(real(((one(T) - temprat) * inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1528,8 +1513,8 @@ function radial_w_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     B2 = real(r31 * r41)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = real((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
     abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
 
@@ -1681,8 +1666,8 @@ function radial_m_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     B2 = real(r31 * r41)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = real((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
     abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
 
@@ -1852,11 +1837,11 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
 
 
     fo = I0_inf(pix)
-    A = √real(r32 * r42)
-    B = √real(r31 * r41)
+    A = √abs(r32 * r42)
+    B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
     temprat = B * (rh - r2) / (A * (rh - r1))
-    x3_s = ((one(T) - temprat) / (one(T) + temprat))
+    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
     τ > (fo - Ir_s) && return T(NaN), true
@@ -2163,7 +2148,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
 
     Δθ = (one(T) - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
-    desc = √(Δθ2 + η / a2)
+    desc = √max(Δθ2 + η / a2, 0)
     up = Δθ + desc
     um = Δθ - desc
     m = up / um

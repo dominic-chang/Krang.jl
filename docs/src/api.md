@@ -59,7 +59,15 @@ Krang.jac_zamo_d_bl_u
 Krang.jac_fluid_u_zamo_d
 Krang.screen_polarisation
 Krang.penrose_walker
-Krang.electronSynchrotronPowerLawPolarization
+Krang.synchrotronIntensity
+Krang.synchrotronPolarization
+```
+
+### Raytracing API Related Functions
+```@docs
+Krang.Mesh
+Krang.ElectronSynchrotronPowerLawPolarization
+Krang.UnionGeometry
 ```
 
 ### Misc
@@ -91,7 +99,6 @@ Krang.IntensityScreen
 Krang.It 
 Krang.IntensityPixel
 Krang.Iϕ_m_I0_terms 
-Krang.ElectronSynchrotronPowerLawPolarizationn
 Krang.AbstractMaterial
 Krang.AbstractScreen
 Krang.radial_w_I0_terms_integrals_case3 
