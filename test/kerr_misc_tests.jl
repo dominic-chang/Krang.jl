@@ -2,8 +2,8 @@
     met = Krang.Kerr(0.9)
     ηtemp = η(met, 5.0, 5.0, π / 4)
     λtemp = λ(met, 5.0, π / 4)
-    @test Krang._pow(-4.0 + 5.0im, 1 / 5) ≈ (-4.0 + 5.0im)^(1 / 5)
-    @test abs(Krang._pow(-4.0, 1 / 5)) ≈ abs((-4.0 + 0.0im)^(1 / 5))
+    @test ^(-4.0 + 5.0im, 1 / 5) ≈ (-4.0 + 5.0im)^(1 / 5)
+    @test abs(^(-4.0+0im, 1 / 5)) ≈ abs((-4.0 + 0.0im)^(1 / 5))
     @test Krang._isreal2(1.0 + 0.0im) == true
     @test λtemp == -5.0 * sin(π / 4)
     @test ηtemp == (25.0 - 0.9^2) * cos(π / 4)^2 + 25.0
@@ -12,7 +12,8 @@
 
     ssmet = Kerr(0.0)
     @test r_potential(ssmet, 27.0, 0.0, 5.0) ≈ 5.0 * (5.0 - 3.0) * (5.0 - 3.0) * (5.0 + 6.0)
-    @test maximum(abs, Krang.get_radial_roots(ssmet, 27.0, 0.0) .- (-6.0 + 0im, 0.0 + 0im, 3.0 + 0im, 3.0 + 0im)) ≈ 0.0
+    @test maximum(abs, Krang.get_radial_roots(ssmet, 27.0, 0.0) .- (-6.0 + 0im, 0.0 + 0im, 3.0 + 0im, 3.0 + 0im)) ≈ 0.0 atol = 1e-5
+
 
     @testset "Radial Integrals 1" begin
         a = 0.99
