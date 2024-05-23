@@ -65,5 +65,32 @@
             @test redshift1/redshift2 ≈ 1.0 atol = 1e-3
             @test lp1/lp2 ≈ 1.0 atol = 1e-3
         end
+
+        @testset "Polarization pixel interface"  begin
+            metric = Kerr(0.01)
+            θs = π/2
+            θo = 0.01/180*π
+            α = 5.0
+            β = 5.0
+            pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
+            λtemp = λ(metric, α, θo)
+            ηtemp = η(metric, α, β, θo)
+            rs,_,_ = emission_radius(pix, θs, true, 0)
+
+            magfield = @SVector[0.,0.,1.0]
+            βfluid = @SVector[0.,0.,0.]
+
+            mat = Krang.ElectronSynchrotronPowerLawIntensity()
+            @inline profile(r) = 1               
+            subimgs = (0, )
+            spec = 1.0
+            geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
+
+            int = mat(pix, geometry)
+
+            norm, redshift, lp = Krang.synchrotronIntensity(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
+            int2 = norm^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
+            @test int ≈ int2 atol = 1e-3
+        end
     end
 end

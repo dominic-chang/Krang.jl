@@ -39,7 +39,6 @@
         intcamera = Krang.IntensityCamera(met, -√27, √27, -√27, √27, θo, 10)
         intscreen = intcamera.screen
 
-        @testset intCamera.
         @testset "Intensity Pixel" begin
             intpix = Krang.IntensityPixel(met, α, β, θo)
 
