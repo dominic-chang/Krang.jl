@@ -80,17 +80,36 @@
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,0.]
 
-            mat = Krang.ElectronSynchrotronPowerLawIntensity()
-            @inline profile(r) = 1               
-            subimgs = (0, )
-            spec = 1.0
-            geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
+            @testset "Intensity" begin
+                mat = Krang.ElectronSynchrotronPowerLawIntensity()
+                @inline profile(r) = 1               
+                subimgs = (0, )
+                spec = 1.0
+                geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
 
-            int = mat(pix, geometry)
+                int = mat(pix, geometry)
 
-            norm, redshift, lp = Krang.synchrotronIntensity(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
-            int2 = norm^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
-            @test int ≈ int2 atol = 1e-3
+                norm, redshift, lp = Krang.synchrotronIntensity(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
+                int2 = norm^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
+                @test int ≈ int2 atol = 1e-3
+            end
+
+            @testset "Polarization" begin
+                mat = Krang.ElectronSynchrotronPowerLawPolarization()
+                @inline profile(r) = 1               
+                subimgs = (0, )
+                spec = 1.0
+                geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
+
+                stokes = mat(pix, geometry)
+
+                eα, eβ, redshift, lp = Krang.synchrotronPolarization(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
+                q = (-(eα^2 - eβ^2) )
+                u = (-2 * eα * eβ )
+
+                int2 = hypot(q,u)^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
+                @test stokes ≈ Krang.StokesParams(int2, q, u, 0.0)
+            end
         end
     end
 end
