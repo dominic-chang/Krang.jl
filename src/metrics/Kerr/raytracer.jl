@@ -133,7 +133,7 @@ for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
+function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where T
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
