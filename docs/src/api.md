@@ -76,7 +76,6 @@ Krang._isreal2
 Krang.regularized_Pi
 Krang.radial_m_I0_terms_integrals_case3 
 Krang.radial_inf_integrals_case4 
-Krang.It_m_I0_terms 
 Krang.It_w_I0_terms 
 Krang.Ir_inf 
 Krang.emission_azimuth 
@@ -98,7 +97,6 @@ Krang.AbstractCamera
 Krang.IntensityScreen
 Krang.It 
 Krang.IntensityPixel
-Krang.Iϕ_m_I0_terms 
 Krang.AbstractMaterial
 Krang.AbstractScreen
 Krang.radial_w_I0_terms_integrals_case3 

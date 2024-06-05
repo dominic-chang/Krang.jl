@@ -11,7 +11,8 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 DocStringExtensions = "0.9"
-JacobiElliptic = "0.1"
+PolarizedTypes = "0.1"
+JacobiElliptic = "0.1, 0.2"
 StaticArrays = "1"
 julia = "1.10"
 

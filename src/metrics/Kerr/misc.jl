@@ -3,20 +3,6 @@
 export λ, η, α, β, αboundary, βboundary, r_potential, θ_potential, get_radial_roots, 
 Ir,Gθ
 
-@inline function _pow(z::Complex{T}, i) where {T}
-    zabs = abs(z)
-    zangle = angle(z)
-    return (zabs^i) * (cos(zangle * i) + sin(zangle * i) * one(T)im)
-end
-
-@inline function _pow(z::T, i) where {T<:Real}
-    zabs = abs(z)
-    if sign(z) < zero(T)
-        return (zabs^i) * (cos(T(π) * i) + sin(T(π) * i)im)
-    end
-    return zabs^i + zero(T)im
-end
-
 """
 Checks if a complex number is real to some tolerance
 """
@@ -160,7 +146,7 @@ Horizontal Bardeen Screen Coordinate
 - `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
-    return sqrt(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2)
+    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2, 0))
 end
 
 """
@@ -247,22 +233,22 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B * B / T(8)
 
     Δ3 = -T(4) * P * P * P - T(27) * Q * Q
-    ωp = _pow(-Q / T(2) + _pow(-Δ3 / T(108), T(0.5)) + zero(T)im, T(1 / 3))
+    ωp = ^(-Q / T(2) + sqrt(-Δ3 / T(108)) + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1/2) + T(√3/2)im, -T(1/2) - T(√3/2)im, one(T) + zero(T)im) .* ωp
 
-    v = -P .* _pow.(T(3) .* C, -one(T))
+    v = -P .* inv.(T(3) .* C)
 
     ξ0 = argmax(real, (C .+ v)) - A / T(3)
     ξ02 = ξ0 + ξ0
 
     predet1 = A2 + ξ02
-    predet2 = (√T(2) * B) * _pow(ξ0, T(-0.5))
-    det1 = _pow(-(predet1 - predet2), T(0.5))
-    det2 = _pow(-(predet1 + predet2), T(0.5))
+    predet2 = (√T(2) * B) * inv(sqrt(ξ0))
+    det1 = sqrt(-(predet1 - predet2))
+    det2 = sqrt(-(predet1 + predet2))
 
-    sqrtξ02 = _pow(ξ02, T(0.5))
+    sqrtξ02 = sqrt(ξ02)
 
     r1 = (-sqrtξ02 - det1) / 2
     r2 = (-sqrtξ02 + det1) / 2
@@ -568,135 +554,6 @@ function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 end
 
 """
-Returns the antiderivative \$I_ϕ=\\int\\frac{a(2Mr-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$ with I0 terms. 
-
-See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
-
-# Arguments
-
-- `metric`: Kerr{T} metric
-- `τ`: Minotime 
-- `roots` : Radial roots
-- `λ`  : Reduced azimuthal angular momentum
-"""
-function Iϕ_m_I0_terms(metric::Kerr{T}, rs, roots, νr, λ) where T
-    numreals = sum(_isreal2.(roots))
-
-    if numreals == 4 #case 2
-        return Iϕ_m_I0_terms_case2(metric, rs, real.(roots), νr, λ)
-    elseif numreals == 2 #case3
-        return Iϕ_m_I0_terms_case3(metric, rs, roots, λ)
-    end #case4
-        return Iϕ_m_I0_terms_case4(metric, rs, roots, λ)
-end
-
-function Iϕ_m_I0_terms_case2(metric::Kerr{T}, rs, roots::NTuple{4}, νr, λ) where {T}
-    _, _, r3, r4 = roots
-    _, r31, r32, r41, r42, r43 = _get_root_diffs(roots...)
-    a = metric.spin
-    a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
-    rp3 = rp - r3
-    rp4 = rp - r4
-    rm3 = rm - r3
-    rm4 = rm - r4
-
-    k = r32 * r41 / (r31 * r42)
-    x2_s = √((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN)
-
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
-
-    Ip = - (-1)^νr*Πp_s
-    Im = - (-1)^νr*Πm_s
-
-    return -2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
-end
-
-function Iϕ_m_I0_terms_case3(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {T}
-    r1, r2, _, _ = roots
-    r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    r1, r2, r21 = real.((r1, r2, r21))
-
-    a = metric.spin
-    a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
-    rp1 = real(rp - r1)
-    rp2 = real(rp - r2)
-    rm1 = real(rm - r1)
-    rm2 = real(rm - r2)
-
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
-    if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
-    end
-    A, B = √A2, √B2
-
-    k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-
-    temprat = B * (rs - r2) * real(_pow(A * (rs - r1), -one(T)))
-    x3_s = clamp(((one(T) - temprat) * real(_pow(one(T) + temprat, -one(T)))), -one(T), one(T))
-    φ_s = acos(x3_s)
-
-    (isnan(φ_s)) && return T(NaN)
-
-    αp = (B * rp2 + A * rp1) / (B * rp2 - A * rp1)
-    αm = (B * rm2 + A * rm1) / (B * rm2 - A * rm1)
-
-    R1p_s = R1(αp, φ_s, k3)
-    R1m_s = R1(αm, φ_s, k3)
-
-    Ip = -inv(B * rp2 + A * rp1) * (2 * r21 * √(A * B) / (B * rp2 - A * rp1) * (- R1p_s))
-    Im = -inv(B * rm2 + A * rm1) * (2 * r21 * √(A * B) / (B * rm2 - A * rm1) * (- R1m_s))
-
-    return -(2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im))
-end
-
-function Iϕ_m_I0_terms_case4(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {T}
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    a = metric.spin
-    a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
-
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
-    b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
-
-    x4_s = (rs + b1) / a2
-    x4_p = (rp + b1) / a2
-    x4_m = (rm + b1) / a2
-
-    go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
-
-    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN)
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-
-    Ip = go / (a2 * (1 - go * x4_p)) * ( - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * ( - S1p_s))
-    Im = go / (a2 * (1 - go * x4_m)) * ( - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * ( - S1m_s))
-
-    return -2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
-end
-
-"""
 Returns the antiderivative \$I_ϕ=\\int\\frac{a(2Mr-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$ with full I0 terms.
 
 See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
@@ -769,8 +626,8 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
-    temprat = B * (rs - r2) * real(_pow(A * (rs - r1), -one(T)))
-    x3_s = clamp(((one(T) - temprat) * real(_pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * real(inv(A * (rs - r1)))
+    x3_s = clamp(((one(T) - temprat) * real(inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1074,8 +931,8 @@ function It_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
 
     k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
 
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = clamp(real(((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))), -one(T), one(T))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = clamp(real(((one(T) - temprat) * inv(one(T) + temprat))), -one(T), one(T))
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1143,167 +1000,6 @@ function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
     Im_total = go / (a2 * (1 - go * x4_m)) * (τ - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * ( - S1m_s))
 
     return (4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 4 * I0_total + 2 * I1_total + I2_total)# + (logdiv + lineardiv)
-end
-
-"""
-Returns the antiderivative \$I_t=\\int\\frac{r^2\\Delta+2Mr(r^2+a^2-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$ 
-without I0 terms.
-
-See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
-
-# Arguments
-
-- `metric`: Kerr{T} metric
-- `roots` : Radial roots
-- `λ`  : Reduced azimuthal angular momentum
-"""
-function It_m_I0_terms(metric::Kerr{T}, rs, roots::NTuple{4}, λ, νr) where {T}
-    numreals = sum(_isreal2.(roots))
-
-    if numreals == 4 #case 2
-        return It_m_I0_terms_case2(metric, rs, real.(roots), λ, νr)
-    elseif numreals == 2 #case3
-        return It_m_I0_terms_case3(metric, rs, roots, λ)
-    end #case4
-
-    return It_m_I0_terms_case4(metric, rs, roots, λ)
-end
-
-function It_m_I0_terms_case2(metric::Kerr{T}, rs, roots::NTuple{4}, λ, νr) where {T}
-    r1, r2, r3, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    r43 = r4 - r3
-    a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
-    rp3 = rp - r3
-    rp4 = rp - r4
-    rm3 = rm - r3
-    rm4 = rm - r4
-
-    k = r32 * r41 / (r31 * r42)
-    x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN)
-
-    coef = 2 / √(r31 * r42)
-    n = abs(r41 / r31)
-    E_s = √(r31 * r42) * JacobiElliptic.E(asin(x2_s), k)
-    Π1_s = coef * JacobiElliptic.Pi(n, asin(x2_s), k)
-
-    poly_coefs = (
-        r1 * r2 * r3 * r4,
-        -r2 * r3 * r4 + r1 * (r2 * (-r3 - r4) - r3 * r4),
-        r3 * r4 + r2 * (r3 + r4) + r1 * (r2 + r3 + r4),
-        -r1 - r2 - r3 - r4,
-        one(T),
-    )
-
-    #equation B37
-    I1_total = r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
-    #equation B38
-    I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (-1)^νr * I2_s# Assymptotic Divergent piece is not included
-
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
-
-    Ip_total = - (-1)^νr*Πp_s
-    Im_total = - (-1)^νr*Πm_s 
-
-    return (4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 2 * I1_total + I2_total)
-end
-
-function It_m_I0_terms_case3(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {T}
-    r1, r2, _, _ = roots
-    r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    r21 = real(r21)
-    r2 = real(r2)
-    r1 = real(r1)
-    a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
-    rp1 = real(rp - r1)
-    rp2 = real(rp - r2)
-    rm1 = real(rm - r1)
-    rm2 = real(rm - r2)
-
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
-    if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
-    end
-    A, B = √A2, √B2
-
-    k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
-
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = clamp(real(((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))), -one(T), one(T))
-    φ_s = acos(x3_s)
-
-    (isnan(φ_s)) && return T(NaN)
-
-    αo = (B + A) / (B - A)
-    αp = (B * rp2 + A * rp1) / (B * rp2 - A * rp1)
-    αm = (B * rm2 + A * rm1) / (B * rm2 - A * rm1)
-
-    Π1_s = 2 * r21 * √real(A * B) / (B2 - A2) * R1(αo, φ_s, k3)
-    Π2_s = ((2 * r21 * √(A * B) / (B2 - A2))^2) * R2(αo, φ_s, k3)
-
-    # Removed logarithmic divergence
-    I1_total = - Π1_s 
-    # Removed linear divergence
-    I2_total = (- 2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * ( - Π2_s)) #+ (B * r2 + A * r1) / (A + B)
-    Ip_total = -inv(B * rp2 + A * rp1) * ( + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * (- R1(αp, φ_s, k3)))
-    Im_total = -inv(B * rm2 + A * rm1) * ( + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * (- R1(αm, φ_s, k3)))
-
-    return (4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 2 * I1_total + I2_total)
-end
-
-function It_m_I0_terms_case4(metric::Kerr{T}, rs, roots::NTuple{4}, λ) where {T}
-    a = metric.spin
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
-
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
-    b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
-
-    x4_s = (rs + b1) / a2
-    x4_p = (rp + b1) / a2
-    x4_m = (rm + b1) / a2
-
-    go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
-
-    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN)
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-
-    Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
-    Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
-
-    # Removed logarithmic divergence
-    I1_total = (a2 / go - b1) * τ - ( - Π1_s) 
-
-    # Removed linear divergence
-    I2_total = - 2(a2 / go - b1) * (- Π1_s) + (- Π2_s) 
-    Ip_total = go / (a2 * (1 - go * x4_p)) * ( - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * ( - S1p_s))
-    Im_total = go / (a2 * (1 - go * x4_m)) * ( - 2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * ( - S1m_s))
-
-    return (4 / (rp - rm) * (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) + 2 * I1_total + I2_total)# + (logdiv + lineardiv)
 end
 
 function radial_inf_integrals(met::Kerr{T}, roots::NTuple{4}) where T
@@ -1527,8 +1223,8 @@ function radial_w_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     B2 = real(r31 * r41)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = real((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
     abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
 
@@ -1680,8 +1376,8 @@ function radial_m_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     B2 = real(r31 * r41)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    temprat = B * (rs - r2) * _pow(A * (rs - r1), -one(T))
-    x3_s = real((one(T) - temprat) * _pow(one(T) + temprat, -one(T)))
+    temprat = B * (rs - r2) * inv(A * (rs - r1))
+    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
     abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
 
@@ -2166,7 +1862,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
 
     Δθ = (one(T) - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
-    desc = √(Δθ2 + η / a2)
+    desc = √max(Δθ2 + η / a2, 0)
     up = Δθ + desc
     um = Δθ - desc
     m = up / um

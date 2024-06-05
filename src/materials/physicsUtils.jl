@@ -116,6 +116,6 @@ function penrose_walker(metric::Kerr{T}, r, θ, p_u::AbstractVector, f_u::Abstra
 
     A = pt * fr - pr * ft + a * sinθ * sinθ * (pr * fϕ - pϕ * fr)
     B = ((r * r + a * a) * (pϕ * fθ - pθ * fϕ) - a * (pt * fθ - pθ * ft)) * sinθ
-    return A * r - B * a * cosθ, -(A * a * cosθ - B * r)
+    return A * r - B * a * cosθ, -(A * a * cosθ + B * r)
 end
 
