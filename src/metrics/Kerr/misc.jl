@@ -589,8 +589,9 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     rm4 = rm - r4
 
     k = r32 * r41 / (r31 * r42)
-    x2_s = √((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN)
+    x2_s = √max((rs - r4) / (rs - r3) * r31 / r41, zero(T))
+    #!(-1 < x2_s < 1) && return T(NaN)
+    !(x2_s < 1) && return T(NaN)
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)

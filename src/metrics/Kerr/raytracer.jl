@@ -35,7 +35,7 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     # is ṙs increasing or decreasing?
     rs, νr, numreals = emission_radius(pix, τ)
 
-    return rs, νr, νθ, numreals, abs(τ)
+    return rs, νr, νθ, numreals
 end
 
 """
