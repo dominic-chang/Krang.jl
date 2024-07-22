@@ -120,7 +120,7 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
 
-    return -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
+    return -(Iϕ + λtemp * Gϕtemp - T(10π)) % T(2π)
 end
 
 """
@@ -134,7 +134,7 @@ for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T, T, T, Bool, Bool} where {T}
+function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where {T}
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)

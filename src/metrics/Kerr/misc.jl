@@ -1674,8 +1674,8 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
             return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
         end
         tempfac = one(T) / √abs(um * a2)
-        Go *= (-one(T))^((θs > T(π / 2)))
-        Gs = (-one(T))^((θs > T(π / 2))) * tempfac * JacobiElliptic.F(asin(√args), k)
+        Go *= (-one(T))^((θs > T(π / 2)) ? 1 : 0)
+        Gs = (-one(T))^((θs > T(π / 2)) ? 1 : 0) * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
         argo = cosθo / √(up)
