@@ -7,7 +7,7 @@
         pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
         λtemp = λ(metric, 5.0, π/4)
         ηtemp = η(metric, 5.0, 5.0, π/4)
-        emrs,_,_ = emission_radius(pix, π/5, true, 0)
+        emrs,_,_,issuccess = emission_radius(pix, π/5, true, 0)
         p_d = p_bl_d(metric, emrs, π/4, ηtemp, λtemp, true, true)
         met_uu = metric_uu(metric, emrs, π/4)
 
@@ -53,7 +53,7 @@
             pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
             λtemp = λ(metric, α, θo)
             ηtemp = η(metric, α, β, θo)
-            rs,_,_ = emission_radius(pix, θs, true, 0)
+            rs,_,_,issuccess = emission_radius(pix, θs, true, 0)
 
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,.0]
@@ -75,7 +75,7 @@
             pix = Krang.SlowLightIntensityPixel(metric, α, β, θo)
             λtemp = λ(metric, α, θo)
             ηtemp = η(metric, α, β, θo)
-            rs,_,_ = emission_radius(pix, θs, true, 0)
+            rs,_,_,issuccess = emission_radius(pix, θs, true, 0)
 
             magfield = @SVector[0.,0.,1.0]
             βfluid = @SVector[0.,0.,0.]

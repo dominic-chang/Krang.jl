@@ -8,7 +8,7 @@
         θo = π/2
         @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
-            @test isnan(emission_radius(pix, π/2, true, 2)[1])
+            @test !emission_radius(pix, π/2, true, 2)[5]
 
             @testset "Case 2" begin
                 α = 10.0
@@ -68,7 +68,7 @@
         met = Krang.Kerr(a)
 
 
-        @test isnan(emission_radius(Krang.SlowLightIntensityPixel(met, 10.0, 1.0, π/2), π/2, true, 2)[1])
+        @test !emission_radius(Krang.SlowLightIntensityPixel(met, 10.0, 1.0, π/2), π/2, true, 2)[5]
 
         @testset "Ordinary Geodesics" begin
             α = 10.0

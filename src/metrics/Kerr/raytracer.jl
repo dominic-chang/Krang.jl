@@ -21,7 +21,7 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     if !isincone#cosθs > abs(cosθo)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-        ((abs(β) + eps(T)) < βbound) && return (T(NaN), true, true, 0)
+        ((abs(β) + eps(T)) < βbound) && return zero(T), true, true, 0, false
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
@@ -33,9 +33,8 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
         νθ = (θo > θs) ⊻ (n % 2 == 1) 
     end
     # is ṙs increasing or decreasing?
-    rs, νr, numreals = emission_radius(pix, τ)
-
-    return rs, νr, νθ, numreals
+    ans, νr, numreals, issuccess = emission_radius(pix, τ)
+    return ans, νr, νθ, numreals, issuccess
 end
 
 """
@@ -58,13 +57,13 @@ function emission_radius(pix::AbstractPixel ,τ::T) where {T}
     numreals = sum(Int.(_isreal2.(roots(pix))))
 
     if numreals == 4 #case 1 & 2
-        ans, νr = _rs_case1_and_2(pix, rh, τ)
+        ans, νr, issuccess = _rs_case1_and_2(pix, rh, τ)
     elseif numreals == 2 #case3
-        ans, νr = _rs_case3(pix, rh, τ)
+        ans, νr, issuccess = _rs_case3(pix, rh, τ)
     else #case 4
-        ans, νr = _rs_case4(pix, rh, τ)
+        ans, νr, issuccess = _rs_case4(pix, rh, τ)
     end
-    return ans, νr, numreals
+    return ans, νr, numreals, issuccess
 end
 
 """
@@ -141,20 +140,20 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), false, false
+            return zero(T), zero(T), zero(T), false, false, false
         end
     end
 
     τ, _, _, _ = Gθ(pix, θs, isindir, n)
     if isnan(τ)
-        return T(NaN), T(NaN), T(NaN), false, false
+        return zero(T), zero(T), zero(T), false, false, false
     end
 
-    rs, νr, _ = emission_radius(pix, τ)
+    rs, νr, _, issuccess = emission_radius(pix, τ)
     ϕs = emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
     νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
-    return rs, θs, ϕs, νr, νθ
+    return rs, θs, ϕs, νr, νθ, issuccess
 end
 
 """
@@ -179,7 +178,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), T(NaN), false, false
+            return zero(T), zero(T), zero(T), zero(T), false, false, false
         end
     end
 
@@ -194,10 +193,10 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         isindir = ((sign(β) > 0) ⊻ (θo > π / 2))
     end
     if isnan(τ)
-        return T(NaN), T(NaN), T(NaN), T(NaN), false, false
+        return zero(T), zero(T), zero(T), zero(T), false, false, false
     end
 
-    rs, νr, _ = emission_radius(pix, τ)
+    rs, νr, _, issuccess = emission_radius(pix, τ)
     I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
@@ -215,7 +214,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     # is θ̇s increasing or decreasing?
     νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
-    return emission_time_regularized, rs, θs, emission_azimuth, νr, νθ
+    return emission_time_regularized, rs, θs, emission_azimuth, νr, νθ, issuccess
 end
 
 """
@@ -239,14 +238,14 @@ function raytrace(pix::AbstractPixel, τ::T) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return T(NaN), T(NaN), T(NaN), T(NaN), true, true
+            return zero(T), zero(T), zero(T), zero(T), true, true, false
         end
     end
 
     a = met.spin
 
     λtemp = λ(met, α, θo)
-    rs, νr, _ = emission_radius(pix, τ)
+    rs, νr, _, issuccess = emission_radius(pix, τ)
     I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
@@ -262,7 +261,7 @@ function raytrace(pix::AbstractPixel, τ::T) where {T}
     emission_time_regularized = (It + a^2 * Gttemp)
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    return emission_time_regularized, rs, θs, emission_azimuth, νr, νθ
+    return emission_time_regularized, rs, θs, emission_azimuth, νr, νθ, issuccess
 end
 
 function θs(metric::Kerr{T}, α, β, θo, τ) where {T}

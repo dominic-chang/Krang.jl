@@ -1517,7 +1517,7 @@ function radial_integrals(pix::AbstractPixel, rs, τ, νr)
     return τ, I1_o-I1_s, I2_o-I2_s, Ip_o-Ip_s, Im_o-Im_s
 end
 
-function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T}
+function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = real.(roots(pix))
     _, _, r3, r4 = radial_roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1525,22 +1525,21 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = !(x2_s < one(T)) ? T(NaN) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     fo = I0_inf(pix)
-    horizonτ = fo - Ir_s 
 
-    r4 < rh && τ > horizonτ && return T(NaN), true# invalid case2
+    r4 < rh && τ > (fo - Ir_s) && return zero(T), true, false# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
     if τ > 2fo
-        return T(NaN), true
+        return zero(T), true, false
     end
     sn = r41 * JacobiElliptic.sn(X2, k)^2
-    return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T)
+    return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
 end
 
-function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
+function _rs_case3(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = roots(pix)
     r1, r2, _, _ = radial_roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1555,20 +1554,20 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > (fo - Ir_s) && return T(NaN), true
+    τ > (fo - Ir_s) && return zero(T), true, false
 
     X3 = √(A * B) * real(fo - τ)
     if X3 < zero(T)
-        return T(NaN), true
+        return zero(T), true, false
     end
     cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
     den = -A + B + (A + B) * cn
 
-    return real(num / den), X3 > zero(T)
+    return real(num / den), X3 > zero(T), true
 end
 
-function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
+function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = roots(pix)
     r1, _, _, r4 = radial_roots
     root_diffs = _get_root_diffs(radial_roots...)
@@ -1588,13 +1587,13 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     Ir_s = coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
     fo = I0_inf(pix)
-    τ > (fo-Ir_s) && return T(NaN), true
+    τ > (fo-Ir_s) && return zero(T), true, false
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
     den = 1 + go * JacobiElliptic.sc(X4, k4)
 
-    return -(a2 * num / den + b1), X4 > zero(T)
+    return -(a2 * num / den + b1), X4 > zero(T), true
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1639,7 +1638,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     a = met.spin
     a2 = a^2
     Go, Ghat = absGθo_Gθhat(pix)
-    Gs, minotime, isvortical =T(NaN), T(NaN), ηtemp < zero(T)
+    Gs, minotime, isvortical = T(NaN), T(NaN), ηtemp < zero(T)
 
     cosθs = cos(θs)
     cosθo = cos(θo)
