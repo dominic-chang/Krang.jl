@@ -1627,7 +1627,7 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 - `isindir` : Is the path direct or indirect?
 - `n` : nth image ordered by minotime
 """
-function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
+function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} where {T}
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
@@ -1638,16 +1638,16 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     a = met.spin
     a2 = a^2
     Go, Ghat = absGθo_Gθhat(pix)
-    Gs, minotime, isvortical = T(NaN), T(NaN), ηtemp < zero(T)
+    Gs, minotime, isvortical = zero(T), zero(T), ηtemp < zero(T)
 
     cosθs = cos(θs)
     cosθo = cos(θo)
     isincone = abs(cosθs) < abs(cosθo)
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return zero(T), zero(T), zero(T), zero(T), isvortical, false
     end
     if ((((signβ < 0) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return zero(T), zero(T), zero(T), zero(T), isvortical, false
     end
 
     Δθ = (one(T) - (ηtemp + λtemp^2) / a2) / 2
@@ -1667,7 +1667,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return zero(T), zero(T), zero(T), zero(T), isvortical, false
         end
         tempfac = one(T) / √abs(um * a2)
         Go *= (-one(T))^((θs > T(π / 2)) ? 1 : 0)
@@ -1677,7 +1677,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = cosθo / √(up)
         k = m
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return zero(T), zero(T), zero(T), zero(T), isvortical, false
         end
         tempfac = one(T) / √abs(um * a^2)
         Gs = tempfac * JacobiElliptic.F(asin(args), k)
@@ -1685,7 +1685,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     minotime = (isindir ? (n + 1) * Ghat - signβ * Go - (-1)^νθ * Gs : n * Ghat - signβ * Go - (-1)^νθ * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return minotime, Gs, Go, Ghat, isvortical
+    return minotime, Gs, Go, Ghat, isvortical, true
 end
 
 function Gs(pix::AbstractPixel, τ::T) where {T}

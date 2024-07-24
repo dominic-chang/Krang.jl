@@ -13,7 +13,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
+function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T, Bool, Bool, Int, Bool} where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
@@ -24,7 +24,8 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
         ((abs(β) + eps(T)) < βbound) && return zero(T), true, true, 0, false
     end
 
-    τ, _, _, _ = Gθ(pix, θs, isindir, n)
+    τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
+    issuccess || return zero(T), true, true, 0, false
 
     # is θ̇s increasing or decreasing?
     #νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
@@ -46,7 +47,7 @@ Returns NaN if the emission coordinates do not exist for that screen coordinate.
 -`pix` : Pixel information
 - `τ` : Mino time
 """
-function emission_radius(pix::AbstractPixel ,τ::T) where {T}
+function emission_radius(pix::AbstractPixel ,τ::T)::Tuple{T, Bool, Int, Bool} where {T}
     met = metric(pix)
     a = met.spin
     ans = zero(T)
@@ -268,7 +269,7 @@ function θs(metric::Kerr{T}, α, β, θo, τ) where {T}
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 
-function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
+function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, Bool} where {T}
     a = metric.spin
     Ghat_2, isvortical = zero(T), η < zero(T)
 

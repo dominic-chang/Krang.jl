@@ -71,8 +71,8 @@
         @test !emission_radius(Krang.SlowLightIntensityPixel(met, 10.0, 1.0, π/2), π/2, true, 2)[5]
 
         @testset "Ordinary Geodesics" begin
-            α = 10.0
-            β = 10.0
+            α = √27*cos(π/4)
+            β = √27*sin(π/4)
             θo = π / 4
             @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
@@ -84,10 +84,12 @@
                             λcase1 = λ(met, α, θo)
                             roots = get_radial_roots(met, ηcase1, λcase1)
                             _, _, _, root = roots
-                            τ1, _, _, _, _ = Krang.Gθ(pix, θs, isindir, n)
-                            testθs = Krang.emission_inclination(pix, τ1)[1]
-                            if !isnan(testθs)
-                                @test  testθs/ θs ≈ 1 atol = 1e-5
+                            τ1, _, _, _, _, issuccess = Krang.Gθ(pix, θs, isindir, n)
+                            if issuccess
+                                testθs = Krang.emission_inclination(pix, τ1)[1]
+                                if !isnan(testθs)
+                                    @test  testθs/ θs ≈ 1 atol = 1e-5
+                                end
                             end
                         end
                     end
@@ -109,10 +111,12 @@
                             λcase1 = λ(met, α, θo)
                             roots = get_radial_roots(met, ηcase1, λcase1)
                             _, _, _, root = roots
-                            τ1, _, _, _, _ = Krang.Gθ(pix, θs, isindir, n)
-                            testθs = Krang.emission_inclination(pix, τ1)[1]
-                            if !isnan(testθs)
-                                @test  testθs/ θs ≈ 1 atol = 1e-5
+                            τ1, _, _, _, _, issuccess = Krang.Gθ(pix, θs, isindir, n)
+                            if issuccess
+                                testθs = Krang.emission_inclination(pix, τ1)[1]
+                                if !isnan(testθs)
+                                    @test  testθs/ θs ≈ 1 atol = 1e-5
+                                end
                             end
                         end
                     end
