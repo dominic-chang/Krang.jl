@@ -140,17 +140,16 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
     if cos(θs) > abs(cos(θo))
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-        if (abs(β) + eps(T)) < βbound
-            return zero(T), zero(T), zero(T), false, false, false
-        end
+
+        (abs(β) + eps(T)) < βbound && return zero(T), zero(T), zero(T), false, false, false
     end
 
-    τ, _, _, _ = Gθ(pix, θs, isindir, n)
-    if isnan(τ)
-        return zero(T), zero(T), zero(T), false, false, false
-    end
+    τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
+    issuccess || return (zero(T), zero(T), zero(T), false, false, false)
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
+    issuccess || return (zero(T), zero(T), zero(T), false, false, false)
+
     ϕs = emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
     νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
