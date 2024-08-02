@@ -1644,7 +1644,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} w
     cosθs = cos(θs)
     cosθo = cos(θo)
     isincone = abs(cosθs) < abs(cosθo)
-    if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
+    if isincone && (isindir != ((signβ > 0) ⊻ (θo > T(π / 2))))
         return minotime, Gs, Go, Ghat, isvortical, false
     end
     if ((((signβ < 0) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
