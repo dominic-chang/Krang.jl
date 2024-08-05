@@ -91,8 +91,9 @@ function S1(α, φ, j)
 end
 
 function S2(α, φ, j)
-    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
-    (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
+    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + 
+        α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
+        (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
 end
 
 """
@@ -136,7 +137,7 @@ function α(::Kerr, λ, θo)
 end
 
 """
-Horizontal Bardeen Screen Coordinate
+Vertical Bardeen Screen Coordinate
 
 # Arguments
 
@@ -150,7 +151,7 @@ function β(metric::Kerr, λ, η, θo)
 end
 
 """
-Defines a horizontal boundary on the assmyptotic observers screen where emission that originates from θs must fall within.
+Defines a horizontal boundary on the assmyptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
@@ -162,7 +163,7 @@ function αboundary(metric::Kerr, θs)
 end
 
 """
-Defines a vertical boundary on the Assyptotic observers screen where emission that originates from θs must fall within.
+Defines a vertical boundary on the assmyptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
@@ -174,7 +175,7 @@ Defines a vertical boundary on the Assyptotic observers screen where emission th
 function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
     a = metric.spin
     cosθs2 = cos(θs)^2
-    √max((cos(θo)^2 - cosθs2) * (α^2 - a^2 * (one(T) - cosθs2)) / (cosθs2 - one(T)), zero(T)) #eq 15 DOI 10.3847/1538-4357/acafe3 
+    return √max((cos(θo)^2 - cosθs2) * (α^2 - a^2 * (one(T) - cosθs2)) / (cosθs2 - one(T)), zero(T)) #eq 15 DOI 10.3847/1538-4357/acafe3 
 end
 
 """
@@ -360,6 +361,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `rs` : Emission radius
 - `roots`  : Roots of the radial potential
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
     numreals = sum(_isreal2.(roots))
@@ -563,6 +565,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `τ`: Minotime 
 - `roots` : Radial roots
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 - `λ`  : Reduced azimuthal angular momentum
 """
 function Iϕ_w_I0_terms(metric::Kerr{T}, rs, τ, roots, νr, λ) where T
@@ -848,6 +851,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `roots` : Radial roots
 - `λ`  : Reduced azimuthal angular momentum
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function It_w_I0_terms(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr) where {T}
     numreals = sum(_isreal2.(roots))
@@ -1092,6 +1096,7 @@ function radial_inf_integrals_case3(metric::Kerr{T}, roots::NTuple{4}) where {T}
 
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 end
+
 """
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
@@ -1621,10 +1626,8 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 
 # Arguments 
 
-- `metric`: Kerr{T} metric
 - `pix` : Pixel information
 - `θs` : Emission inclination
-- `θo` : Observer inclination
 - `isindir` : Is the path direct or indirect?
 - `n` : nth image ordered by minotime
 """

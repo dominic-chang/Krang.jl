@@ -1,10 +1,12 @@
-#include("./misc.jl")
-# Follows the Formalism of Gralla & Lupsasca (https://arxiv.org/pdf/1910.12881.pdf)
+# Follows the Formalism of Gralla & Lupsasca (https://arxiv.org/pdf/1910.12881.pdf).
+# Functions generically return 0 when the emission coordinates do not exist for a given screen coordinate to play nice 
+# with Enzyme's AD.
+
 export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates
 
 """
 Emission radius for point originating at inclination θs whose nth order image appears at the screen coordinate (`α`, `β`). 
-Returns NaN if the emission coordinates do not exist for that screen coordinate.
+Returns 0 if the emission coordinates do not exist for that screen coordinate.
 
 # Arguments
 
@@ -18,7 +20,7 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T,
     θo = inclination(pix)
     met = metric(pix)
     isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
-    if !isincone#cosθs > abs(cosθo)
+    if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
         ((abs(β) + eps(T)) < βbound) && return zero(T), true, true, 0, false
@@ -28,8 +30,7 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T,
     issuccess || return zero(T), true, true, 0, false
 
     # is θ̇s increasing or decreasing?
-    #νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    νθ = !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
     if isincone 
         νθ = (θo > θs) ⊻ (n % 2 == 1) 
     end
@@ -40,7 +41,7 @@ end
 
 """
 Emission radius for point originating at at Mino time τ whose image appears at the screen coordinate (`α`, `β`). 
-Returns NaN if the emission coordinates do not exist for that screen coordinate.
+Returns 0 if the emission coordinates do not exist for that screen coordinate.
 
 # Arguments
 
@@ -123,8 +124,8 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
 end
 
 """
-Emission radius and azimuthal angle for point originating at inclination θs whose nth order image appears at the screen coordinate (`α`, `β`). 
-for an observer located at inclination θo.
+Emission radius and azimuthal angle for point originating at inclination θs whose nth order image appears at the screen 
+coordinate (`α`, `β`) for an observer located at inclination θo.
 
 # Arguments
 
@@ -157,8 +158,8 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
 end
 
 """
-Emission radius and azimuthal angle for point originating at inclination θs whose nth order image appears at the screen coordinate (`α`, `β`).
-for an observer located at inclination θo.
+Emission radius and azimuthal angle for point originating at inclination θs whose nth order image appears at the screen
+coordinate (`α`, `β`) for an observer located at inclination θo.
 
 # Arguments
 
