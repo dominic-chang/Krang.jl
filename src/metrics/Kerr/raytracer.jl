@@ -247,6 +247,7 @@ function raytrace(pix::AbstractPixel, τ::T) where {T}
 
     λtemp = λ(met, α, θo)
     rs, νr, _, issuccess = emission_radius(pix, τ)
+    issuccess || return zero(T), zero(T), zero(T), zero(T), true, true, false
     I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
