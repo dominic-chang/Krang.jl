@@ -26,12 +26,12 @@
             @test Krang.η(abspix) == Krang.η(met, α, β, θo)
             @test Krang.λ(abspix) == Krang.λ(met, α, θo)
             @test max((abs.(Krang.roots(abspix) .- crit_roots))...) ≈ 0.0 atol = 1e-5
-            @test isnan(Krang.I0_inf(abspix)) ≈ isnan(Krang.Ir_inf(met, crit_roots))
-            @test isnan(Krang.Ir_inf(abspix)) ≈ isnan(Krang.Ir_inf(met, crit_roots))
-            @test isnan(Krang.I1_inf_m_I0_terms(abspix)) ≈ isnan(Krang.radial_inf_integrals(met, crit_roots)[1])
-            @test isnan(Krang.I2_inf_m_I0_terms(abspix)) ≈ isnan(Krang.radial_inf_integrals(met, crit_roots)[2])
-            @test isnan(Krang.Ip_inf_m_I0_terms(abspix)) ≈ isnan(Krang.radial_inf_integrals(met, crit_roots)[3])
-            @test isnan(Krang.Im_inf_m_I0_terms(abspix)) ≈ isnan(Krang.radial_inf_integrals(met, crit_roots)[4])
+            @test iszero(Krang.I0_inf(abspix)) ≈ iszero(Krang.Ir_inf(met, crit_roots))
+            @test iszero(Krang.Ir_inf(abspix)) ≈ iszero(Krang.Ir_inf(met, crit_roots))
+            @test iszero(Krang.I1_inf_m_I0_terms(abspix)) ≈ iszero(Krang.radial_inf_integrals(met, crit_roots)[1])
+            @test iszero(Krang.I2_inf_m_I0_terms(abspix)) ≈ iszero(Krang.radial_inf_integrals(met, crit_roots)[2])
+            @test iszero(Krang.Ip_inf_m_I0_terms(abspix)) ≈ iszero(Krang.radial_inf_integrals(met, crit_roots)[3])
+            @test iszero(Krang.Im_inf_m_I0_terms(abspix)) ≈ iszero(Krang.radial_inf_integrals(met, crit_roots)[4])
         end
     end
 

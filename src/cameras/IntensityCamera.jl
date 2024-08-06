@@ -18,7 +18,7 @@ struct IntensityPixel{T} <: AbstractPixel
     θo::T
     η::T
     λ::T
-    function IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
+    function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)

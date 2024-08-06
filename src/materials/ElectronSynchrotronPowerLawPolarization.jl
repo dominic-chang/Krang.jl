@@ -93,15 +93,17 @@ function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, g
     for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
         isindir ⊻= true
         for n in subimgs
-            νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            rs, νr, _ = emission_radius(pix, geometry.opening_angle, isindir, n)
-            eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
+            #νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+            rs, νr, νθ, _, issuccess = emission_radius(pix, geometry.opening_angle, isindir, n)
+            if issuccess
+                eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magfield, fluid_velocity, νr, νθ)
 
-            prof = profile(rs) * max(redshift, eps(T))^(T(3) + σ)
-            q = T(-(eα^2 - eβ^2) + eps(T))
-            u = T(-2 * eα * eβ + eps(T))
-            i = hypot(q, u)^(1 + σ) * lp * prof
-            observation += StokesParams(nan2zero(i), nan2zero(q), nan2zero(u), zero(T))
+                prof = profile(rs) * max(redshift, eps(T))^(T(3) + σ)
+                q = T(-(eα^2 - eβ^2) + eps(T))
+                u = T(-2 * eα * eβ + eps(T))
+                i = hypot(q, u)^(one(T) + σ) * lp * prof
+                observation += StokesParams(i, q, u, zero(T))
+            end
         end
     end
     return observation
