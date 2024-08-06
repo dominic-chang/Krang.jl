@@ -112,4 +112,7 @@
             end
         end
     end
+    @testset "Penrose Walker Constant" begin
+        @test all(penrose_walker(Krang.Kerr(0.0), 1.0, 0.0, [1.0,0.0,0.0,0.0], [0.0,1.0,0.0,0.0]) .== (1.0, 0.0))
+    end
 end

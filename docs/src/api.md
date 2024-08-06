@@ -74,7 +74,6 @@ Krang.UnionGeometry
 ```@docs
 Krang._isreal2
 Krang.regularized_Pi
-Krang.radial_m_I0_terms_integrals_case3 
 Krang.radial_inf_integrals_case4 
 Krang.It_w_I0_terms 
 Krang.Ir_inf 
@@ -84,9 +83,7 @@ Krang.Iϕ
 Krang.SlowLightIntensityCamera
 Krang.Iϕ_w_I0_terms 
 Krang.SlowLightIntensityPixel
-Krang.radial_m_I0_terms_integrals_case4 
 Krang.Iϕ_inf 
-Krang.radial_m_I0_terms_integrals_case2 
 Krang.radial_inf_integrals_case3 
 Krang.AbstractPixel
 Krang.radial_w_I0_terms_integrals_case2 
