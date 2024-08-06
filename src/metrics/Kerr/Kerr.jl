@@ -76,7 +76,7 @@ function metric_uu(metric::Kerr{T}, coordinates) where {T}
 end
 
 """
-Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
+Kerr metric in Boyer Lindquist (BL) coordinates.
 """
 function metric_dd(metric::Kerr{T}, r, θ) where {T}
     Ξt = Ξ(metric, r, θ)

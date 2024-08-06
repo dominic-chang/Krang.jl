@@ -91,8 +91,9 @@ function S1(α, φ, j)
 end
 
 function S2(α, φ, j)
-    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
-    (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
+    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * JacobiElliptic.F(φ, j) + 
+        α^2 * JacobiElliptic.E(φ, j) + α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3) +
+        (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
 end
 
 """
@@ -136,7 +137,7 @@ function α(::Kerr, λ, θo)
 end
 
 """
-Horizontal Bardeen Screen Coordinate
+Vertical Bardeen Screen Coordinate
 
 # Arguments
 
@@ -150,7 +151,7 @@ function β(metric::Kerr, λ, η, θo)
 end
 
 """
-Defines a horizontal boundary on the assmyptotic observers screen where emission that originates from θs must fall within.
+Defines a horizontal boundary on the assmyptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
@@ -162,7 +163,7 @@ function αboundary(metric::Kerr, θs)
 end
 
 """
-Defines a vertical boundary on the Assyptotic observers screen where emission that originates from θs must fall within.
+Defines a vertical boundary on the assmyptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
@@ -174,7 +175,7 @@ Defines a vertical boundary on the Assyptotic observers screen where emission th
 function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
     a = metric.spin
     cosθs2 = cos(θs)^2
-    √max((cos(θo)^2 - cosθs2) * (α^2 - a^2 * (one(T) - cosθs2)) / (cosθs2 - one(T)), zero(T)) #eq 15 DOI 10.3847/1538-4357/acafe3 
+    return √max((cos(θo)^2 - cosθs2) * (α^2 - a^2 * (one(T) - cosθs2)) / (cosθs2 - one(T)), zero(T)) #eq 15 DOI 10.3847/1538-4357/acafe3 
 end
 
 """
@@ -299,7 +300,7 @@ function Ir_inf(metric::Kerr{T}, roots) where {T}
     else #case 4
         return Ir_inf_case4(metric, roots)
     end
-    return T(NaN)
+    return T(Inf)
 end
 
 function Ir_inf_case1_and_2(::Kerr{T}, roots::NTuple{4}) where {T}
@@ -334,7 +335,7 @@ function Ir_inf_case4(::Kerr{T}, roots::NTuple{4}) where {T}
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     C = √real(r31 * r42)
     D = √real(r32 * r41)
@@ -360,6 +361,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `rs` : Emission radius
 - `roots`  : Roots of the radial potential
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
     numreals = sum(_isreal2.(roots))
@@ -371,7 +373,7 @@ function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
     else #case 4
         return Ir_s_case4(metric, rs, roots)
     end
-    return T(NaN)
+    return T(Inf)
 end
 
 function Ir_s_case1_and_2(::Kerr{T}, rs, roots::NTuple{4}, νr) where {T}
@@ -381,7 +383,7 @@ function Ir_s_case1_and_2(::Kerr{T}, rs, roots::NTuple{4}, νr) where {T}
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = (x2_s > one(T)) ? T(NaN) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_s = (x2_s > one(T)) ? T(Inf) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     return -(-1)^νr*Ir_s
 end
@@ -410,7 +412,7 @@ function Ir_s_case4(::Kerr{T}, rs, roots::NTuple{4}) where {T}
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     C = √real(r31 * r42)
     D = √real(r32 * r41)
@@ -493,7 +495,7 @@ function Iϕ_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     A, B = √A2, √B2
 
@@ -525,7 +527,7 @@ function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm = one(T) - √(one(T) - a2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
 
     C = √real(r31 * r42)
@@ -563,6 +565,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `τ`: Minotime 
 - `roots` : Radial roots
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 - `λ`  : Reduced azimuthal angular momentum
 """
 function Iϕ_w_I0_terms(metric::Kerr{T}, rs, τ, roots, νr, λ) where T
@@ -590,8 +593,8 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √max((rs - r4) / (rs - r3) * r31 / r41, zero(T))
-    #!(-1 < x2_s < 1) && return T(NaN)
-    !(x2_s < 1) && return T(NaN)
+    #!(-1 < x2_s < 1) 
+    !(x2_s < 1) && return T(Inf)
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -621,7 +624,7 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     A, B = √A2, √B2
 
@@ -654,7 +657,7 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     rm = one(T) - √(one(T) - a2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
 
     C = √real(r31 * r42)
@@ -673,7 +676,7 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     gp = (go * x4_p - one(T)) / (go + x4_p)
     gm = (go * x4_m - one(T)) / (go + x4_m)
 
-    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN)
+    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(Inf)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
 
@@ -759,7 +762,7 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     A, B = √A2, √B2
 
@@ -795,7 +798,7 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm = one(T) - √(one(T) - a^2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
 
     C = √real(r31 * r42)
@@ -848,6 +851,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `roots` : Radial roots
 - `λ`  : Reduced azimuthal angular momentum
+- `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function It_w_I0_terms(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr) where {T}
     numreals = sum(_isreal2.(roots))
@@ -875,7 +879,8 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN)
+    #!(-1 < x2_s < 1)
+    !(x2_s < 1) && return T(Inf)
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
@@ -926,7 +931,7 @@ function It_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
     A2 = real(r32 * r42)
     B2 = real(r31 * r41)
     if A2 < zero(T) || B2 < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
     A, B = √A2, √B2
 
@@ -964,7 +969,7 @@ function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
     rm = one(T) - √(one(T) - a^2)
 
     if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(NaN)
+        return T(Inf)
     end
 
     C = √real(r31 * r42)
@@ -1091,6 +1096,7 @@ function radial_inf_integrals_case3(metric::Kerr{T}, roots::NTuple{4}) where {T}
 
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 end
+
 """
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
@@ -1168,7 +1174,7 @@ function radial_w_I0_terms_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    !(x2_s < 1) && return zero(T), zero(T), zero(T), zero(T), zero(T)
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
@@ -1227,7 +1233,7 @@ function radial_w_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     temprat = B * (rs - r2) * inv(A * (rs - r1))
     x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
-    abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    abs(x3_s) > one(T) && return zero(T), zero(T), zero(T), zero(T)
 
     φ_s = acos(x3_s)
     αo = (B + A) / (B - A)
@@ -1275,7 +1281,7 @@ function radial_w_I0_terms_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}
     gp = (go * x4_p - one(T)) / (go + x4_p)
     gm = (go * x4_m - one(T)) / (go + x4_m)
 
-    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
     #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
@@ -1323,7 +1329,7 @@ function radial_m_I0_terms_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
-    !(-1 < x2_s < 1) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    !(x2_s < 1) && return zero(T), zero(T), zero(T), zero(T)
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
@@ -1380,7 +1386,7 @@ function radial_m_I0_terms_integrals_case3(metric::Kerr{T}, rs, roots::NTuple{4}
     temprat = B * (rs - r2) * inv(A * (rs - r1))
     x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
 
-    abs(x3_s) > one(T) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    abs(x3_s) > one(T) && return zero(T), zero(T), zero(T), zero(T)
 
     φ_s = acos(x3_s)
     αo = (B + A) / (B - A)
@@ -1426,7 +1432,7 @@ function radial_m_I0_terms_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}
     gp = (go * x4_p - one(T)) / (go + x4_p)
     gm = (go * x4_m - one(T)) / (go + x4_m)
 
-    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN), T(NaN), T(NaN), T(NaN), T(NaN), T(NaN)
+    (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
     #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
@@ -1517,7 +1523,7 @@ function radial_integrals(pix::AbstractPixel, rs, τ, νr)
     return τ, I1_o-I1_s, I2_o-I2_s, Ip_o-Ip_s, Im_o-Im_s
 end
 
-function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T}
+function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = real.(roots(pix))
     _, _, r3, r4 = radial_roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1525,22 +1531,21 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool} where {T
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = !(x2_s < one(T)) ? T(NaN) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     fo = I0_inf(pix)
-    horizonτ = fo - Ir_s 
 
-    r4 < rh && τ > horizonτ && return T(NaN), true# invalid case2
+    r4 < rh && τ > (fo - Ir_s) && return zero(T), false, false# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
     if τ > 2fo
-        return T(NaN), true
+        return zero(T), false, false
     end
     sn = r41 * JacobiElliptic.sn(X2, k)^2
-    return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T)
+    return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
 end
 
-function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
+function _rs_case3(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = roots(pix)
     r1, r2, _, _ = radial_roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1555,20 +1560,20 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T) where {T}
     x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > (fo - Ir_s) && return T(NaN), true
+    τ > (fo - Ir_s) && return zero(T), false, false
 
     X3 = √(A * B) * real(fo - τ)
     if X3 < zero(T)
-        return T(NaN), true
+        return zero(T), false, false
     end
     cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
     den = -A + B + (A + B) * cn
 
-    return real(num / den), X3 > zero(T)
+    return real(num / den), X3 > zero(T), true
 end
 
-function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
+function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T, Bool, Bool} where {T}
     radial_roots = roots(pix)
     r1, _, _, r4 = radial_roots
     root_diffs = _get_root_diffs(radial_roots...)
@@ -1588,13 +1593,13 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T) where {T}
     Ir_s = coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
     fo = I0_inf(pix)
-    τ > (fo-Ir_s) && return T(NaN), true
+    τ > (fo-Ir_s) && return zero(T), false, false
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
     den = 1 + go * JacobiElliptic.sc(X4, k4)
 
-    return -(a2 * num / den + b1), X4 > zero(T)
+    return -(a2 * num / den + b1), X4 > zero(T), true
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1621,14 +1626,12 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 
 # Arguments 
 
-- `metric`: Kerr{T} metric
 - `pix` : Pixel information
 - `θs` : Emission inclination
-- `θo` : Observer inclination
 - `isindir` : Is the path direct or indirect?
 - `n` : nth image ordered by minotime
 """
-function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
+function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} where {T}
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
@@ -1639,16 +1642,16 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     a = met.spin
     a2 = a^2
     Go, Ghat = absGθo_Gθhat(pix)
-    Gs, minotime, isvortical =T(NaN), T(NaN), ηtemp < zero(T)
+    Gs, minotime, isvortical = zero(T), zero(T), ηtemp < zero(T)
 
     cosθs = cos(θs)
     cosθo = cos(θo)
     isincone = abs(cosθs) < abs(cosθo)
-    if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+    if isincone && (isindir != ((signβ > 0) ⊻ (θo > T(π / 2))))
+        return minotime, Gs, Go, Ghat, isvortical, false
     end
     if ((((signβ < 0) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return minotime, Gs, Go, Ghat, isvortical, false
     end
 
     Δθ = (one(T) - (ηtemp + λtemp^2) / a2) / 2
@@ -1668,7 +1671,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return minotime, Gs, Go, Ghat, isvortical, false
         end
         tempfac = one(T) / √abs(um * a2)
         Go *= (-one(T))^((θs > T(π / 2)) ? 1 : 0)
@@ -1678,7 +1681,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = cosθo / √(up)
         k = m
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return zero(T), zero(T), zero(T), zero(T), isvortical, false
         end
         tempfac = one(T) / √abs(um * a^2)
         Gs = tempfac * JacobiElliptic.F(asin(args), k)
@@ -1686,7 +1689,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n) where {T}
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     minotime = (isindir ? (n + 1) * Ghat - signβ * Go - (-1)^νθ * Gs : n * Ghat - signβ * Go - (-1)^νθ * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return minotime, Gs, Go, Ghat, isvortical
+    return minotime, Gs, Go, Ghat, isvortical, true
 end
 
 function Gs(pix::AbstractPixel, τ::T) where {T}
@@ -1701,7 +1704,7 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     a = met.spin
 
     Go, Ghat = absGθo_Gθhat(pix)
-    Gs, isvortical = T(NaN), ηtemp < zero(T)
+    Gs, isvortical = zero(T), ηtemp < zero(T)
 
     Δθ = T(0.5) * (one(T) - (ηtemp + λtemp^2) / a^2)
     up = Δθ + √(Δθ^2 + ηtemp / a^2)
@@ -1747,10 +1750,10 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
 
     isincone = abs(cos(θs)) < abs(cos(θo))
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return ans, Gs, Go, Ghat, isvortical, false
     end
     if ((((signβ < zero(T)) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return ans, Gs, Go, Ghat, isvortical, false
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
@@ -1768,7 +1771,7 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = (cos(θo)^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
         argn = (up - um) / (1 - um)
@@ -1779,7 +1782,7 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = cos(θo) / √(up)
         #k = abs(m)
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = inv(√abs(um * a^2))
         Gs = tempfac * JacobiElliptic.Pi(up, asin(args), k)
@@ -1787,7 +1790,7 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     ans = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return ans, Gs, Go, Ghat, isvortical
+    return ans, Gs, Go, Ghat, isvortical, true
 end
 
 function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
@@ -1800,14 +1803,14 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
     λtemp = λ(met, α, θo)
     a = met.spin
     Go, Ghat = absGto_Gthat(pix)
-    Gs, ans, isvortical =T(NaN), T(NaN), ηtemp < zero(T)
+    Gs, ans, isvortical = zero(T), zero(T), ηtemp < zero(T)
 
     isincone = abs(cos(θs)) < abs(cos(θo))
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return ans, Gs, Go, Ghat, isvortical, false
     end
     if ((((signβ < zero(T)) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) || (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+        return ans, Gs, Go, Ghat, isvortical, false
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
@@ -1826,7 +1829,7 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = √abs(um / a^2)
         Go *= ((θs > T(π / 2)) ? -1 : 1) 
@@ -1837,7 +1840,7 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
         argo = cosθo / √(up)
         #k = abs(m)
         if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN), T(NaN), T(NaN), isvortical
+            return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
         Gs = tempfac * (JacobiElliptic.E(asin(args), k) - JacobiElliptic.F(asin(args), k)) / (2k)
@@ -1845,17 +1848,17 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     ans = (isindir ? (n + 1) * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs : n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
-    return ans, Gs, Go, Ghat, isvortical
+    return ans, Gs, Go, Ghat, isvortical, true
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
 # SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
-function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
+function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
     a2 = a^2
-    Go, Ghat, isvortical = T(NaN), T(NaN), η < zero(T)
+    Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (one(T) - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
@@ -1873,7 +1876,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = one(T) / √abs(um * a2)
         Go = tempfac * JacobiElliptic.F(asin(√argo), k)
@@ -1882,7 +1885,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = cosθo / √(up)
         k = m
         if !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = one(T) / √abs(um * a^2)
         Go = tempfac * JacobiElliptic.F(asin(argo), k)
@@ -1892,10 +1895,10 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ) where {T}
     return Go, Ghat
 end
 
-function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ) where {T}
+function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
 
     a = metric.spin
-    Go, Ghat, isvortical = T(NaN), T(NaN), η < zero(T)
+    Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
     up = Δθ + √(Δθ^2 + η / a^2)
@@ -1911,7 +1914,7 @@ function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
         argn = (up - um) / (1 - um)
@@ -1921,7 +1924,7 @@ function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = cosθo / √(up)
         #k = abs(m)
         if !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = inv(√abs(um * a^2))
         Go = tempfac * JacobiElliptic.Pi(up, asin(argo), k)
@@ -1931,9 +1934,9 @@ function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ) where {T}
     return Go, Ghat
 end
 
-function _absGto_Gthat(metric::Kerr{T}, θo, η, λ) where {T}
+function _absGto_Gthat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
-    Go, Ghat, isvortical = T(NaN), T(NaN), η< zero(T)
+    Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η+ λ^2) / a^2) / T(2)
     up = Δθ + √(Δθ^2 + η/ a^2)
@@ -1949,7 +1952,7 @@ function _absGto_Gthat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = (cosθo^2 - um) / (up - um)
         k = one(T) - m
         if (!(zero(T) < argo < one(T)))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = √abs(um / a^2)
         Go =  tempfac * JacobiElliptic.E(asin(√argo), k)
@@ -1959,7 +1962,7 @@ function _absGto_Gthat(metric::Kerr{T}, θo, η, λ) where {T}
         argo = cosθo / √(up)
         #k = abs(m)
         if !(-one(T) < argo < one(T))
-            return T(NaN), T(NaN)
+            return Go, Ghat
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
         Go = tempfac * (JacobiElliptic.E(asin(argo), k) - JacobiElliptic.F(asin(argo), k)) / (2k)
