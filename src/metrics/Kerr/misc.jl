@@ -1855,12 +1855,6 @@ end
 # SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
-"""
-# Returns 
-- `Go`
-- `Ghat` 
-- `issuccess`
-"""
 function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
     a2 = a^2
