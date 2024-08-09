@@ -77,7 +77,7 @@ struct IntensityCamera{T} <: AbstractCamera
     screen::IntensityScreen{T}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
+    function IntensityCamera(met::Kerr{T}, θo::T, αmin::T, αmax::T, βmin::T, βmax::T, res::Int) where {T}
         new{T}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
