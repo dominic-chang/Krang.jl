@@ -144,7 +144,7 @@
                 τ = Krang.Gθ(pix, θs, isindir, 0)[1]
                 ts, testrs, testθs, ϕs, νr, νθ = Krang.emission_coordinates(pix, θs, isindir, 0)
                 testrs2, testθs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, 0)
-                ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.raytrace(pix, τ)
+                ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.emission_coordinates(pix, τ)
 
                 testτ = Krang.Ir(pix, isindir, testrs)[1]
                 @testset "Consistency between raytracing methods" begin
