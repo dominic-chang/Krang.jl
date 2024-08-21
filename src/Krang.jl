@@ -25,5 +25,6 @@ include("materials/CoordinatePoint.jl")
 include("materials/ElectronSynchrotronPowerLawPolarization.jl")
 include("materials/ElectronSynchrotronPowerLawIntensity.jl")
 include("schemes/schemes.jl")
+include("schemes/RayCast.jl")
 include("raytracer_api.jl")
 end
