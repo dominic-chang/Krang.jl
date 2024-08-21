@@ -226,7 +226,7 @@ Raytrace a point that appears at the screen coordinate (`α`, `β`) for an obser
 - `pix` : Pixel information
 - `τ` : Mino Time
 """
-function raytrace(pix::AbstractPixel, τ::T) where {T}
+function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)

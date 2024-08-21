@@ -1,4 +1,4 @@
-export ⊕
+export ⊕, add, Scene
 """
     $TYPEDEF
 
@@ -49,4 +49,12 @@ end
 struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
     geometry::G
     material::M
+end
+
+
+const Scene = NTuple{N, Mesh} where {N}
+Scene() = NTuple{0, Mesh}()
+
+function add(scene::Scene, mesh::Mesh)
+    return (scene..., mesh)
 end

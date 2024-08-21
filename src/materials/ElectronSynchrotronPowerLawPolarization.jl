@@ -1,7 +1,7 @@
 """
 Returns the screen polarization associated with a killing spinor κ as seen seen by an assymptotic observer.
 """
-function screen_polarisation(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}# Eq 31 10.1103/PhysRevD.104.044060
+function screen_polarization(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}# Eq 31 10.1103/PhysRevD.104.044060
     a = metric.spin
     κ1 = real(κ)
     κ2 = imag(κ)
@@ -60,7 +60,7 @@ function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magfield
     κ = sum(curr_p_bl_u .* f_temp_d)
     κ = κ * inv(sqrt((conj(κ) * κ)))
 
-    eα, eβ = screen_polarisation(metric, κ, θo, α, β) .* norm
+    eα, eβ = screen_polarization(metric, κ, θo, α, β) .* norm
 
     return eα, eβ, inv(p_fluid_u[1]), abs(p_fluid_u[1] / p_fluid_u[4])
 end

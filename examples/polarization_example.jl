@@ -5,7 +5,6 @@
 # source, at a fixed inclination angle from the blackhole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
-#using Revise
 using Krang
 using CairoMakie 
 
@@ -53,16 +52,13 @@ material = Krang.ElectronSynchrotronPowerLawPolarization();
 
 θs = (75 * π / 180)
 geometry1 = Krang.ConeGeometry((θs), (magfield1, vel, (0,1,2), profile, σ))
+mesh1 = Krang.Mesh(geometry1, material)
 geometry2 = Krang.ConeGeometry((π-θs), (magfield2, vel, (0,1,2), profile, σ))
-geometry = geometry1 ⊕ geometry2
+mesh2 = Krang.Mesh(geometry2, material)
 
-mesh = Krang.Mesh(geometry, material)
+scene = Krang.Scene((mesh1, mesh2))
 
-ivals, qvals, uvals, vvals = (Matrix{Float64}(undef, sze, sze) for _ in 1:4)
-
-@Threads.threads for I in CartesianIndices(camera.screen.pixels)
-    ivals[I], qvals[I], uvals[I], vvals[I] = mesh.material(camera.screen.pixels[I], mesh.geometry)
-end
+stokesvals = render(Krang.RayTrace, camera, scene)
 
 fig = Figure(resolution=(700, 700));
 ax1 = Axis(fig[1, 1], aspect=1, title="I")
@@ -71,7 +67,8 @@ ax3 = Axis(fig[2, 1], aspect=1, title="U")
 ax4 = Axis(fig[2, 2], aspect=1, title="V")
 colormaps = [:afmhot, :redsblues, :redsblues, :redsblues]
 
-zip([ax1, ax2, ax3, ax4], [ivals, qvals, uvals, vvals], colormaps) .|> x->heatmap!(x[1], x[2], colormap=x[3])
+zip([ax1, ax2, ax3, ax4], [getproperty.(stokesvals,:I), getproperty.(stokesvals,:Q), getproperty.(stokesvals,:U), getproperty.(stokesvals,:V)], colormaps) .|> x->heatmap!(x[1], x[2], colormap=x[3])
+fig
 
 save("polarization_example.png", fig)
 
