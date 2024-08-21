@@ -40,7 +40,6 @@ Photon rings are of particular interest because of their strong dependence on gr
 The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
 This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoto].
 
-# Software components
 
 # Related Packages
 - `Comrade` [@Tiede2022]: A Bayesian imaging framework for reconstructing images from VLBI observations while accounting for calibration residuals.
