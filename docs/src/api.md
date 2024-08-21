@@ -10,7 +10,6 @@ Krang.emission_radius
 Krang.emission_inclination
 Krang.emission_coordinates_fast_light
 Krang.emission_coordinates
-Krang.raytrace
 Krang.mino_time
 ```
 

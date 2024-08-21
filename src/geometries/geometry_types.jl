@@ -52,13 +52,8 @@ struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
 end
 
 
-"""
-    $TYPEDEF
-"""
 const Scene = NTuple{N, Mesh} where {N}
-function Scene()
-    return NTuple{0, Mesh}()
-end
+Scene() = NTuple{0, Mesh}()
 
 function add(scene::Scene, mesh::Mesh)
     return (scene..., mesh)
