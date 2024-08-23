@@ -42,7 +42,7 @@ This feature could potentially be seen in the near future with a recent as a spa
 
 
 # Related Packages
-- `Comrade` [@Tiede2022]: A Bayesian imaging framework for reconstructing images from VLBI observations while accounting for calibration residuals.
+- `AART` [@cardenas-avendano]: An Adaptive Analytical Ray Tracing code for geodesics in the Kerr space time.
 
 # Acknowledgements
 The authors thank Iniyan Natarajan, Alexander Plavin, and Paul Tiede for helpful discussions. Support for this work was provided by the NSF (AST-1935980, AST-2034306) and by the Gordon and Betty Moore Foundation through grant GBMF-10423. This work was supported by the Black Hole Initiative, which is funded by grants from the John Templeton Foundation (Grant #62286) and the Gordon and Betty Moore Foundation (Grant GBMF-8273), although the opinions expressed in this work are those of the author(s) and do not necessarily reflect the views of these Foundations.
