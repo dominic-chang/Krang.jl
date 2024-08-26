@@ -7,7 +7,7 @@
     @testset "Abstract Camera" begin
 
         @testset "Abstract Pixel" begin
-            struct TestPixel{T} <: Krang.AbstractPixel 
+            struct TestPixel{T} <: Krang.AbstractPixel{T}
                 metric::Kerr{T}
                 screen_coordinate::NTuple{2, T}
                 θo::T
