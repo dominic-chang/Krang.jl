@@ -17,7 +17,7 @@ abstract type AbstractScreen end
 
 Abstract Pixel Type
 """
-abstract type AbstractPixel end
+abstract type AbstractPixel{T} end
 
 function screen_coordinate(pix::AbstractPixel) return pix.screen_coordinate end
 function metric(pix::AbstractPixel) return pix.metric end

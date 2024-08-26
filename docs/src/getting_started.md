@@ -12,6 +12,7 @@ These are then viewed by cameras that are sensitive to particular observables (*
 ## Raytracing
 
 Light rays in this module can be parameterized in terms of either the cones ($\theta_s$), or the minotime ($\Delta\tau$).
+Parameterization interms of cones allows for images to separated interms of sub images and ray traced individually.
 
 ### Raytracing conical surfaces
 Surfaces of constant $\theta$ define spin axis centered cones whose apex lie at the origin of the coordinate system.

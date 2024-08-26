@@ -2,7 +2,13 @@
 # Functions generically return 0 when the emission coordinates do not exist for a given screen coordinate to play nice 
 # with Enzyme's AD.
 
-export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates
+export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates, emission_coordinates!
+
+function emission_coordinates!(coordinates::Array{T,3}, camera::AbstractCamera, τ::T) where {T} 
+    for I in CartesianIndices(camera.screen.pixels)
+        coordinates[:,I] .= emission_coordinates(camera.screen.pixels[I], τ)[1:4]
+    end
+end
 
 """
 Emission radius for point originating at inclination θs whose nth order image appears at the screen coordinate (`α`, `β`). 
