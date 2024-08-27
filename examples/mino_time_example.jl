@@ -96,4 +96,8 @@ sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric))
 GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent blackhole
 
 for i in lines_to_plot; GLMk.lines!(ax, i) end
-display(fig)
+fig
+
+GLMk.save("mino_time_rays.png", fig)
+
+# ![image](mino_time_rays.png)
