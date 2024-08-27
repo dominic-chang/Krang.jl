@@ -6,7 +6,7 @@
 #
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
-import GLMakie as GLMk
+import WGLMakie as GLMk
 GLMk.Makie.inline!(true)
 
 #
