@@ -16,7 +16,7 @@ MD_FILES = [joinpath("examples", file) for file in readdir(OUTDIR)]
 Documenter.DocMeta.setdocmeta!(Krang, :DocTestSetup, :(using Krang); recursive=true)
 
 format=DocumenterVitepress.MarkdownVitepress(
-    repo = "https://github.com/dchang10/Krang.jl", # this must be the full URL!
+    repo = "https://github.com/dominic-chang/Krang.jl", # this must be the full URL!
     devbranch = "main",
     devurl = "dev",
     #clean_md_output = true
