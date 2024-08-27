@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node # This is still useful because it caches the node_modules so we don't constantly re-install.  You don't technically need this, though.
+      - name: Setup Node & External Dependencies # This is still useful because it caches the node_modules so we don't constantly re-install.  You don't technically need this, though.
         uses: actions/setup-node@v4
         with:
             node-version: 20
@@ -42,12 +42,14 @@ jobs:
         run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/LuxDL/DocumenterVitepress.jl.git")]); Pkg.instantiate()'
       - name: Install examples dependencies
         run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()),]); Pkg.instantiate()'
+      - name: Install custom documentation dependencies
+        run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs -e 'using Pkg; pkg"dev ."; Pkg.instantiate(); Pkg.precompile(); Pkg.status()'
       - name: Build and deploy
-        uses: julia-actions/julia-docdeploy@v1
-        with: 
-          prefix: xvfb-run -s '-screen 0 1024x768x24' 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
+          GKSwstype: "100"
           JULIA_DEBUG: "Documenter"
           DATADEPS_ALWAYS_ACCEPT: true
+        run: |
+          DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs/ --color=yes docs/make.jl
