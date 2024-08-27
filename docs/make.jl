@@ -25,9 +25,9 @@ format=DocumenterVitepress.MarkdownVitepress(
 
 makedocs(;
     sitename="Krang.jl",
-    authors="Dominic <dchang3419@hotmail.com> and contributors",
+    authors="Dominic <dochang@g.harvard.edu> and contributors",
     modules=[Krang],
-    repo="https://github.com/dchang10/Krang.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/dominic-chang/Krang.jl/blob/{commit}{path}#{line}",
     format=format,
     draft = false,
     source = "src",
@@ -51,7 +51,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/dchang10/Krang.jl",
+    repo="github.com/dominic-chang/Krang.jl",
     target = "build", # this is where Vitepress stores its output
     devbranch="main",
     push_preview=true,
