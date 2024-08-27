@@ -30,6 +30,7 @@ jobs:
             node-version: 20
             cache: npm 
             cache-dependency-path: 'docs/package-lock.json' # this should be a package-lock.json file
+      - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
       - run: cd docs/; rm package-lock.json; npm install; cd ..
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
@@ -43,6 +44,8 @@ jobs:
         run: julia --project=examples -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()),]); Pkg.instantiate()'
       - name: Build and deploy
         uses: julia-actions/julia-docdeploy@v1
+        with: 
+          prefix: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
