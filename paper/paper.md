@@ -11,7 +11,7 @@ authors:
     orcid: 0000-0001-9939-5257
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
 affiliations:
- - name: Harvard University
+ - name: Department of Physics, Harvard University
    index: 1
  - name: Black Hole Initiative at Harvard University
    index: 2
@@ -21,7 +21,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-`Krang` is a Julia [@Bezanson2015] package that implements efficient algorithms for raytracing emission geometries in the Kerr black hole space time.
+`Krang` is a Julia[^1] [@Bezanson2015] package that implements efficient algorithms for raytracing emission geometries in the Kerr black hole space time.
 It is GPU compatible and is specialized for studies of sub-image contributions from gravitational lensed sources [@MJohnsonRing]. 
 Such algorithms are of interest for modeling the sources seen by Very Long Baseline Interferometry (VLBI) observations of Low Luminosity Active Galactic Nuclei (LLAGN) such as those imaged by the Event Horizon Telescope Collaboration (EHTC).
 
@@ -40,9 +40,19 @@ Photon rings are of particular interest because of their strong dependence on gr
 The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
 This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoto].
 
+Scientific studies of black hole images within the current software landscape often requires great compromise due to the computational complexity of the problem, and the incompatibility of the existing software with other analysis packages.
+It is difficult, for example, to apply machine learning optimization algorithms to existing raytracing codes in python implementations since they typically rely on special functions that are not implemented within existing machine learning frameworks.
+Existing python implementations are also bounded to CPU evaluations, limiting their capability of accessing acceleration from specialized hardware.
+A Julia implementation of raytracing algorithms is thus beneficial because of the languages modular design, differentiable programming and efficient execution.
+Krang therefore benefits from the 'plug and play' nature of the julia programming language, allowing for easy development and synergy with existing analysis pipelines, and fast CPU/GPU executions.
 
-# Related Packages
-- `AART` [@cardenas-avendano]: An Adaptive Analytical Ray Tracing code for geodesics in the Kerr space time.
+
+# Similar Packages
+- `AART` [@cardenas-avendano]: An Adaptive Analytical Ray Tracing code for geodesics in the Kerr space time in python.
+
+- `KerrBam` [@Palumbo_2022]: An adaptive analytical raytracing code for equatorial synchrotron models in python.
+
+- `Gradus` [@Gradus]: A Julia implementation of a numeric, differentiable, general relativistic raytracer.
 
 # Acknowledgements
 The authors thank Iniyan Natarajan, Alexander Plavin, and Paul Tiede for helpful discussions. Support for this work was provided by the NSF (AST-1935980, AST-2034306) and by the Gordon and Betty Moore Foundation through grant GBMF-10423. This work was supported by the Black Hole Initiative, which is funded by grants from the John Templeton Foundation (Grant #62286) and the Gordon and Betty Moore Foundation (Grant GBMF-8273), although the opinions expressed in this work are those of the author(s) and do not necessarily reflect the views of these Foundations.
