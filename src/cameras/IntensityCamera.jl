@@ -5,7 +5,7 @@ export IntensityCamera
 Intensity Pixel Type. 
 Each Pixel is associated with a single ray, and caches some information about the ray.
 """
-struct IntensityPixel{T} <: AbstractPixel
+struct IntensityPixel{T} <: AbstractPixel{T}
     metric::Kerr{T}
     screen_coordinate::NTuple{2, T}
     "Radial roots"

@@ -58,7 +58,7 @@ mesh2 = Krang.Mesh(geometry2, material)
 
 scene = Krang.Scene((mesh1, mesh2))
 
-stokesvals = render(Krang.RayTrace, camera, scene)
+stokesvals = render(camera, scene)
 
 fig = Figure(resolution=(700, 700));
 ax1 = Axis(fig[1, 1], aspect=1, title="I")

@@ -9,7 +9,7 @@ GENERATED = joinpath(@__DIR__, "..", "examples")
 OUTDIR = joinpath(@__DIR__, "src", "examples")
 
 blacklist = ["gpu", "JuKeBOX", "Krang_logo", "enzyme"]
-SOURCE_FILES = filter(x-> all(i->!occursin(i, x), blacklist), Glob.glob("*.jl", GENERATED))[1:2]
+SOURCE_FILES = filter(x-> all(i->!occursin(i, x), blacklist), Glob.glob("*.jl", GENERATED))
 foreach(fn -> Literate.markdown(fn, OUTDIR, documenter=true), SOURCE_FILES)
 MD_FILES = [joinpath("examples", file) for file in readdir(OUTDIR)]
 

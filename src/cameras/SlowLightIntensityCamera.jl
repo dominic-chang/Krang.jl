@@ -5,7 +5,7 @@ export SlowLightIntensityCamera
 
 Intensity Pixel Type.
 """
-struct SlowLightIntensityPixel{T} <: AbstractPixel
+struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     metric::Kerr{T}
     "Pixel screen_coordinate"
     screen_coordinate::NTuple{2, T}

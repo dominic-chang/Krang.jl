@@ -3,6 +3,8 @@ using DocStringExtensions
 using StaticArrays
 using JacobiElliptic
 using PolarizedTypes
+using GeometryBasics
+using Rotations
 @template (FUNCTIONS, METHODS, MACROS) =
     """
     $(TYPEDSIGNATURES)
@@ -12,6 +14,7 @@ using PolarizedTypes
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr/Kerr.jl")
 include("geometries/geometry_types.jl")
+include("geometries/mesh_geometry.jl")
 include("cameras/camera_types.jl")
 include("cameras/SlowLightIntensityCamera.jl")
 include("cameras/IntensityCamera.jl")
@@ -25,6 +28,6 @@ include("materials/CoordinatePoint.jl")
 include("materials/ElectronSynchrotronPowerLawPolarization.jl")
 include("materials/ElectronSynchrotronPowerLawIntensity.jl")
 include("schemes/schemes.jl")
-include("schemes/RayCast.jl")
+include("schemes/RayTrace.jl")
 include("raytracer_api.jl")
 end
