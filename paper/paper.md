@@ -15,14 +15,14 @@ affiliations:
    index: 1
  - name: Black Hole Initiative at Harvard University
    index: 2
-date: 19 Dec 2023
+date: 05 Sep 2024
 bibliography: paper.bib
 
 ---
 
 # Summary
 `Krang` is a Julia[^1] [@Bezanson2015] package that implements efficient algorithms for raytracing emission geometries in the Kerr black hole space time.
-It is GPU compatible and is specialized for studies of sub-image contributions from gravitational lensed sources [@MJohnsonRing]. 
+It is GPU compatible and is specialized for studies of sub-image contributions from gravitational lensed sources [@JohnsonRing]. 
 Such algorithms are of interest for modeling the sources seen by Very Long Baseline Interferometry (VLBI) observations of Low Luminosity Active Galactic Nuclei (LLAGN) such as those imaged by the Event Horizon Telescope Collaboration (EHTC).
 
 [^1]: https://julialang.org
@@ -38,7 +38,7 @@ The large scale of the black holes allow for many of these effects to be describ
 A relativistic image feature that has been theorized to exist, but is yet to be observed, are the individual sub-image contributions to the overall image structure known as photon-rings, [@JohnsonRing].
 Photon rings are of particular interest because of their strong dependence on gravitational effects and their insensitivity to variations in the emission physics around the black hole.
 The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
-This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoto].
+This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoton].
 
 Scientific studies of black hole images within the current software landscape often requires great compromise due to the computational complexity of the problem, and the incompatibility of the existing software with other analysis packages.
 It is difficult, for example, to apply machine learning optimization algorithms to existing raytracing codes in python implementations since they typically rely on special functions that are not implemented within existing machine learning frameworks.
