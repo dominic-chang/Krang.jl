@@ -215,7 +215,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2)) % T(2π)
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
@@ -265,7 +265,7 @@ function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2)) % T(2π)
     emission_time_regularized = (It + a^2 * Gttemp)
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
