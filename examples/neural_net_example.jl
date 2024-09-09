@@ -1,6 +1,5 @@
-# # Nueral Network Emission Model Example
+# # Neural Network Emission Model Example
 # In this example we will build a simple Neural Network emission model which we will ray trace and optimize with LBFGS
-using Pkg; Pkg.activate((@__DIR__))    
 using Lux
 using Krang
 using Random
