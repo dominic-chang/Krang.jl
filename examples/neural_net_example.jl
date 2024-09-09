@@ -15,7 +15,7 @@ emission_model = Chain(
     Dense(20 => 1, Lux.sigmoid)
     ) 
 
-ps, st = Lux.setup(rng, emission_model)
+ps, st = Lux.setup(rng, emission_model);
 
 # Our image model will effectively act as a raytracing layer after our emission model.
 # In our example, we will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to
@@ -90,7 +90,7 @@ save("emission_model_and_target_model.png", fig)
 # ![image](emission_model_and_target_model.png)
 
 # This will be the image we will try to fit our model to.
-target_img = reshape(received_intensity, sze, sze)
+target_img = reshape(received_intensity, sze, sze);
 
 # ## Fitting the model
 # Lets fit our model using the normalized cross correlation as a kernel for our loss function.
@@ -117,8 +117,8 @@ end
 
 bhattacharyya(target_img, target_img)
 
-ps, st = Lux.setup(rng, emission_model)
-image_model = ImageModel(emission_model)
+ps, st = Lux.setup(rng, emission_model);
+image_model = ImageModel(emission_model);
 
 emitted_intensity = reshape(emission_model(pixels, ps, st)[1], sze, sze)
 received_intensity = reshape(image_model(pixels, ps, st)[1], sze, sze)
@@ -165,7 +165,7 @@ ps_trained, st_trained = let st=Ref(st), x=pixels, y=target_img
         optprob,
         OptimizationOptimisers.ADAM(0.05),
         maxiters = 1_000, 
-    callback=Callback(10,()->nothing)
+    callback=Callback(100,()->nothing)
     )
     
     solution.u, st[]
