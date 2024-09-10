@@ -15,9 +15,9 @@ hero:
       text: Getting Started
       link: /getting_started
     - theme: alt
-      icon: github
       text: View on Github
       link: https://github.com/dominic-chang/Krang.jl
+    - theme: alt
       text: API 
       link: /api
 
