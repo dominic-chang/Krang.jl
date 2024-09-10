@@ -17,10 +17,9 @@ hero:
     - theme: alt
       icon: github
       text: View on Github
-      link: https://github.com/dchang10/Krang.jl
-    - theme: alt
-      text: Examples
-      link: /examples
+      link: https://github.com/dominic-chang/Krang.jl
+      text: API 
+      link: /api
 
 features:
   - icon: <img width="64" height="64" src="https://metal.juliagpu.org/stable/assets/logo.png" />
