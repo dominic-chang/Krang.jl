@@ -50,7 +50,7 @@ coordinates = (zeros(sze, sze) for _ in 1:3)
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 material = Krang.CoordinatePoint();
 colormaps = (:afmhot, :afmhot, :hsv)
-colorrange = ((-20, 20), (0, rmax), (0, 2π))
+colorrange = ((-20, 20), (0, rmax), (-π, π))
 
 # Draw Function
 function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
@@ -63,7 +63,7 @@ function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
         @Threads.threads for I in CartesianIndices(camera.screen.pixels)
             times[I], radii[I], _, azimuths[I] = meshes[i].material(camera.screen.pixels[I], meshes[i].geometry)
         end
-        coordinates = (times, radii, azimuths)
+        coordinates = (times, radii, (azimuths .% (2π)))
         for j in 1:3
             heatmap!(axes_list[i][j], coordinates[j], colormap = colormaps[j], colorrange=colorrange[j])
         end
