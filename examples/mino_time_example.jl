@@ -56,7 +56,7 @@ recording = GLMk.record(fig, "raytrace.gif", range(0.1, 3, length=290), framerat
     time = coordinates[1,:,:]
     radius = coordinates[2,:,:]
     inclination = coordinates[3,:,:]
-    azimuth = ((coordinates[4,:,:] .% (2π)) .+ 2π) .% (2π)
+    azimuth = mod2pi.(coordinates[4,:,:])
 
     data = (time, radius, inclination, azimuth)
     titles = (GLMk.L"\text{Regularized Time }(t_s)", GLMk.L"\text{Radius }(r_s)", GLMk.L"\text{Inclination }(\theta_s)", GLMk.L"\text{Azimuth } (\phi_s)")
