@@ -50,7 +50,7 @@ coordinates = (zeros(sze, sze) for _ in 1:3)
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 material = Krang.CoordinatePoint();
 colormaps = (:afmhot, :afmhot, :hsv)
-colorrange = ((-20, 20), (0, rmax), (-π, π))
+colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
 # Draw Function
 function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)

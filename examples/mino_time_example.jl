@@ -61,7 +61,7 @@ recording = GLMk.record(fig, "raytrace.gif", range(0.1, 3, length=290), framerat
     data = (time, radius, inclination, azimuth)
     titles = (GLMk.L"\text{Regularized Time }(t_s)", GLMk.L"\text{Radius }(r_s)", GLMk.L"\text{Inclination }(\theta_s)", GLMk.L"\text{Azimuth } (\phi_s)")
     colormaps = (:afmhot, :afmhot, :afmhot, :hsv)
-    colorrange = ((-20, 20), (0, rmax), (0,π), (-π, π))
+    colorrange = ((-20, 20), (0, rmax), (0,π), (0, 2π))
     indices = ((1,1), ())
 
     for i in 1:4
