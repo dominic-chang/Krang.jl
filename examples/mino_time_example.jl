@@ -82,15 +82,15 @@ end
 
 # ![image](raytrace.gif)
 
-camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, 4);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -3, 3, -3, 3, 4);
 
 fig = GLMk.Figure()
 ax = GLMk.Axis3(fig[1,1], aspect=(1,1,1))
-GLMk.xlims!(ax, (-10, 10)) 
-GLMk.ylims!(ax, (-10, 10)) 
-GLMk.zlims!(ax, (-10, 10)) 
+GLMk.xlims!(ax, (-3, 3)) 
+GLMk.ylims!(ax, (-3, 3)) 
+GLMk.zlims!(ax, (-3, 3)) 
 lines_to_plot = []
-lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 1_000)
+lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 5_000)
 
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric))
 GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent blackhole
@@ -100,4 +100,4 @@ fig
 
 GLMk.save("mino_time_rays.png", fig)
 
-# ![image](mino_time_rays.png)
+# ![Photons trajectories around Kerr black hole in Boyer-Lindquist Coordinates](mino_time_rays.png)
