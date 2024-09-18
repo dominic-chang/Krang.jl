@@ -63,7 +63,7 @@ function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
         @Threads.threads for I in CartesianIndices(camera.screen.pixels)
             times[I], radii[I], _, azimuths[I] = meshes[i].material(camera.screen.pixels[I], meshes[i].geometry)
         end
-        coordinates = (times, radii, (azimuths .% (π)))
+        coordinates = (times, radii, ((azimuths .% (2π)) .+ 2π) .% (2π))
         for j in 1:3
             heatmap!(axes_list[i][j], coordinates[j], colormap = colormaps[j], colorrange=colorrange[j])
         end
