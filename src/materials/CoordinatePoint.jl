@@ -4,7 +4,7 @@ function (prof::CoordinatePoint)(pix::AbstractPixel, geometry::ConeGeometry{T,A}
     n, rmin, rmax = geometry.attributes
     θs = geometry.opening_angle
 
-    observation = zeros(T, 4)
+    observation = ntuple(j -> zero(T), Val(4))
 
     isindir = false 
     for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
