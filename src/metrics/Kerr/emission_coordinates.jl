@@ -54,7 +54,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 -`pix` : Pixel information
 - `τ` : Mino time
 """
-function emission_radius(pix::AbstractPixel ,τ::T)::Tuple{T, Bool, Int, Bool} where {T}
+function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T, Bool, Int, Bool} where {T}
     met = metric(pix)
     a = met.spin
     ans = zero(T)
