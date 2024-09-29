@@ -52,16 +52,21 @@ material = Krang.CoordinatePoint();
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
+store = Matrix{NTuple{4, Float64}}(undef, sze, sze)
+
 # Draw Function
-function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
+function draw!(axes_list, store, camera, material, coordinates, rmin, rmax, θs)
     times, radii, azimuths = coordinates 
     map(axes -> empty!.(axes), axes_list)
 
-    meshes = [Krang.Mesh(Krang.ConeGeometry(θs, (i, rmin, rmax)), material) for i in 0:2]
+    scenes = (Krang.Scene((Krang.Mesh(Krang.ConeGeometry(θs, (i, rmin, rmax)), material),)) for i in 0:2)
     
-    for i in 1:3
-        @Threads.threads for I in CartesianIndices(camera.screen.pixels)
-            times[I], radii[I], _, azimuths[I] = meshes[i].material(camera.screen.pixels[I], meshes[i].geometry)
+    for (i,scene) in enumerate(scenes)
+        rendered_scene = Krang.render!(store, camera, scene)
+        for I in CartesianIndices(rendered_scene)
+            times[I] = rendered_scene[I][1]
+            radii[I] = rendered_scene[I][2]
+            azimuths[I] = rendered_scene[I][4]
         end
         coordinates = (times, radii, mod2pi.(azimuths ))
         for j in 1:3
@@ -70,9 +75,11 @@ function draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
     end
 end
 
+θs = π/4
+
 # Create the animation of Cone of Emission Coordinates
 recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180), framerate=12) do θs
-    draw!(axes_list, camera, material, coordinates, rmin, rmax, θs)
+    draw!(axes_list, store, camera, material, coordinates, rmin, rmax, θs)
 end
 
 # ![image](coordinate.gif)
