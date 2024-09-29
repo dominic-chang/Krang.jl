@@ -11,7 +11,6 @@ rng = Random.GLOBAL_RNG
 
 emission_model = Chain(
     Dense(2 => 20, Lux.sigmoid),  
-    Dense(20 => 20, Lux.sigmoid),  
     Dense(20 => 1, Lux.sigmoid)
     ) 
 
@@ -163,8 +162,8 @@ ps_trained, st_trained = let st=Ref(st), x=pixels, y=target_img
     
     solution = Optimization.solve(
         optprob,
-        OptimizationOptimisers.Adam(0.05),
-        maxiters = 1_000, 
+        OptimizationOptimisers.Adam(0.01),
+        maxiters = 5_000, 
     callback=Callback(100,()->nothing)
     )
     
