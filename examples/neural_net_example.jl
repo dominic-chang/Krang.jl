@@ -1,13 +1,17 @@
 # # Neural Network Emission Model Example
-# In this example we will build a simple Neural Network emission model which we will ray trace and optimize with LBFGS
+# This is a pedagogical example that serves as a proof of concept.
+# We will build a simple Neural Network emission model to be ray traced and optimize with ADAM algorithm.
+
 using Lux
 using Krang
 using Random
 Random.seed!(123)
 rng = Random.GLOBAL_RNG
 
-# Our model with take in spacetime coordinates and return an intensity value:
-# This is a simple fully connected Neural Network with 2 hidden layers
+# Our model will take in spacetime coordinates and return observed intensity value for a given pixel:
+# 
+# We will first define a simple emisison model that will be raytraced.
+# The emission model will ge taken to be a simple fully connected Neural Network with 2 hidden layers
 
 emission_model = Chain(
     Dense(2 => 20, Lux.sigmoid),  
@@ -17,14 +21,16 @@ emission_model = Chain(
 
 ps, st = Lux.setup(rng, emission_model);
 
-# Our image model will effectively act as a raytracing layer after our emission model.
-# In our example, we will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to
-# the spin axis.
-# We will create a struct for our image model and store our emission model as an argument.
+# We will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to the spin axis in this example.
+# These parameters could be made to float in the optimization process.
+# We will do this by defining an `ImageModel` comprised of an emission layer and a raytracing layer.
+# We will create a struct for our image model and store our emission model as a layer to be raytraced.
 
 struct ImageModel{T <: Chain}
     emission_layer::T
 end
+
+# The models in Lux are functors that take in features, parameters and model state, and return the output and model state.
 
 function (m::ImageModel)(x, ps, st)
     metric = Krang.Kerr(0.99e0)
