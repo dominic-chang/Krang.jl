@@ -11,6 +11,7 @@ rng = Random.GLOBAL_RNG
 
 emission_model = Chain(
     Dense(2 => 20, Lux.sigmoid),  
+    Dense(20 => 20, Lux.sigmoid),
     Dense(20 => 1, Lux.sigmoid)
     ) 
 
@@ -103,18 +104,18 @@ Enzyme.API.runtimeActivity!(true)
 
 Enzyme.Compiler.RunAttributor[] = false
 
-function bhattacharyya(img1::Matrix{T}, img2::Matrix{T}) where T
+function mse(img1::Matrix{T}, img2::Matrix{T}) where T
     img1 = reshape(img1, sze, sze) ./ sum(img1)
     img2 = reshape(img2, sze, sze) ./ sum(img2)
-    sum(sqrt.(img1 .* img2))
+    mean((img1 .- img2) .^ 2)
 end
 
 function loss_function(pixels, y, ps, st)
     y_pred, st = image_model(pixels, ps, st)
-    -log(bhattacharyya(y, y_pred)), st
+    mse(y, y_pred), st
 end
 
-bhattacharyya(target_img, target_img)
+mse(target_img, target_img)
 
 ps, st = Lux.setup(rng, emission_model);
 image_model = ImageModel(emission_model);
@@ -162,7 +163,7 @@ ps_trained, st_trained = let st=Ref(st), x=pixels, y=target_img
     
     solution = Optimization.solve(
         optprob,
-        OptimizationOptimisers.Adam(0.01),
+        OptimizationOptimisers.Adam(),
         maxiters = 5_000, 
     callback=Callback(100,()->nothing)
     )
