@@ -1,7 +1,8 @@
 # # Creating a Custom Dual Cone Model
 
-# In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
-# We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
+# We will defined a custom model for low luminosity active galactice nuclei (LLAGN).
+# A detailed description of the model can be found in this [reference](https://doi.org/10.48550/arXiv.2405.04749).
+# We will show the emission of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
 # source, at a fixed inclination angle from the blackhole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
@@ -19,20 +20,33 @@ curr_theme = Theme(
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 
 #
-# We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
-# A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
-# screen of the observer.
-metric = Krang.Kerr(-0.94);
+# We will use a $0.94$ spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of $θo=17^\circ$. 
+# The emission to be raytraced is 
+metric = Krang.Kerr(0.94);
 θo = 17 * π / 180;
-sze = 400;
-rmin = Krang.horizon(metric)
-rmax = 10.0;
 ρmax = 10.0;
+
+# Let's create a camera with a resolution of 400x400 pixels
+camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, 400);
+
+# We will need to create `Mesh` objects to render the scene.
+# First we will create the material for the mesh.
+# Our material will be the `ElectronSynchrotronPowerLawPolarization` material with the following parameters.
+
 χ = -1.705612782769303
 ι = 0.5807355065517938
 βv = 0.8776461626924748
 σ = 0.7335172899224874
 η1 = 2.6444786738735804
+η2 = π-η1
+
+# These will be used to define the magnetic field and fluid velocity.
+
+magfield1 = Krang.SVector(sin(ι)*cos(η1), sin(ι)*sin(η1), cos(ι));
+magfield2 = Krang.SVector(sin(ι)*cos(η2), sin(ι)*sin(η2), cos(ι));
+vel = Krang.SVector(βv, (π/2), χ);
+
+# This material also requires the definition of a profile function. We will take a double power law in radius.
 
 function profile(r)
     R = 3.3266154761905455
@@ -41,23 +55,23 @@ function profile(r)
     return (r/R)^p1/(1+(r/R)^(p1+p2))
 end
 
-# Create the material
-
-camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
-η2 = π-η1
-magfield1 = Krang.SVector(sin(ι)*cos(η1), sin(ι)*sin(η1), cos(ι));
-magfield2 = Krang.SVector(sin(ι)*cos(η2), sin(ι)*sin(η2), cos(ι));
-vel = Krang.SVector(βv, (π/2), χ);
 material = Krang.ElectronSynchrotronPowerLawPolarization();
 
-θs = (75 * π / 180)
-geometry1 = Krang.ConeGeometry((θs), (magfield1, vel, (0,1,2), profile, σ))
-mesh1 = Krang.Mesh(geometry1, material)
-geometry2 = Krang.ConeGeometry((π-θs), (magfield2, vel, (0,1,2), profile, σ))
-mesh2 = Krang.Mesh(geometry2, material)
+# Next we will define the geometries of each mesh. We will use a `ConeGeometry` with an opening angle of $75^\circ$.
+# The additional information needed for the material will be passed as attributes to the geometry.
+# This includes the sub-images to raytrace, which in our case will be the n=0 and n=1 sub-images.
 
+θs = (75 * π / 180)
+geometry1 = Krang.ConeGeometry((θs), (magfield1, vel, (0,1,), profile, σ))
+geometry2 = Krang.ConeGeometry((π-θs), (magfield2, vel, (0,1,), profile, σ))
+
+
+# We will create two meshes, one for each geometry anc create a scene with both meshes.
+mesh1 = Krang.Mesh(geometry1, material)
+mesh2 = Krang.Mesh(geometry2, material)
 scene = Krang.Scene((mesh1, mesh2))
 
+# Finally, we will render the scene with the camera and plot the Stokes parameters.
 stokesvals = render(camera, scene)
 
 fig = Figure(resolution=(700, 700));
