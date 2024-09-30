@@ -5,6 +5,7 @@ using JacobiElliptic
 using PolarizedTypes
 using GeometryBasics
 using Rotations
+using KernelAbstractions
 @template (FUNCTIONS, METHODS, MACROS) =
     """
     $(TYPEDSIGNATURES)

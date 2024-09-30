@@ -47,7 +47,7 @@ axes_list = [
 
 # Initialize Camera and Pre-Allocate Memory for data to be plotted
 coordinates = (zeros(sze, sze) for _ in 1:3)
-camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze, A=Matrix);
 material = Krang.CoordinatePoint();
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
@@ -83,3 +83,14 @@ recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180),
 end
 
 # ![image](coordinate.gif)
+
+
+# > [!IMPORTANT]
+# > To use the GPU, by passing the appropriate array to the camera. and creating the appropriate store. for example:
+# 
+# ```julia
+# using CUDA
+# 
+# store = CUDA.fill(0.0, sze, sze)
+# camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze, A=CuArray)
+# ```

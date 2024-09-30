@@ -28,6 +28,8 @@ save("stanford_bunny.png", fig)
 # ![image](stanford_bunny.png)
 
 # Raytrace the mesh embedded in the Kerr space time with additive blending
+# The mesh is embedded in the space-time by assuming the world coordinates of the mesh is the same as the Cartesian coordinates
+# that would be generated from Boyer-Lindquist coordinates.
 camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
 
 intersections = raytrace(camera, bunny_mesh)'

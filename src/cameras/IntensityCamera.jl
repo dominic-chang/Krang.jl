@@ -42,7 +42,7 @@ end
 
 Screen made of Intensity Pixels.
 """
-struct IntensityScreen{T} <: AbstractScreen
+struct IntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
     αrange::NTuple{2, T}
 
@@ -50,18 +50,22 @@ struct IntensityScreen{T} <: AbstractScreen
     βrange::NTuple{2, T}
 
     "Data type that stores screen pixel information"
-    pixels::Matrix{IntensityPixel{T}}
-    function IntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
-        screen = Matrix{IntensityPixel}(undef, res, res)
-        αvals = range(αmin, αmax, length=res)
-        βvals = range(βmin, βmax, length=res)
+    pixels::A
+
+    @kernel function _generate_screen!(screen, met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where T
+        I,J = @index(Global, NTuple)
+        α = αmin + (αmax - αmin) * T(I) / res
+        β = βmin + (βmax - βmin) * T(J) / res
+        screen[I, J] = IntensityPixel(met, α, β, θo)
+    end
+    function IntensityScreen(met::Kerr{T}, αmin::T, αmax::T, βmin::T, βmax::T, θo::T, res; A=Matrix) where {T}
+        screen = A(Matrix{IntensityPixel{T}}(undef, res, res))
+
+        backend = get_backend(screen)
+
+        _generate_screen!(backend)(screen, met, αmin, αmax, βmin, βmax, θo, res, ndrange = (res, res))
         
-        for (iα, α) in enumerate(αvals)
-            for (iβ, β) in enumerate(βvals)
-                screen[iα, iβ] = IntensityPixel(met, α, β, θo)
-            end
-        end
-        new{T}((αmin, αmax), (βmin, βmax), screen)
+        new{T, A}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -71,14 +75,14 @@ end
 Observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct IntensityCamera{T} <: AbstractCamera
+struct IntensityCamera{T, A} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
-    screen::IntensityScreen{T}
+    screen::IntensityScreen{T, A}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function IntensityCamera(met::Kerr{T}, θo::T, αmin::T, αmax::T, βmin::T, βmax::T, res::Int) where {T}
-        new{T}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+    function IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int; A=Matrix) where {T}
+        new{T, A}(met, IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A=A), (T(Inf), θo))
     end
 end
 

@@ -61,7 +61,7 @@ end
 
 Screen made of Intensity Pixels.
 """
-struct SlowLightIntensityScreen{T} <: AbstractScreen
+struct SlowLightIntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
     αrange::NTuple{2, T}
 
@@ -69,18 +69,22 @@ struct SlowLightIntensityScreen{T} <: AbstractScreen
     βrange::NTuple{2, T}
 
     "Data type that stores screen pixel information"
-    pixels::Matrix{SlowLightIntensityPixel{T}}
-    function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
-        screen = Matrix{SlowLightIntensityPixel}(undef, res, res)
-        αvals = range(αmin, αmax, length=res)
-        βvals = range(βmin, βmax, length=res)
+    pixels::A
+
+    @kernel function _generate_screen!(screen, met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where T
+        I,J = @index(Global, NTuple)
+        α = αmin + (αmax - αmin) * T(I) / res
+        β = βmin + (βmax - βmin) * T(J) / res
+        screen[I, J] = SlowLightIntensityPixel(met, α, β, θo)
+    end
+    function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res; A=Matrix) where {T}
+        screen = A(Matrix{SlowLightIntensityPixel{T}}(undef, res, res))
+
+        backend = get_backend(screen)
+
+        _generate_screen!(backend)(screen, met, αmin, αmax, βmin, βmax, θo, res, ndrange = (res, res))
         
-        Threads.@threads for (iα, α) in collect(enumerate(αvals))
-            for (iβ, β) in enumerate(βvals)
-                screen[iα, iβ] = SlowLightIntensityPixel(met, α, β, θo)
-            end
-        end
-        new{T}((αmin, αmax), (βmin, βmax), screen)
+        new{T, A}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -90,14 +94,14 @@ end
 Observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct SlowLightIntensityCamera{T} <: AbstractCamera
+struct SlowLightIntensityCamera{T, A} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
-    screen::SlowLightIntensityScreen{T}
+    screen::SlowLightIntensityScreen{T, A}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
-    function SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
-        new{T}(met, SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+    function SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
+        new{T, A}(met, SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
     end
 end
 
