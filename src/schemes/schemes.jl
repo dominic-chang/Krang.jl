@@ -12,9 +12,7 @@ end
 
 @kernel function _render!(store, pixels, mesh::Mesh)
     I = @index(Global)
-    for I in CartesianIndices(pixels)
-        @inbounds store[I] = mesh.material(pixels[I], mesh.geometry)
-    end
+    @inbounds store[I] = mesh.material(pixels[I], mesh.geometry)
 end
 
 function render!(store, camera::AbstractCamera, scene::Scene)  

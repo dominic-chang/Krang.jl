@@ -54,8 +54,8 @@ struct IntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
 
     @kernel function _generate_screen!(screen, met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where T
         I,J = @index(Global, NTuple)
-        α = αmin + (αmax - αmin) * T(I) / res
-        β = βmin + (βmax - βmin) * T(J) / res
+        α = αmin + (αmax - αmin) * (T(I)-1) / (res-1)
+        β = βmin + (βmax - βmin) * (T(J)-1) / (res-1)
         screen[I, J] = IntensityPixel(met, α, β, θo)
     end
     function IntensityScreen(met::Kerr{T}, αmin::T, αmax::T, βmin::T, βmax::T, θo::T, res; A=Matrix) where {T}
