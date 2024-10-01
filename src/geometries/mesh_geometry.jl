@@ -1,10 +1,5 @@
 export load, translate, scale, rotate
 
-"""
-    $TYPEDEF
-
-Mesh Geometry Type. Embeds a mesh in 3D space assuming Boyer-Lindquist coordinates.
-"""
 const MeshGeometry = GeometryBasics.Mesh
 
 function translate(mesh, x, y, z)
