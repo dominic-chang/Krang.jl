@@ -58,3 +58,15 @@ There are currently two types of cameras which can be used for either 'slow ligh
 
 * `SlowLightIntensityCamera` : Precomputes geodesic information necessary to solve the 'slow light' raytracing problem.
 
+The GPU arrays can be passed to the cameras on construction to raytrace enforce raytracing on the GPU.
+An sketch of how to do this with a CUDA array is:
+
+```julia
+using CUDA
+ 
+store = CUDA.fill(0.0, sze, sze)
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze, A=CuArray)
+Krang.render!(store, camera, scene)
+```
+
+
