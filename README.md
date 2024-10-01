@@ -8,6 +8,7 @@ The ray tracing scheme has been optimized for GPU compatibility and automatic di
 These considerations allow our algorithms to be easily used in Machine Learning applications with the existing julia infrastructure.
 
 ## Documentation
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://dominic-chang.github.io/Krang.jl/v0.2.0/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://dominic-chang.github.io/Krang.jl/dev/)
 ## Repo Status
 [![Build Status](https://github.com/dominic-chang/Krang.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/dchang10/Krang.jl/actions/workflows/CI.yml?query=branch%3Amain)
