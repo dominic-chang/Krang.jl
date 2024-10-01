@@ -84,7 +84,7 @@ struct SlowLightIntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
 
         _generate_screen!(backend)(screen, met, αmin, αmax, βmin, βmax, θo, res, ndrange = (res, res))
         
-        new{T, A}((αmin, αmax), (βmin, βmax), screen)
+        new{T, typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -101,7 +101,8 @@ struct SlowLightIntensityCamera{T, A} <: AbstractCamera
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
     function SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
-        new{T, A}(met, SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res), (T(Inf), θo))
+        screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A)
+        new{T,typeof(screen.pixels)}(met, screen, (T(Inf), θo))
     end
 end
 
