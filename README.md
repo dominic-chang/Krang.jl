@@ -13,3 +13,8 @@ These considerations allow our algorithms to be easily used in Machine Learning 
 ## Repo Status
 [![Build Status](https://github.com/dominic-chang/Krang.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/dchang10/Krang.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/dominic-chang/Krang.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dchang10/Krang.jl)
+# Installation
+Launch your Julia session with then type `]` to move into Pkg mode. Once in pkg mode type
+```julia
+add Krang
+```
