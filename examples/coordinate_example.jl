@@ -1,6 +1,8 @@
 # # Raytracing with inclination
 
-# In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
+# This example shows how to access coordinate information from the raytracing process.
+# You will likely need to do this when making custom physics `materials`.
+# We will raytrace a sequence of cones in the region around a Kerr blackhole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
 # source, at a fixed inclination angle from the blackhole's spin axis.
 #
@@ -54,15 +56,36 @@ colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
 store = Matrix{NTuple{4, Float64}}(undef, sze, sze)
 
+
+# Let's defined a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
+# We will includes some basic occlusion effects by checking if the ray intersects with the cone on the 'far-side' or the 'near-side'.
+function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry{T,A}) where {T, A}
+    n, rmin, rmax = geometry.attributes
+    θs = geometry.opening_angle
+
+    coords = ntuple(j -> zero(T), Val(4))
+
+    isindir = false 
+    for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
+        isindir ⊻= true
+        ts, rs, θs, ϕs =  emission_coordinates(pix, geometry.opening_angle, isindir, n)
+        if rs ≤ rmin || rs ≥ rmax
+            continue
+        end
+        coords = isnan(rs) ? observation :  (ts, rs, θs, ϕs)
+    end
+    return coords 
+end
+
 # Draw Function
-function draw!(axes_list, store, camera, material, coordinates, rmin, rmax, θs)
+function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
     times, radii, azimuths = coordinates 
     map(axes -> empty!.(axes), axes_list)
 
-    scenes = (Krang.Scene((Krang.Mesh(Krang.ConeGeometry(θs, (i, rmin, rmax)), material),)) for i in 0:2)
+    geometries = (Krang.ConeGeometry(θs, (i, rmin, rmax)) for i in 0:2)
     
-    for (i,scene) in enumerate(scenes)
-        rendered_scene = Krang.render!(store, camera, scene)
+    for (i, geometry) in enumerate(geometries)
+        rendered_scene = coordinate_point.(camera.screen.pixels, Ref(geometry))
         for I in CartesianIndices(rendered_scene)
             times[I] = rendered_scene[I][1]
             radii[I] = rendered_scene[I][2]
@@ -79,7 +102,7 @@ end
 
 # Create the animation of Cone of Emission Coordinates
 recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180), framerate=12) do θs
-    draw!(axes_list, store, camera, material, coordinates, rmin, rmax, θs)
+    draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
 # ![image](coordinate.gif)

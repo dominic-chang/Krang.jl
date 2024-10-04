@@ -1523,8 +1523,8 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} w
             return minotime, Gs, Go, Ghat, isvortical, false
         end
         tempfac = one(T) / √abs(um * a2)
-        Go *= (-one(T))^((θs > T(π / 2)) ? 1 : 0)
-        Gs = (-one(T))^((θs > T(π / 2)) ? 1 : 0) * tempfac * JacobiElliptic.F(asin(√args), k)
+        Go *= (θs > T(π / 2) ? -one(T) : one(T))
+        Gs = (θs > T(π / 2) ? -one(T) : one(T)) * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
         argo = cosθo / √(up)
