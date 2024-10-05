@@ -1,7 +1,7 @@
 name = "Krang"
 uuid = "54806c32-d51a-438d-8447-e0041be2fbfb"
 authors = ["Dominic <dchang3419@hotmail.com> and contributors"]
-version = "0.2.1"
+version = "0.2.2"
 
 [deps]
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
@@ -15,7 +15,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 [compat]
 DocStringExtensions = "0.9"
 GeometryBasics = "0.4"
-JacobiElliptic = "0.1, 0.2"
+JacobiElliptic = "0.1, 0.2, 0.3"
 PolarizedTypes = "0.1"
 Rotations = "1"
 StaticArrays = "1"
