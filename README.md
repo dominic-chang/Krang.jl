@@ -2,7 +2,7 @@
 
 This Julia language package that accurately and efficiently solves for null geodesics in the Kerr spacetime.
 
-The package is intended mainly for scientic usage for astrophysical observations, and thus, have constrained the observer to lie at assymptotic infinity.
+The package is intended mainly for scientic usage for astrophysical observations, and thus, have constrained the observer to lie at asmyptptic infinity.
 These algorithms mainly follow the formalism of [Gralla & Lupsasca](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.044032), with the exception for a new sub image indexing scheme and a regularized time integral definition.
 The ray tracing scheme has been optimized for GPU compatibility and automatic differentiability with [Enzyme.jl](https://enzyme.mit.edu/julia/stable/). 
 These considerations allow our algorithms to be easily used in Machine Learning applications with the existing julia infrastructure.

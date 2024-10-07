@@ -1,5 +1,5 @@
 """
-Returns the screen polarization associated with a killing spinor κ as seen seen by an assymptotic observer.
+Returns the screen polarization associated with a killing spinor κ as seen seen by an asmyptptic observer.
 """
 function screen_polarization(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}# Eq 31 10.1103/PhysRevD.104.044060
     a = metric.spin

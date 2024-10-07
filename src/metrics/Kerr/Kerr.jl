@@ -10,7 +10,7 @@ $FIELDS
 struct Kerr{T} <: AbstractMetric
     "M = mass"
     mass::T  
-    "a = J/M, where J is the angular momentum and M is the mass of the blackhole."
+    "a = J/M, where J is the angular momentum and M is the mass of the black hole."
     spin::T
     function Kerr(spin::T) where {T}
         new{T}(one(T), spin)

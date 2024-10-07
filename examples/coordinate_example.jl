@@ -2,9 +2,9 @@
 
 # This example shows how to access coordinate information from the raytracing process.
 # You will likely need to do this when making custom physics `materials`.
-# We will raytrace a sequence of cones in the region around a Kerr blackhole as seen by an observer stationed at infinity.
+# We will raytrace a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
-# source, at a fixed inclination angle from the blackhole's spin axis.
+# source, at a fixed inclination angle from the black hole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
@@ -32,7 +32,7 @@ rmax = 10.0;
 ρmax = 15.0;
 
 #
-# We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
+# We will use a 0.99 spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 

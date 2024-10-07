@@ -1,6 +1,6 @@
 # Regularized time
 
-The Kerr spacetime admits a unique Killing vector field, $\xi^t$, that is timelike at $r=\infty$, and whose integral curves serve as a natural time coordinate for observers sitting far away from the blackhole.
+The Kerr spacetime admits a unique Killing vector field, $\xi^t$, that is timelike at $r=\infty$, and whose integral curves serve as a natural time coordinate for observers sitting far away from the black hole.
 This is the typical time coordinate used for the Kerr when expressed in Boyer-Lindquist form.
 
 It is then possible to calculate the total coordinate time elapsed time over the trajectory of any null geodesic $\gamma(r,\theta)$ as,
@@ -30,7 +30,7 @@ where,
 \end{align}
 ```
 
-One idiosyncracy of this coordinate is that it introduces ambiguities when evaluating the elapsed time of any geodesic terminating at the assymptotic observer.
+One idiosyncracy of this coordinate is that it introduces ambiguities when evaluating the elapsed time of any geodesic terminating at the asmyptptic observer.
 The ambiguity is due to logarithmic and linear divergences in the integral $I_t$ at $r_o=\infty$ which take the form,[^CAZ]
 ```math
 \begin{align}

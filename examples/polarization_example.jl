@@ -3,7 +3,7 @@
 # We will defined a custom model for low luminosity active galactice nuclei (LLAGN).
 # A detailed description of the model can be found in this [reference](https://doi.org/10.48550/arXiv.2405.04749).
 # We will show the emission of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
-# source, at a fixed inclination angle from the blackhole's spin axis.
+# source, at a fixed inclination angle from the black hole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
@@ -20,7 +20,7 @@ curr_theme = Theme(
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 
 #
-# We will use a $0.94$ spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of $θo=17^\circ$. 
+# We will use a $0.94$ spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of $θo=17^\circ$. 
 # The emission to be raytraced is 
 metric = Krang.Kerr(0.94);
 θo = 17 * π / 180;

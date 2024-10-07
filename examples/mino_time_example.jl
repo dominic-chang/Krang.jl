@@ -1,8 +1,8 @@
 # # Rays parameterized with Mino time
 
-# In this example, we will raytrace the region around a Kerr blackhole as seen by an observer stationed at infinity.
+# In this example, we will raytrace the region around a Kerr black hole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
-# source, at a fixed inclination angle from the blackhole's spin axis.
+# source, at a fixed inclination angle from the black hole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
@@ -10,7 +10,7 @@ import GLMakie as GLMk
 GLMk.Makie.inline!(true)
 
 #
-# We will use a 0.99 spin Kerr blackhole viewed by an assymptotic observer at an inclination angle of θo=π/4. 
+# We will use a 0.99 spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 metric = Krang.Kerr(0.99); # Kerr spacetime with 0.99 spin
@@ -93,7 +93,7 @@ lines_to_plot = []
 lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 5_000)
 
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric))
-GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent blackhole
+GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent black hole
 
 for i in lines_to_plot; GLMk.lines!(ax, i) end
 fig
