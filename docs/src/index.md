@@ -27,6 +27,6 @@ features:
     details: Type stable and type preserving. GPU compatible with CUDA.jl and Metal.jl.
   - icon: <img width="64" height="64" src="https://enzyme.mit.edu/julia/stable/assets/logo.svg" alt="markdown"/>
     title: Automatic Differentiable, Backwards Propagation compatible
-    details: Supports automatie differentiation with Enzyme.jl
+    details: Supports automatic differentiation with Enzyme.jl
 ---
 ```
