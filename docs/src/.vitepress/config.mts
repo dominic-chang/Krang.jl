@@ -37,7 +37,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting_started' },
-      { text: 'Examples', link: '/examples/coordinate_example' },
+      { text: 'Examples', link: '/examples/coordinate-example' },
       { text: 'API', link: '/api' }
     ],
     sidebar: 'REPLACE_ME_DOCUMENTER_VITEPRESS',

@@ -12,7 +12,7 @@ These are then viewed by cameras that are sensitive to particular observables (*
 ## Meshes
 ### Materials
 Marterials define the local physics necessary to properly render geometries.
-Materials may sometimes need additional information that can be stored in geometries by passing `attributes` to the geometry constructor (see ![Custom Dual Cone Model](examples/polarization_example.md) for an example of passing attributes to geometries).
+Materials may sometimes need additional information that can be stored in geometries by passing `attributes` to the geometry constructor (see ![Custom Dual Cone Model](examples/polarization-example.md) for an example of passing attributes to geometries).
 
 ### Geometries
 There are two basic geometries currently available in Krang. 
