@@ -53,9 +53,6 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
-store = Matrix{NTuple{4, Float64}}(undef, sze, sze)
-
-
 # Let's defined a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
 # We will includes some basic occlusion effects by checking if the ray intersects with the cone on the 'far-side' or the 'near-side'.
 function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry{T,A}) where {T, A}
@@ -104,15 +101,11 @@ recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180),
     draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
-# ![image](coordinate.gif)
-
-
 # > [!IMPORTANT]
-# > To use the GPU, by passing the appropriate array to the camera. and creating the appropriate store. for example:
+# > The GPU can be used in this example with an appropriate broadcast.
 # 
 # ```julia
 # using CUDA
 # 
-# store = CUDA.fill(0.0, sze, sze)
-# camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze, A=CuArray)
+# rendered_scene = coordinate_point.(CuArray(camera.screen.pixels), Ref(geometry))
 # ```
