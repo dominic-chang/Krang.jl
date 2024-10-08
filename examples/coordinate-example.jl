@@ -101,6 +101,8 @@ recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180),
     draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
+# ![Emission coordinates of cones](coordinate.gif)
+
 # > [!IMPORTANT]
 # > The GPU can be used in this example with an appropriate broadcast.
 # 
