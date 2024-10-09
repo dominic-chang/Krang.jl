@@ -22,8 +22,16 @@ function synchrotronIntensity(metric::Kerr{T}, α, β, ri, θs, θo, magfield::S
 
     return norm, inv(p_fluid_u[1]), abs(p_fluid_u[1] / p_fluid_u[4])
 end
+"""
+    $TYPEDEF
+
+   Intensity of linear polarization material from https://doi.org/10.3847/1538-4357/abf117
+"""
 struct ElectronSynchrotronPowerLawIntensity <: AbstractMaterial end
 
+"""
+    Functor for the the ElectronSynchrotronPowerLawIntensity material
+"""
 function (prof::ElectronSynchrotronPowerLawIntensity)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
     magfield, fluid_velocity, subimgs, profile, σ = geometry.attributes
 

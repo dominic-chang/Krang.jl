@@ -77,7 +77,7 @@ function nan2zero(x)
 end
 
 """
-    Functor for the NarayanPolarization material
+    Functor for the ElectronSynchrotronPowerLawPolarization material
 """
 function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
     magfield, fluid_velocity, subimgs, profile, σ = geometry.attributes

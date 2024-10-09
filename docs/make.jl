@@ -48,6 +48,7 @@ makedocs(;
         ],
         "api.md",
     ],
+    checkdocs=:none
 )
 
 deploydocs(;

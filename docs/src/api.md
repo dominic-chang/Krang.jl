@@ -48,7 +48,7 @@ Krang.αboundary
 Krang.βboundary
 ```
 
-### Polarization Functions
+### Local Frame transformations
 ```@docs
 Krang.p_bl_d
 Krang.jac_bl_u_zamo_d
@@ -56,17 +56,40 @@ Krang.jac_zamo_u_bl_d
 Krang.jac_bl_d_zamo_u
 Krang.jac_zamo_d_bl_u
 Krang.jac_fluid_u_zamo_d
+```
+
+### Polarization
+```@docs
 Krang.screen_polarization
 Krang.penrose_walker
 Krang.synchrotronIntensity
 Krang.synchrotronPolarization
 ```
 
-### Raytracing API Related Functions
+### Meshes, Geometries and Materials
 ```@docs
 Krang.Mesh
+Krang.MeshGeometry
+Krang.ElectronSynchrotronPowerLawIntensity
 Krang.ElectronSynchrotronPowerLawPolarization
 Krang.UnionGeometry
+```
+
+### Pixel Related Functions
+```@docs
+Krang.absGθo_Gθhat
+Krang.I1_inf_m_I0_terms
+Krang.radial_inf_integrals_m_I0_terms
+Krang.inclination
+Krang.metric
+Krang.absGto_Gthat
+Krang.screen_coordinate
+Krang.Ip_inf_m_I0_terms
+Krang.I2_inf_m_I0_terms
+Krang.roots
+Krang.Im_inf_m_I0_terms
+Krang.absGϕo_Gϕhat
+Krang.I0_inf
 ```
 
 ### Misc
@@ -102,3 +125,4 @@ Krang.AbstractGeometry
 Krang.radial_inf_integrals_case2 
 Krang.It_inf 
 ```
+

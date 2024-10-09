@@ -3,8 +3,8 @@
 # This example shows how to access coordinate information from the raytracing process.
 # You will likely need to do this when making custom physics `materials`.
 # We will raytrace a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity.
-# We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
-# source, at a fixed inclination angle from the black hole's spin axis.
+# We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons that are emitted from the 
+# source, at a fixed inclination angles with respect to the black hole's spin axis.
 #
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
@@ -24,17 +24,17 @@ curr_theme = Theme(
 )
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 
-metric = Krang.Kerr(0.99);
-θo = 45 * π / 180;
-sze = 400;
-rmin = Krang.horizon(metric)
-rmax = 10.0;
-ρmax = 15.0;
-
-#
-# We will use a 0.99 spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of θo=π/4. 
+# We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
+
+
+metric = Krang.Kerr(0.99); # Kerr metric with a spin of 0.99
+θo = 45 * π / 180; # inclination angle of the observer. θo ∈ (0, π)
+sze = 400; # resolution of the screen is sze x sze
+rmin = Krang.horizon(metric); # minimum radius to be raytraced
+rmax = 10.0; # maximum radius to be raytraced
+ρmax = 15.0; # horizontal and vertical limits of the screen
 
 # Create Figure
 fig = Figure(resolution=(700, 700));

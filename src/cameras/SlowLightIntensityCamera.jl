@@ -31,6 +31,26 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     θo::T
     η::T
     λ::T
+    @doc """
+        SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
+
+    Construct a `SlowLightIntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
+
+    # Arguments
+    - `met::Kerr{T}`: The Kerr metric.
+    - `α::T`: The Bardeen α value (screen coordinate).
+    - `β::T`: The Bardeen β value (screen coordinate).
+    - `θo::T`: The inclination angle.
+
+    # Returns
+    - A `SlowLightIntensityPixel` object initialized with the given parameters.
+
+    # Details
+    This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
+    It then computes the radial roots and adjusts them if necessary. 
+    It also calculates the radial and angular antiderivatives. 
+    Finally, it initializes a `SlowLightIntensityPixel` object with the calculated values and the provided parameters.
+    """
     function SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
@@ -59,7 +79,7 @@ end
 """
     $TYPEDEF
 
-Screen made of Intensity Pixels.
+Screen made of `SlowLightIntensityPixel`s.
 """
 struct SlowLightIntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
@@ -77,6 +97,24 @@ struct SlowLightIntensityScreen{T, A <:AbstractMatrix} <: AbstractScreen
         β = βmin + (βmax - βmin) * (T(J)-1) / (res-1)
         screen[I, J] = SlowLightIntensityPixel(met, α, β, θo)
     end
+    @doc """
+        SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res; A=Matrix) where {T}
+
+    Construct a `SlowLightIntensityScreen` object.
+
+    # Arguments
+    - `met::Kerr{T}`: The Kerr metric object.
+    - `αmin`: Minimum Bardeen α value.
+    - `αmax`: Maximum Bardeen α value.
+    - `βmin`: Minimum Bardeen β value.
+    - `βmax`: Maximum Bardeen β value.
+    - `θo`: Observer's inclination angle. θo ∈ (0, π).
+    - `res`: Resolution of the screen (number of pixels along one dimension).
+    - `A=Matrix`: Data type that stores screen pixel information (default is `Matrix`). A GPUMatrix can be used for GPU computations.
+
+    # Returns
+    A `SlowLightIntensityScreen` object.
+    """
     function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res; A=Matrix) where {T}
         screen = A(Matrix{SlowLightIntensityPixel{T}}(undef, res, res))
 
@@ -91,7 +129,7 @@ end
 """
     $TYPEDEF
 
-Observer sitting at radial infinity.
+Camera that caches slow light raytracing information for an observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
 struct SlowLightIntensityCamera{T, A} <: AbstractCamera
@@ -100,6 +138,24 @@ struct SlowLightIntensityCamera{T, A} <: AbstractCamera
     screen::SlowLightIntensityScreen{T, A}
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2, T}
+    @doc """
+        SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
+
+    Constructs a `SlowLightIntensityCamera` object.
+
+    # Arguments
+    - `met::Kerr{T}`: The Kerr metric.
+    - `θo`: The Observer's inclination angle. θo ∈ (0, π).
+    - `αmin`: Minimum α coordinate on the screen.
+    - `αmax`: Maximum α coordinate on the screen.
+    - `βmin`: Minimum β coordinate on the screen.
+    - `βmax`: Maximum β coordinate on the screen.
+    - `res`: Resolution of the screen (number of pixels along one dimension).
+    - `A`: Data type that stores screen pixel information (default is `Matrix`). A GPUMatrix can be used for GPU computations.
+
+    # Returns
+    - A `SlowLightIntensityCamera` object.
+    """
     function SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
         screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A)
         new{T,typeof(screen.pixels)}(met, screen, (T(Inf), θo))
