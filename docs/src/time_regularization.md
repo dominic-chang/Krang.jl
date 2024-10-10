@@ -30,7 +30,7 @@ where,
 \end{align}
 ```
 
-One idiosyncracy of this coordinate is that it introduces ambiguities when evaluating the elapsed time of any geodesic terminating at the asmyptptic observer.
+One idiosyncracy of this coordinate is that it introduces ambiguities when evaluating the elapsed time of any geodesic terminating at the asymptotic observer.
 The ambiguity is due to logarithmic and linear divergences in the integral $I_t$ at $r_o=\infty$ which take the form,[^CAZ]
 ```math
 \begin{align}

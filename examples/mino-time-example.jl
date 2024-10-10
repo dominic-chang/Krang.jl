@@ -10,7 +10,7 @@ import GLMakie as GLMk
 GLMk.Makie.inline!(true)
 
 #
-# We will use a 0.99 spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of θo=π/4. 
+# We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
 # A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
 # screen of the observer.
 metric = Krang.Kerr(0.99); # Kerr spacetime with 0.99 spin

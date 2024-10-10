@@ -20,7 +20,7 @@ curr_theme = Theme(
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 
 #
-# We will use a $0.94$ spin Kerr black hole viewed by an asmyptptic observer at an inclination angle of $θo=17^\circ$. 
+# We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
 # The emission to be raytraced is 
 metric = Krang.Kerr(0.94);
 θo = 17 * π / 180;

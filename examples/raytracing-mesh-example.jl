@@ -7,7 +7,7 @@ using FileIO
 metric = Krang.Kerr(0.99) # Kerr metric with a spin of 0.99
 θo = 90/180*π # Inclination angle of the observer
 ρmax = 12.0 # Horizontal and Vertical extent of the screen
-sze = 50 # Resolution of the screen is sze x sze
+sze = 100 # Resolution of the screen is sze x sze
 
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
 
@@ -57,10 +57,10 @@ end
 
 GLMk.hidedecorations!(ax)
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric)) # Sphere to represent black hole
-lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 90) # 100 is the number of steps to take along the ray
+lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 100) # 100 is the number of steps to take along the ray
 
 img = zeros(sze, sze)
-recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=100) do i
+recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=400) do i
     line = lines_to_plot[i] 
 
     img[i] = intersections[i]
