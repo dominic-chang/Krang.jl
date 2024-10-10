@@ -21,8 +21,6 @@ There are two basic geometries currently available in Krang.
 
 * `MeshGeometry` : Geometry made from a triangular mesh. The mesh is embdedded by placing vertices at points in a Cartesian like coordinate system generated from  the Boyer-Lindquist coordinates to a Cartesian like equivalent, and . There are convenience functions defines to `translate`, `rotate` and `scale` these geometries.
 
-
-
 ## Raytracing
 
 Light rays in this module can be parameterized in terms of either the cones ($\theta_s$), or the minotime ($\Delta\tau$).
@@ -69,4 +67,11 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 Krang.render!(store, camera, scene)
 ```
 
+## Examples
+Some pedagogical example usage of the raytracing code in the [Examples](examples/coordinate-example.md) section. These examples primarily use `CairoMakie` and `GLMakie` for plotting.
+You can install these by enering the `julia` package mode and running:
+
+```julia
+pkg> add CairoMakie GLMakie
+```
 

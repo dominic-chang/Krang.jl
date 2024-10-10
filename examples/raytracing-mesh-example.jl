@@ -18,16 +18,15 @@ bunny_mesh = translate(
             load(download("https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj", "bunny.obj")), 100
         ),π/2, 1.0, 0.0, 0.0
     ), 2.0,7.0,-10.0
-)
+);
 
 # Raytrace the mesh embedded in the Kerr space time. The emission picked up by a ray will be the sum of all the intersections of the ray with the mesh
 # The mesh is embedded in the space-time by assuming the world coordinates of the mesh is the same as the Boyer-Lindquist coordinates of the space time.
-# Below is some code that generates a gif showing a global view of what the intersection between the mesh and each ray looks like.
 # The ray tracing is done by scanning over the image one line at a time
 
 # Let us now raytrace the image to see what the mesh looks like from the observer's perspective.
 
-intersections = raytrace(camera, bunny_mesh)
+intersections = raytrace(camera, bunny_mesh);
 
 # And plot the image with GLMakie, 
 
@@ -36,7 +35,7 @@ ax = GLMk.Axis(fig[1,1], aspect=1)
 GLMk.heatmap!(ax, intersections, colormap=:afmhot)
 fig
 
-save("mesh_geometry_example.png", fig)
+save("mesh_geometry_example.png", fig);
 
 # ![image](mesh_geometry_example.png)
 
@@ -58,10 +57,10 @@ end
 
 GLMk.hidedecorations!(ax)
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric)) # Sphere to represent black hole
-lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 100) # 100 is the number of steps to take along the ray
+lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 90) # 100 is the number of steps to take along the ray
 
 img = zeros(sze, sze)
-recording = GLMk.record(fig, "mesh.gif", 1:sze*sze, framerate=90) do i
+recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=100) do i
     line = lines_to_plot[i] 
 
     img[i] = intersections[i]
@@ -79,6 +78,7 @@ recording = GLMk.record(fig, "mesh.gif", 1:sze*sze, framerate=90) do i
     GLMk.lines!(ax3, line, color=:red)
     GLMk.heatmap!(ax, img, colormap=:afmhot, colorrange=(0, 8))
 end
-    
-# ![image](mesh.gif)
+# ```@raw html 
+# <video loop muted playsinline controls src="./mesh.mp4" />
+# ```
 
