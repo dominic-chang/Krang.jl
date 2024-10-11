@@ -63,9 +63,10 @@ geometry2 = Krang.ConeGeometry((π-θs))
 # We will create two meshes, one for each geometry anc create a scene with both meshes.
 mesh1 = Krang.Mesh(geometry1, material1)
 mesh2 = Krang.Mesh(geometry2, material2)
-scene = Krang.Scene((mesh1, mesh2))
 
 # Finally, we will render the scene with the camera and plot the Stokes parameters.
+
+scene = Krang.Scene((mesh1, mesh2))
 stokesvals = render(camera, scene)
 
 fig = Figure(resolution=(700, 700));
@@ -80,4 +81,4 @@ fig
 
 save("polarization_example.png", fig)
 
-# ![image](polarization_example.png)
+# ![polarization of emission model](polarization_example.png)

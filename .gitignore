@@ -11,3 +11,4 @@ Manifest.toml
 *.gif
 *.png
 docs/node_modules
+*.npy

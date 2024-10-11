@@ -72,7 +72,6 @@ Krang.Mesh
 Krang.MeshGeometry
 Krang.ElectronSynchrotronPowerLawIntensity
 Krang.ElectronSynchrotronPowerLawPolarization
-Krang.UnionGeometry
 ```
 
 ### Pixel Related Functions
