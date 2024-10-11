@@ -59,7 +59,7 @@ sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric)) # Sphere to repre
 lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 100) # 100 is the number of steps to take along the ray
 
 img = zeros(sze, sze)
-recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=400) do i
+recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=120) do i
     line = lines_to_plot[i] 
 
     img[i] = intersections[i]

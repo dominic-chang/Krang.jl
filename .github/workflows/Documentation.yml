@@ -33,11 +33,11 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
       - run: cd docs/; rm package-lock.json; npm install; cd ..
       - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'
       - name: Pull Julia cache
-        uses: julia-actions/cache@v1
+        uses: julia-actions/cache@v2
       - name: Install docs dependencies
         run: julia --project=docs -e 'using Pkg; Pkg.develop([PackageSpec(path=pwd()), PackageSpec(path="https://github.com/LuxDL/DocumenterVitepress.jl.git")]); Pkg.instantiate()'
       - name: Install examples dependencies
