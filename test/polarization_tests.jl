@@ -81,25 +81,33 @@
             βfluid = @SVector[0.,0.,0.]
 
             @testset "Intensity" begin
-                mat = Krang.ElectronSynchrotronPowerLawIntensity()
-                @inline profile(r) = 1               
                 subimgs = (0, )
                 spec = 1.0
-                geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
+                rpeak = 5.0
+                p1 = 1.0
+                p2 = 1.0
+
+                mat = Krang.ElectronSynchrotronPowerLawIntensity(magfield..., βfluid..., spec, rpeak, p1, p2, subimgs)
+                geometry = Krang.ConeGeometry((θs))
 
                 int = mat(pix, geometry)
 
+                profile(r) = (r/rpeak)^p1/(1+(r/rpeak)^(p1+p2))
                 norm, redshift, lp = Krang.synchrotronIntensity(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
                 int2 = norm^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
                 @test int ≈ int2 atol = 1e-3
             end
 
             @testset "Polarization" begin
-                mat = Krang.ElectronSynchrotronPowerLawPolarization()
                 @inline profile(r) = 1               
                 subimgs = (0, )
                 spec = 1.0
-                geometry = Krang.ConeGeometry((θs), (magfield, βfluid, subimgs, profile, spec))
+                rpeak = 5.0
+                p1 = 1.0
+                p2 = 1.0
+
+                mat = Krang.ElectronSynchrotronPowerLawPolarization(magfield..., βfluid..., spec, rpeak, p1, p2, subimgs)
+                geometry = Krang.ConeGeometry((θs))
 
                 stokes = mat(pix, geometry)
 
@@ -107,6 +115,7 @@
                 q = (-(eα^2 - eβ^2) )
                 u = (-2 * eα * eβ )
 
+                profile(r) = (r/rpeak)^p1/(1+(r/rpeak)^(p1+p2))
                 int2 = hypot(q,u)^(1 + spec) * lp * profile(rs)*redshift^(3 + spec)
                 @test stokes ≈ Krang.StokesParams(int2, q, u, 0.0)
             end

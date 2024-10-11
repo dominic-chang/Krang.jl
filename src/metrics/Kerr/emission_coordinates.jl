@@ -54,7 +54,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 -`pix` : Pixel information
 - `τ` : Mino time
 """
-function emission_radius(pix::AbstractPixel ,τ::T)::Tuple{T, Bool, Int, Bool} where {T}
+function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T, Bool, Int, Bool} where {T}
     met = metric(pix)
     a = met.spin
     ans = zero(T)
@@ -126,7 +126,7 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
 
-    return -(Iϕ + λtemp * Gϕtemp - T(10π)) % T(2π)
+    return -(Iϕ + λtemp * Gϕtemp + T(π/2))
 end
 
 """
@@ -215,7 +215,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
@@ -265,7 +265,7 @@ function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp - 10π) % T(2π)
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
     emission_time_regularized = (It + a^2 * Gttemp)
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))

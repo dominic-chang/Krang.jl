@@ -195,7 +195,7 @@ function r_potential(metric::Kerr{T}, η, λ, r) where {T}
 end
 
 """
-Theta potential of a Kerr blackhole
+Theta potential of a Kerr black hole
 
 # Arguments
 
@@ -732,7 +732,7 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     #equation B37
     I1_total = log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k))# Removed the logarithmic divergence
     #equation B38
-    I2_total = r3 - E_o # Assymptotic Divergent piece is not included
+    I2_total = r3 - E_o # asymptotic Divergent piece is not included
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -901,7 +901,7 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
     I1_total = r3 * I0_total + r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
     #equation B38
     I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = - (r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s# Assymptotic Divergent piece is not included
+    I2_total = - (r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s# asymptotic Divergent piece is not included
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1046,7 +1046,7 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     #equation B37
     I1o_m_I0_terms =  log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k) )
     #equation B38
-    I2o_m_I0_terms = r3 - E_o# Assymptotic Divergent piece is not included
+    I2o_m_I0_terms = r3 - E_o# asymptotic Divergent piece is not included
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1195,7 +1195,7 @@ function radial_w_I0_terms_integrals_case2(metric::Kerr{T}, rs, roots::NTuple{4}
     I1_total = - r3 * I0_total - r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
     #equation B38
     I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s# Assymptotic Divergent piece is not included
+    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s# asymptotic Divergent piece is not included
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1523,8 +1523,8 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} w
             return minotime, Gs, Go, Ghat, isvortical, false
         end
         tempfac = one(T) / √abs(um * a2)
-        Go *= (-one(T))^((θs > T(π / 2)) ? 1 : 0)
-        Gs = (-one(T))^((θs > T(π / 2)) ? 1 : 0) * tempfac * JacobiElliptic.F(asin(√args), k)
+        Go *= (θs > T(π / 2) ? -one(T) : one(T))
+        Gs = (θs > T(π / 2) ? -one(T) : one(T)) * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
         argo = cosθo / √(up)

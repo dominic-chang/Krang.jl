@@ -7,11 +7,11 @@ import footnote from "markdown-it-footnote";
 export default defineConfig({
   base: 'REPLACE_ME_DOCUMENTER_VITEPRESS',// TODO: replace this in makedocs!
   title: 'REPLACE_ME_DOCUMENTER_VITEPRESS',
-  description: "A VitePress Site",
+  description: "Kerr Raytracer for Analytic Null Geodesics",
   lastUpdated: true,
   cleanUrls: true,
   outDir: 'REPLACE_ME_DOCUMENTER_VITEPRESS', // This is required for MarkdownVitepress to work correctly...
-  head: [['link', { rel: 'icon', href: '/public/favicon.ico' }]],
+  head: [['link', { rel: 'icon', href: '/Krang_logo.ico' }]],
   
   markdown: {
     math: true,
@@ -37,7 +37,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting_started' },
-      { text: 'Examples', link: '/examples/coordinate_example' },
+      { text: 'Examples', link: '/examples/coordinate-example' },
       { text: 'API', link: '/api' }
     ],
     sidebar: 'REPLACE_ME_DOCUMENTER_VITEPRESS',

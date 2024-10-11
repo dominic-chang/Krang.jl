@@ -10,8 +10,20 @@ $FIELDS
 struct Kerr{T} <: AbstractMetric
     "M = mass"
     mass::T  
-    "a = J/M, where J is the angular momentum and M is the mass of the blackhole."
+    "a = J/M, where J is the angular momentum and M is the mass of the black hole."
     spin::T
+
+    @doc """
+        Kerr(spin::T) where {T}
+    
+    Constructs a `Kerr` object representing the Kerr metric.
+    
+    # Arguments
+    - `spin::T`: The spin parameter `a = J/M`, where `J` is the angular momentum and `M` is the mass of the black hole. spin ∈ (-1, 0) ∪ (0, 1).
+    
+    # Returns
+    - A `Kerr` object with the given spin and a default mass of 1.
+    """
     function Kerr(spin::T) where {T}
         new{T}(one(T), spin)
     end
@@ -31,16 +43,16 @@ end
 function Σ(metric::Kerr{T}, r, θ) where {T}
     return r^2 + metric.spin^2 * cos(θ)^2
 end
-function A(metric::Kerr{T}, r, θ) where {T}
+function A(metric::Kerr{T}, r, θ; Δ=Δ(metric, r)) where {T}
     a = metric.spin
-    return (r^2 + a^2)^2 - a^2 * Δ(metric, r) * sin(θ)^2
+    return (r^2 + a^2)^2 - a^2 * Δ * sin(θ)^2
 end
-function Ξ(metric::Kerr{T}, r, θ) where {T}
+function Ξ(metric::Kerr{T}, r, θ; Δ=Δ(metric, r)) where {T}
     a = metric.spin
-    return (r^2 + a^2)^2 - Δ(metric, r) * a^2 * sin(θ)^2
+    return (r^2 + a^2)^2 - Δ * a^2 * sin(θ)^2
 end
-function ω(metric::Kerr{T}, r, θ) where {T}
-    return T(2) * metric.spin * r / Ξ(metric, r, θ)
+function ω(metric::Kerr{T}, r, θ; Ξ=Ξ(metric, r, θ)) where {T}
+    return T(2) * metric.spin * r / Ξ
 end
 
 
@@ -48,10 +60,10 @@ end
 Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 """
 function metric_uu(metric::Kerr{T}, r, θ) where {T}
-    Ξt = Ξ(metric, r, θ)
-    Σt = Σ(metric, r, θ)
     Δt = Δ(metric, r)
-    ωt = ω(metric, r, θ)
+    Ξt = Ξ(metric, r, θ; Δ=Δt)
+    Σt = Σ(metric, r, θ)
+    ωt = ω(metric, r, θ; Ξ=Ξt)
     z = zero(T)
 
     return @SMatrix [ #Eq 1 2105.09440
@@ -79,10 +91,10 @@ end
 Kerr metric in Boyer Lindquist (BL) coordinates.
 """
 function metric_dd(metric::Kerr{T}, r, θ) where {T}
-    Ξt = Ξ(metric, r, θ)
-    Σt = Σ(metric, r, θ)
     Δt = Δ(metric, r)
-    ωt = ω(metric, r, θ)
+    Ξt = Ξ(metric, r, θ; Δ=Δt)
+    Σt = Σ(metric, r, θ)
+    ωt = ω(metric, r, θ; Ξ=Ξt)
     sin2 = sin(θ)^2
     z = zero(T)
 

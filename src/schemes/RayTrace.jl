@@ -44,6 +44,7 @@ function generate_ray!(ray::Matrix{T}, pixel::Krang.AbstractPixel, res::Int) whe
     for I in range(1, res)
 
         _, curr_rad, curr_inc, curr_az, _, _ = emission_coordinates(pixel, Δτ*I)
+        curr_az = mod2pi(curr_az)
         ray[1,I] = curr_rad * sin(curr_inc)*cos(curr_az)
         ray[2,I] = curr_rad * sin(curr_inc)*sin(curr_az)
         ray[3,I] = curr_rad * cos(curr_inc)
