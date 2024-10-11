@@ -53,7 +53,7 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
-# Let's defined a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
+# Let's define a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
 # We will includes some basic occlusion effects by checking if the ray intersects with the cone on the 'far-side' or the 'near-side'.
 function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry{T,A}) where {T, A}
     n, rmin, rmax = geometry.attributes
@@ -74,6 +74,7 @@ function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry
 end
 
 # Draw Function
+# This function draws the coordinates associated with the n=0,1,2 subimages of a cone with opening angle θs.
 function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
     times, radii, azimuths = coordinates 
     map(axes -> empty!.(axes), axes_list)
@@ -93,8 +94,6 @@ function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
         end
     end
 end
-
-θs = π/4
 
 # Create the animation of Cone of Emission Coordinates
 recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180), framerate=12) do θs

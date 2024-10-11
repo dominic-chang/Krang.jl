@@ -31,26 +31,11 @@ Disk(;attributes=nothing) = ConeGeometry(π/2;attributes=attributes)
 
 """
     $TYPEDEF
-
-Geometry that is comprised of the union of two geometries.
-"""
-struct UnionGeometry{G1,G2} <: AbstractGeometry where {G1<:AbstractGeometry, G2<:AbstractGeometry}
-    geometry1::G1
-    geometry2::G2
-end
-
-function ⊕(geometry1::G1, geometry2::G2) where {G1<:AbstractGeometry, G2<:AbstractGeometry}
-    return UnionGeometry(geometry1, geometry2)
-end
-
-"""
-    $TYPEDEF
 """
 struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
     geometry::G
     material::M
 end
-
 
 const Scene = NTuple{N, Mesh} where {N}
 Scene() = NTuple{0, Mesh}()

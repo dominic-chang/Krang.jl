@@ -96,7 +96,7 @@ save("emission_model_and_target_model.png", fig)
 # ![image](emission_model_and_target_model.png)
 
 # This will be the image we will try to fit our model to.
-target_img = reshape(received_intensity, sze, sze);
+target_img = reshape(received_intensity, 1, sze*sze);
 
 # ## Fitting the model
 # Lets fit our model using the normalized cross correlation as a kernel for our loss function.
@@ -106,14 +106,10 @@ using Optimization
 using OptimizationOptimisers
 using StatsBase
 using ComponentArrays
-Enzyme.API.runtimeActivity!(true)
-
 Enzyme.Compiler.RunAttributor[] = false
 
 function mse(img1::Matrix{T}, img2::Matrix{T}) where T
-    img1 = reshape(img1, sze, sze) ./ sum(img1)
-    img2 = reshape(img2, sze, sze) ./ sum(img2)
-    mean((img1 .- img2) .^ 2)
+    mean(((img1 ./ sum(img1))  .- (img2 ./ sum(img2))) .^ 2)
 end
 
 function loss_function(pixels, y, ps, st)
@@ -154,7 +150,7 @@ function (c::Callback)(state, loss, others...)
     end
 end
 
-ps_trained, st_trained = let st=Ref(st), x=pixels, y=target_img
+ps_trained, st_trained = let st=Ref(st), x=pixels, y=reshape(target_img, 1, sze*sze)
     
     optprob = Optimization.OptimizationProblem(
         Optimization.OptimizationFunction(
@@ -184,11 +180,10 @@ loss_function(pixels, target_img, ps_trained, st_trained)
 using Printf
 begin 
     fig = Figure(size=(700, 300));
-    heatmap!(Axis(fig[1,1], aspect=1, title="Target Image"), target_img)
+    heatmap!(Axis(fig[1,1], aspect=1, title="Target Image"), reshape(target_img, sze, sze))
     heatmap!(Axis(fig[1,2], aspect=1, title="Starting State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps, st)[1])))"), acc_intensity)  
     heatmap!(Axis(fig[1,3], aspect=1, title="Fitted State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps_trained, st_trained)[1])))"), received_intensity)
     save("neural_net_results.png", fig)
 end
 
 # ![image](neural_net_results.png)
-

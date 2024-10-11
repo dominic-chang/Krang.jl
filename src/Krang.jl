@@ -26,5 +26,4 @@ include("materials/ElectronSynchrotronPowerLawPolarization.jl")
 include("materials/ElectronSynchrotronPowerLawIntensity.jl")
 include("schemes/schemes.jl")
 include("schemes/RayTrace.jl")
-include("raytracer_api.jl")
 end

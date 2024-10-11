@@ -1,6 +1,6 @@
 # # Creating a Custom Dual Cone Model
 
-# We will defined a custom model for low luminosity active galactice nuclei (LLAGN).
+# We will define a custom model for low luminosity active galactice nuclei (LLAGN).
 # A detailed description of the model can be found in this [reference](https://doi.org/10.48550/arXiv.2405.04749).
 # We will show the emission of the n=0 (direct) and n=1 (indirect) photons as they are emitted from the 
 # source, at a fixed inclination angle from the black hole's spin axis.
@@ -45,30 +45,24 @@ camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, 400);
 magfield1 = Krang.SVector(sin(ι)*cos(η1), sin(ι)*sin(η1), cos(ι));
 magfield2 = Krang.SVector(sin(ι)*cos(η2), sin(ι)*sin(η2), cos(ι));
 vel = Krang.SVector(βv, (π/2), χ);
-
-# This material also requires the definition of a profile function. We will take a double power law in radius.
-
-function profile(r)
-    R = 3.3266154761905455
-    p1 = 4.05269835622511
-    p2 = 4.411852974336667
-    return (r/R)^p1/(1+(r/R)^(p1+p2))
-end
-
-material = Krang.ElectronSynchrotronPowerLawPolarization();
+R = 3.3266154761905455
+p1 = 4.05269835622511
+p2 = 4.411852974336667
 
 # Next we will define the geometries of each mesh. We will use a `ConeGeometry` with an opening angle of $75^\circ$.
 # The additional information needed for the material will be passed as attributes to the geometry.
 # This includes the sub-images to raytrace, which in our case will be the n=0 and n=1 sub-images.
 
 θs = (75 * π / 180)
-geometry1 = Krang.ConeGeometry((θs), (magfield1, vel, (0,1,), profile, σ))
-geometry2 = Krang.ConeGeometry((π-θs), (magfield2, vel, (0,1,), profile, σ))
+material1 = Krang.ElectronSynchrotronPowerLawPolarization(magfield1..., vel..., σ, R, p1, p2, (0,1,));
+geometry1 = Krang.ConeGeometry((θs))
+material2 = Krang.ElectronSynchrotronPowerLawPolarization(magfield2..., vel..., σ, R, p1, p2, (0,1,));
+geometry2 = Krang.ConeGeometry((π-θs))
 
 
 # We will create two meshes, one for each geometry anc create a scene with both meshes.
-mesh1 = Krang.Mesh(geometry1, material)
-mesh2 = Krang.Mesh(geometry2, material)
+mesh1 = Krang.Mesh(geometry1, material1)
+mesh2 = Krang.Mesh(geometry2, material2)
 scene = Krang.Scene((mesh1, mesh2))
 
 # Finally, we will render the scene with the camera and plot the Stokes parameters.

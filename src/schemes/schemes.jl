@@ -2,12 +2,18 @@ export render, render!, render_cpu_threaded!
 abstract type AbstractScheme end
 
 function render(camera::AbstractCamera, scene::Scene)  
+    return render.(camera.screen.pixels, Ref(scene))
+end
 
-    mapreduce(
-        mesh -> mesh.material.(camera.screen.pixels, Ref(mesh.geometry)),
-        +,
-        scene
-    )
+function render(pixel::AbstractPixel, scene::Scene)
+    mesh = scene[1]
+    ans = mesh.material(pixel, mesh.geometry)
+
+    for itr in 2:length(scene)
+        mesh = scene[itr]
+        ans += mesh.material(pixel, mesh.geometry)
+    end
+    return ans
 end
 
 @kernel function _render!(store, pixels, mesh::Mesh)

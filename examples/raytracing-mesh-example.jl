@@ -32,8 +32,7 @@ intersections = raytrace(camera, bunny_mesh);
 
 fig = GLMk.Figure()
 ax = GLMk.Axis(fig[1,1], aspect=1)  
-GLMk.heatmap!(ax, intersections, colormap=:afmhot)
-fig
+GLMk.heatmap!(ax, intersections, colormap=:afmhot);
 
 save("mesh_geometry_example.png", fig);
 
