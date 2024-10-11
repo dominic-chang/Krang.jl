@@ -48,11 +48,11 @@ Krang therefore benefits from the 'plug and play' nature of the julia programmin
 
 
 # Similar Packages
-- `AART` [@cardenas-avendano]: An Adaptive Analytical Ray Tracing code for geodesics in the Kerr space time in python.
+- `AART` [@cardenas-avendano]: An adaptive analytical ray tracing code for geodesics in the Kerr space time in python.
 
-- `KerrBam` [@Palumbo_2022]: An adaptive analytical raytracing code for equatorial synchrotron models in python.
+- `KerrBam` [@Palumbo_2022]: An analytical raytracing code for equatorial synchrotron models in python.
 
-- `Gradus` [@Gradus]: A Julia implementation of a numeric, differentiable, general relativistic raytracer.
+- `Gradus` [@Gradus]: A julia implementation of a numeric, general relativistic raytracer with radiative transfer.
 
 # Acknowledgements
 The authors thank Iniyan Natarajan, Alexander Plavin, and Paul Tiede for helpful discussions. Support for this work was provided by the NSF (AST-1935980, AST-2034306) and by the Gordon and Betty Moore Foundation through grant GBMF-10423. This work was supported by the Black Hole Initiative, which is funded by grants from the John Templeton Foundation (Grant #62286) and the Gordon and Betty Moore Foundation (Grant GBMF-8273), although the opinions expressed in this work are those of the author(s) and do not necessarily reflect the views of these Foundations.
