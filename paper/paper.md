@@ -40,8 +40,8 @@ Photon rings are of particular interest because of their strong dependence on gr
 The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
 This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoton].
 
-Scientific studies of black hole images within the current software landscape often requires great compromise due to the computational complexity of the problem, and the incompatibility of the existing software with other analysis packages.
-It is difficult, for example, to apply machine learning optimization algorithms to existing raytracing codes in python implementations since they typically rely on special functions that are not implemented within existing machine learning frameworks.
+Scientific studies of black hole images within the current software landscape often requires great compromise due to the computational complexity of the problem.
+Other difficultes can arise from interfacing existing raytracing software with the wider ecosystem of tools; it is difficult, for example, to apply machine learning optimization algorithms to existing python raytracing codes since they typically rely on special functions that are not implemented within current machine learning frameworks.
 Existing python implementations are also bounded to CPU evaluations, limiting their capability of accessing acceleration from specialized hardware.
 A Julia implementation of raytracing algorithms is thus beneficial because of the languages modular design, differentiable programming and efficient execution.
 Krang therefore benefits from the 'plug and play' nature of the julia programming language, allowing for easy development and synergy with existing analysis pipelines, and fast CPU/GPU executions.
