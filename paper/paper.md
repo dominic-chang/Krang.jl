@@ -35,7 +35,7 @@ The emission from these sources originating from relativistic plasmas that are a
 Scientific analysis of the data from these sources often require complicated source modelling that includes various relativistic effects which leave characteristic signatures in the observed images.
 The large scale of the black holes allow for many of these effects to be described within the geometric optics limit of electro-magnetism. Ray tracing techniques thus present viable options for modeling images of super massive black holes.
 
-A relativistic image feature that has been theorized to exist, but is yet to be observed, are the individual sub-image contributions to the overall image structure known as photon-rings, [@JohnsonRing].
+A relativistic image feature that has been theorized to exist, but is yet to be resolved, are the individual sub-image contributions to the overall image structure known as photon-rings, [@JohnsonRing].
 Photon rings are of particular interest because of their strong dependence on gravitational effects and their insensitivity to variations in the emission physics around the black hole.
 The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
 This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoton].
