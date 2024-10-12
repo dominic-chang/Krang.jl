@@ -35,7 +35,7 @@ function (m::ZAMORedshifts)(pix::Krang.AbstractPixel, geometry::Krang.ConeGeomet
             p_zamo_u = jac_zamo_u_bl_d(metric, rs, θs) * curr_p_bl_u
             redshift = inv(p_zamo_u[1])
 
-            observation = max(redshift, eps(T))^(T(3))
+            observation = max(redshift, eps(T))
         end
     end
     return observation

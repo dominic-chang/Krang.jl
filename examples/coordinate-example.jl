@@ -49,7 +49,7 @@ axes_list = [
 
 # Initialize Camera and Pre-Allocate Memory for data to be plotted
 coordinates = (zeros(sze, sze) for _ in 1:3)
-camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze, A=Matrix);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
