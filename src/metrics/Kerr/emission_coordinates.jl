@@ -197,7 +197,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     #isindir = !(((τ + sign(β)*τo - (νθ ? 1 : -1)*τs)/τhat) ≈ n) # TODO: Why is this here
     if (abs(cosθs) < abs(cosθo))
-        isindir = ((sign(β) > 0) ⊻ (θo > π / 2))
+        isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
     if isnan(τ)
         return zero(T), zero(T), zero(T), zero(T), false, false, false
