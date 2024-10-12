@@ -2,13 +2,11 @@ export generate_ray, raytrace
 
 struct RayTrace <: AbstractScheme end
 
-function generate_ray!(ray::Matrix{T}, pixel::Krang.AbstractPixel, res::Int) where T
-    numreals = Int(sum((Krang._isreal2.(Krang.roots(pixel)))))
-    τf = zero(T)
-    actual_res = res
+function _getτf(pixel::AbstractPixel{T}) where T
+    numreals = unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel)))))
+
     if numreals == 4 
         τf = 2Krang.I0_inf(pixel)
-        actual_res += 1 # The last point on scattering rays is at infinity
     else
         rh = Krang.horizon(pixel.metric)
         radial_roots = roots(pixel)
@@ -39,24 +37,58 @@ function generate_ray!(ray::Matrix{T}, pixel::Krang.AbstractPixel, res::Int) whe
             τf = I0_inf(pixel) - coef*JacobiElliptic.F(atan(x4_s) + atan(go), k4)
         end
     end
+    return τf
+end
 
-    Δτ = T(τf/(actual_res))
+function generate_ray!(ray::Matrix{T}, pixel::Krang.AbstractPixel, res::Int) where T
+    actual_res = unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res+1 : res 
+    τf = _getτf(pixel)
+
+    Δτ = τf/actual_res
     for I in range(1, res)
 
         _, curr_rad, curr_inc, curr_az, _, _ = emission_coordinates(pixel, Δτ*I)
-        curr_az = mod2pi(curr_az)
+        curr_az = curr_az % T(2π)
         ray[1,I] = curr_rad * sin(curr_inc)*cos(curr_az)
         ray[2,I] = curr_rad * sin(curr_inc)*sin(curr_az)
         ray[3,I] = curr_rad * cos(curr_inc)
 
     end
-
 end
 
-function generate_ray(pixel::Krang.AbstractPixel{T}, res::Int) where T
+function generate_ray(pixel::AbstractPixel{T}, res::Int) where T
     ray = zeros(T, 3, res)
     generate_ray!(ray, pixel, res)
     return ray
+end
+
+@kernel function _generate_rays!(rays::AbstractArray{T}, pixels::AbstractMatrix{P}, res::Int) where {T, P<:AbstractPixel}
+    (I,J,K,L) = @index(Global, NTuple)
+    l = Int(L)
+    pixel = pixels[I,J]
+    actual_res = unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res+1 : res 
+    τf =  _getτf(pixel)
+
+    Δτ = τf/actual_res
+
+    _, curr_rad, curr_inc, curr_az, _, _ = emission_coordinates(pixel, Δτ*l)
+    curr_az = curr_az % T(2π)
+    k = Int(K)
+    if k == 1
+        rays[I,J,K,L] = curr_rad * sin(curr_inc)*cos(curr_az)
+    elseif k == 2
+        rays[I,J,K,L] = curr_rad * sin(curr_inc)*sin(curr_az)
+    else
+        rays[I,J,K,L] = curr_rad * cos(curr_inc)
+    end
+end
+
+function generate_rays(pixels::AbstractMatrix{P}, res::Int; A=Array)  where {P<: AbstractPixel{T}} where T
+    dims = (size(pixels)..., 3, res)
+    rays = A{T}(undef, dims...)
+    backend = get_backend(rays)
+    _generate_rays!(backend)(rays, pixels, res, ndrange = dims)
+    return rays
 end
 
 function line_intersection(origin::AbstractVector{T}, line_point_2, t_a, t_b, t_c) where T

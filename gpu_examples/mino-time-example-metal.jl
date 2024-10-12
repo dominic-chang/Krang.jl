@@ -87,13 +87,16 @@ ax = GLMk.Axis3(fig[1,1], aspect=(1,1,1))
 GLMk.xlims!(ax, (-3, 3)) 
 GLMk.ylims!(ax, (-3, 3)) 
 GLMk.zlims!(ax, (-3, 3)) 
-lines_to_plot = []
-lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 5_000)
+lines_to_plot = Krang.generate_rays(MtlArray(camera.screen.pixels), 5_000; A=MtlArray) |> Array
 
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric))
 GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent black hole
 
-for i in lines_to_plot; GLMk.lines!(ax, i) end
+for i in 1:4; 
+    for j in 1:4; 
+        GLMk.lines!(ax, lines_to_plot[i,j,:,:]) 
+    end
+end
 fig
 
 GLMk.save("mino_time_rays.png", fig)
