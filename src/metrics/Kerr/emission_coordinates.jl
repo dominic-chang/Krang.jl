@@ -276,7 +276,7 @@ function θs(metric::Kerr{T}, α, β, θo, τ) where {T}
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 
-function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, Bool} where {T}
+function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
     a = metric.spin
     Ghat_2, isvortical = zero(T), η < zero(T)
 
@@ -291,7 +291,7 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, 
     ans, k, argo, τs, τo, τhat = zero(T), zero(T), zero(T), zero(T), zero(T), zero(T)
     tempfac = one(T) / √abs(um * a^2)
     if isvortical
-        argo = clamp((cos(θo)^2 - um) / (up - um), 0.0, 1.0)
+        argo = clamp((cos(θo)^2 - um) / (up - um), zero(T), one(T))
         k = one(T) - m
         tempfac = inv(√abs(um * a^2))
         τo = tempfac * JacobiElliptic.F(asin(√argo), k)
@@ -299,12 +299,13 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, 
         τhat = 2Ghat_2
         Δτtemp = (τ % τhat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * τo)
         n = floor(τ / τhat)
-        absτs = abs(argmin(abs, [τhat - Δτtemp, Δτtemp]))
+        absτs = abs(argmin(abs, (τhat - Δτtemp, Δτtemp)))
         τs = (θo > T(π / 2) ? -one(T) : one(T)) * absτs
 
         argr = (JacobiElliptic.sn(absτs / tempfac, k))^2
         ans = acos((θo > T(π / 2) ? -one(T) : one(T)) * √((up - um) * argr + um))
-        τo = (-1)^(ans > π / 2)  * τo
+        sign = ans > T(π / 2) ? -one(T) : one(T)
+        τo = sign  * τo
     else
         argo = clamp(cos(θo) / √(up), -one(T), one(T))
         k = m
@@ -314,7 +315,8 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, 
         τhat = Ghat_2 + Ghat_2
         Δτtemp = (τ % τhat + signβ * τo)
         n = floor(τ / τhat)
-        τs = argmin(abs, [(-one(T))^n * signβ * (τhat - Δτtemp), (-one(T))^n * signβ * Δτtemp])
+        sign = (n%2 == 1) ? -one(T) : one(T)
+        τs = argmin(abs, (sign * signβ * (τhat - Δτtemp), sign * signβ * Δτtemp))
         newargs = JacobiElliptic.sn(τs / tempfac, k)
         ans = acos(√up * newargs)
     end
@@ -324,13 +326,13 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ)::Tuple{T, T, T, T, Int, 
     if isincone
         νθ = (n % 2 == 1) ⊻ (θo > ans)
         τ1 = (n + 1) * τhat - signβ * τo + (νθ ? 1 : -1) * τs
-        isindir = isapprox(τ1, τ, rtol=1e-5)
-    elseif ans < π / 2
+        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
+    elseif ans < T(π / 2)
         τ1 = (n + 1) * τhat - signβ * τo - τs
-        isindir = isapprox(τ1, τ, rtol=1e-5)
+        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
     else
         τ1 = (n + 1) * τhat - signβ * τo + τs
-        isindir = isapprox(τ1, τ, rtol=1e-5)
+        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
     end
 
     return ans, τs, τo, τhat, n, isindir

@@ -9,6 +9,7 @@
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
 using CairoMakie
+using Metal
 
 curr_theme = Theme(
     Axis = (
@@ -29,12 +30,12 @@ set_theme!(merge!(curr_theme, theme_latexfonts()))
 # screen of the observer.
 
 
-metric = Krang.Kerr(0.99); # Kerr metric with a spin of 0.99
-θo = 45 * π / 180; # inclination angle of the observer. θo ∈ (0, π)
+metric = Krang.Kerr(0.99f0); # Kerr metric with a spin of 0.99
+θo = 45f0 * π / 180; # inclination angle of the observer. θo ∈ (0, π)
 sze = 400; # resolution of the screen is sze x sze
 rmin = Krang.horizon(metric); # minimum radius to be raytraced
-rmax = 10.0; # maximum radius to be raytraced
-ρmax = 15.0; # horizontal and vertical limits of the screen
+rmax = 10f0; # maximum radius to be raytraced
+ρmax = 15f0; # horizontal and vertical limits of the screen
 
 # Create Figure
 fig = Figure(resolution=(700, 700));
@@ -68,7 +69,7 @@ function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry
         if rs ≤ rmin || rs ≥ rmax
             continue
         end
-        coords = isnan(rs) ? observation :  (ts, rs, θs, ϕs)
+        coords = (ts, rs, θs, ϕs)
     end
     return coords 
 end
@@ -82,7 +83,7 @@ function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
     geometries = (Krang.ConeGeometry(θs, (i, rmin, rmax)) for i in 0:2)
     
     for (i, geometry) in enumerate(geometries)
-        rendered_scene = coordinate_point.(camera.screen.pixels, Ref(geometry))
+        rendered_scene = Array(coordinate_point.(MtlArray(camera.screen.pixels), Ref(geometry)))
         for I in CartesianIndices(rendered_scene)
             times[I] = rendered_scene[I][1]
             radii[I] = rendered_scene[I][2]
@@ -96,7 +97,7 @@ function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
 # Create the animation of Cone of Emission Coordinates
-recording = CairoMakie.record(fig, "coordinate.gif", range(0.0, π, length=180), framerate=12) do θs
+recording = CairoMakie.record(fig, "coordinate.gif", range(0f0, 1f0π, length=180), framerate=12) do θs
     draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
@@ -108,5 +109,5 @@ end
 # ```julia
 # using CUDA
 # 
-# rendered_scene = coordinate_point.(CuArray(camera.screen.pixels), Ref(geometry))
+# rendered_scene = Array(coordinate_point.(CuArray(camera.screen.pixels), Ref(geometry)))
 # ```
