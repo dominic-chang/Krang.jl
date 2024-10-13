@@ -89,6 +89,7 @@ Krang.roots
 Krang.Im_inf_m_I0_terms
 Krang.absGϕo_Gϕhat
 Krang.I0_inf
+Krang.total_mino_time
 ```
 
 ### Misc
