@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/3e20d455-b83e-4470-97a1-eb0e20b10ea2" alt="Krang_logo" style="width:400px;display:block;margin-left: auto;margin-right: auto;"/>
+<img width="300" alt="Krang" src="https://github.com/user-attachments/assets/bd42b144-c8b4-45aa-a331-944cfa9e9794">
 
 # Kerr Raytracer for Analytic Null Geodesics (KRANG)
 
