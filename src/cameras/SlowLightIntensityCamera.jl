@@ -13,6 +13,8 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     roots::NTuple{4,Complex{T}}
     "Radial antiderivative"
     I0_inf::T
+    "Total possible Mino time"
+    total_mino_time::T
     "Radial phi antiderivative"
     Iϕ_inf::T
     "Radial time antiderivative"
@@ -60,11 +62,14 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
         I1, I2, Ip, Im = radial_inf_integrals(met, roots)
+
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
             (α, β), 
             roots, 
-            Krang.Ir_inf(met, roots), 
+            I0_inf,
+            total_mino_time(met, roots),
             Krang.Iϕ_inf(met, roots, tempλ), 
             Krang.It_inf(met, roots, tempλ), 
             I1, I2, Ip, Im, 
@@ -168,6 +173,7 @@ function roots(pix::SlowLightIntensityPixel) return pix.roots end
 function screen_coordinate(pix::SlowLightIntensityPixel) return pix.screen_coordinate end
 function inclination(pix::SlowLightIntensityPixel) return pix.θo end
 function I0_inf(pix::SlowLightIntensityPixel) return pix.I0_inf end
+function total_mino_time(pix::SlowLightIntensityPixel) return pix.total_mino_time end
 function Ir_inf(pix::SlowLightIntensityPixel) return pix.I0_inf end
 function I1_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.I1_inf_m_I0_terms end
 function I2_inf_m_I0_terms(pix::SlowLightIntensityPixel) return pix.I2_inf_m_I0_terms end

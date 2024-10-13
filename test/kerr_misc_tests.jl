@@ -31,12 +31,17 @@
 
                 rs = 1.1 * real(root)
                 τ1 = Ir(pix, true, rs)[1]
+                τf = total_mino_time(met, roots)
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ1, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase1, λcase1, r)))
                     prob = IntegralProblem(f, rs, Inf; nout=1)
                     sol = solve(prob, HCubatureJL(); reltol=1e-10, abstol=1e-10)
                     @test τ1 / sol.u ≈ 1.0 atol = 1e-5
+
+                    prob = IntegralProblem(f, real(root), Inf; nout=1)
+                    sol = solve(prob, HCubatureJL(); reltol=1e-10, abstol=1e-10)
+                    @test τf / (2sol.u) ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase1, λcase1, r)))
@@ -61,19 +66,24 @@
             θo = π / 4
             @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
-
                 ηcase3 = η(met, α, β, θo)
                 λcase3 = λ(met, α, θo)
                 roots = get_radial_roots(met, ηcase3, λcase3)
                 @test sum(Krang._isreal2.(roots)) == 2
                 rs = 1.1horizon(met)
+                rh = horizon(met)
                 τ3 = Ir(pix, true, rs)[1]
+                τf = total_mino_time(met, roots)
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ3, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
                     prob = IntegralProblem(f, rs, Inf; nout=1)
                     sol = solve(prob, HCubatureJL(); reltol=1e-5, abstol=1e-5)
                     @test τ3 / sol.u ≈ 1.0 atol = 1e-5
+
+                    prob = IntegralProblem(f, rh, Inf; nout=1)
+                    sol = solve(prob, HCubatureJL(); reltol=1e-5, abstol=1e-5)
+                    @test τf / sol.u ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase3, λcase3, r)))
@@ -100,14 +110,20 @@
                 λcase4 = λ(met, α, θo)
                 roots = get_radial_roots(met, ηcase4, λcase4)
                 @test sum(Krang._isreal2.(roots)) == 0
-                rs = 1.1horizon(met)
+                rs = horizon(met)
+                rh = horizon(met)
                 τ4 = Ir( pix, true, rs)[1]
+                τf = total_mino_time(met, roots)
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ4, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase4, λcase4, r)))
                     prob = IntegralProblem(f, rs, Inf; nout=1)
                     sol = solve(prob, HCubatureJL(); reltol=1e-10, abstol=1e-10)
                     @test τ4 / sol.u ≈ 1.0 atol = 1e-5
+
+                    prob = IntegralProblem(f, rh, Inf; nout=1)
+                    sol = solve(prob, HCubatureJL(); reltol=1e-10, abstol=1e-10)
+                    @test τf / sol.u ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase4, λcase4, r)))

@@ -1,7 +1,7 @@
 # Miscellaneous functions
 ##----------------------------------------------------------------------------------------------------------------------
 export λ, η, α, β, αboundary, βboundary, r_potential, θ_potential, get_radial_roots, 
-Ir,Gθ
+Ir,Gθ, total_mino_time
 
 """
 Checks if a complex number is real to some tolerance
@@ -1299,6 +1299,28 @@ function radial_w_I0_terms_integrals_case4(metric::Kerr{T}, rs, roots::NTuple{4}
     return I1_total, I2_total, Ip_total, Im_total
 end
 
+"""
+Returns the maximum mino time that can be accrued along a ray.
+
+# Arguments
+
+- `metric` : Kerr metric
+- `roots` : Roots of the radial potential
+- `I0_inf` : Mino time at infinity
+"""
+function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where T
+    numreals = unsafe_trunc(Int, sum((Krang._isreal2.(roots))))
+    I0_inf = Ir_inf(metric, roots)
+
+    if numreals == 4 
+        τf = 2I0_inf
+    else
+        rh = Krang.horizon(metric)
+        τf = I0_inf - Krang.Ir_s(metric, rh, roots, true)
+    end
+    return τf
+end
+
 ##----------------------------------------------------------------------------------------------------------------------
 # Pixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1355,7 +1377,6 @@ function It(pix::AbstractPixel, rs, τ, νr)
 
     return tempIt_inf - It_w_I0_terms(metric, rs, τ, pix.roots, λtemp, νr)
 end
-
 
 """
 Return the radial integrals
@@ -1454,6 +1475,7 @@ end
 ##----------------------------------------------------------------------------------------------------------------------
 # Inclination functions
 ##----------------------------------------------------------------------------------------------------------------------
+
 """
 Mino time of trajectory between two inclinations for a given screen coordinate
 
@@ -1467,7 +1489,6 @@ Mino time of trajectory between two inclinations for a given screen coordinate
 function mino_time(pix::AbstractPixel, θs, isindir, n)
     return Gθ(pix, θs, isindir, n)[1]
 end
-
 
 """
 Returns the antiderivative \$G_\\theta=\\int\\frac{d\\theta}{\\sqrt{\\Theta(\\theta)}}\$.
