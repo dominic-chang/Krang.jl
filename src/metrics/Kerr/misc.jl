@@ -151,7 +151,7 @@ function β(metric::Kerr, λ, η, θo)
 end
 
 """
-Defines a horizontal boundary on the assmyptotic observer's screen that emission that from θs must fall within.
+Defines a horizontal boundary on the assymptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
@@ -163,7 +163,7 @@ function αboundary(metric::Kerr, θs)
 end
 
 """
-Defines a vertical boundary on the assmyptotic observer's screen that emission that from θs must fall within.
+Defines a vertical boundary on the assymptotic observer's screen that emission that from θs must fall within.
 
 # Arguments
 
