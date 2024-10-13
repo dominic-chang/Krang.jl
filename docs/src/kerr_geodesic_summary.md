@@ -116,7 +116,10 @@ The Hamilton-Jacobi Equations then reduce to four first order differential equat
 \end{align}
 ```
 where we have defined the Mino time by its relationship to the affine parameter; 
-$$d\tau=d\tilde\tau/\Sigma.$$
+
+```math
+d\tau=d\tilde\tau/\Sigma.
+```
 
 Equations (15)-(18) define a 'Kepler-like' problem for photons in the Kerr spacetime.  
 The Mino time here acts similar to the Keplerian coordinate time in that problem, and can be expressed either in terms of $r$ or $\theta$ using equations (15) and (16);

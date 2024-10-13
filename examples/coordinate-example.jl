@@ -25,7 +25,7 @@ curr_theme = Theme(
 set_theme!(merge!(curr_theme, theme_latexfonts()))
 
 # We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
-# A region spanned by radii between the horizon and 10M at varying inclinations will be raytraced onto the 20Mx20M 
+# A region spanned by radii between the horizon and 10M at varying inclinations will be raytraced onto the 15x15 
 # screen of the observer.
 
 
@@ -47,7 +47,7 @@ axes_list = [
 ]
 
 
-# Initialize Camera and Pre-Allocate Memory for data to be plotted
+# Initialize Camera and pre-allocate memory for data to be plotted
 coordinates = (zeros(sze, sze) for _ in 1:3)
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 colormaps = (:afmhot, :afmhot, :hsv)
