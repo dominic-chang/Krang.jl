@@ -12,6 +12,8 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     roots::NTuple{4,Complex{T}}
     "Radial antiderivative"
     I0_inf::T
+    "Total possible Mino time"
+    total_mino_time::T
     "Angular antiderivative"
     absGθo_Gθhat::NTuple{2,T}
     "Inclination"
@@ -45,11 +47,13 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         if (numreals == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
             (α, β), 
             roots,
-            Krang.Ir_inf(met, roots), 
+            I0_inf, 
+            total_mino_time(met, roots),
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ), 
             θo, tempη, tempλ
         )
@@ -150,5 +154,6 @@ function roots(pix::IntensityPixel) return pix.roots end
 function screen_coordinate(pix::IntensityPixel) return pix.screen_coordinate end
 function inclination(pix::IntensityPixel) return pix.θo end
 function I0_inf(pix::IntensityPixel) return pix.I0_inf end
+function total_mino_time(pix::IntensityPixel) return pix.total_mino_time end
 function Ir_inf(pix::IntensityPixel) return pix.I0_inf end
 function absGθo_Gθhat(pix::IntensityPixel) return pix.absGθo_Gθhat end

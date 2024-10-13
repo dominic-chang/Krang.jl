@@ -131,6 +131,20 @@ function I0_inf(pix::AbstractPixel)
 end
 
 """
+    total_mino_time(pix::AbstractPixel)
+
+Return the total possible Mino time for a ray associated with a pixel.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The total possible Mino time for a ray associated with the pixel.
+"""
+function total_mino_time(pix::AbstractPixel)
+    return total_mino_time(metric(pix), roots(pix))
+end
+"""
     Ir_inf(pix::AbstractPixel)
 
 Calculate the Ir infinity value for a given pixel.
