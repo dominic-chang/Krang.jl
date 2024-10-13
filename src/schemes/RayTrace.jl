@@ -111,6 +111,7 @@ function raytrace(camera, mesh_geometry; res=100)
     end
     return intersections
 end
+
 function raytrace(pixel::AbstractPixel{T}, faces::Matrix{OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
     intersections = 0
     ray = zeros(T, 3, res)

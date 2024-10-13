@@ -304,8 +304,7 @@
                                 @test tempGo / solθo.u ≈ 1.0 atol = 1e-3
                                 @test tempGhat / (2solθt.u) ≈ 1.0 atol = 1e-3
 
-
-                                #@test Krang.Gs(pix, τ) / tempGs ≈ 1.0 atol = 1e-3
+                                @test Krang.Gs(pix, τ) / tempGs ≈ 1.0 atol = 1e-3
                             end
                         end
                         @testset "Gϕ" begin
