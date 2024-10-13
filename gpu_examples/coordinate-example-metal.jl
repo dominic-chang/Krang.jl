@@ -1,12 +1,3 @@
-# # Raytracing with inclination
-
-# This example shows how to access coordinate information from the raytracing process.
-# You will likely need to do this when making custom physics `materials`.
-# We will raytrace a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity.
-# We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons that are emitted from the 
-# source, at a fixed inclination angles with respect to the black hole's spin axis.
-#
-# First, let's import Krang and CairoMakie for plotting.
 using Krang
 using CairoMakie
 using Metal
@@ -24,11 +15,6 @@ curr_theme = Theme(
     )
 )
 set_theme!(merge!(curr_theme, theme_latexfonts()))
-
-# We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
-# A region spanned by radii between the horizon and 20M at varying inclinations will be raytraced onto the 20Mx20M 
-# screen of the observer.
-
 
 metric = Krang.Kerr(0.99f0); # Kerr metric with a spin of 0.99
 θo = 45f0 * π / 180; # inclination angle of the observer. θo ∈ (0, π)
@@ -54,8 +40,6 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
-# Let's define a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
-# We will includes some basic occlusion effects by checking if the ray intersects with the cone on the 'far-side' or the 'near-side'.
 function coordinate_point(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry{T,A}) where {T, A}
     n, rmin, rmax = geometry.attributes
     θs = geometry.opening_angle
@@ -101,13 +85,3 @@ recording = CairoMakie.record(fig, "coordinate.gif", range(0f0, 1f0π, length=18
     draw!(axes_list, camera, coordinates, rmin, rmax, θs)
 end
 
-# ![Emission coordinates of cones](coordinate.gif)
-
-# > [!IMPORTANT]
-# > The GPU can be used in this example with an appropriate broadcast.
-# 
-# ```julia
-# using CUDA
-# 
-# rendered_scene = Array(coordinate_point.(CuArray(camera.screen.pixels), Ref(geometry)))
-# ```
