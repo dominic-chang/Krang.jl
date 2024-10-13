@@ -36,13 +36,17 @@ Surfaces of constant $\theta$ define spin axis centered cones whose apex lie at 
 
 ### Raytracing with rays parameterized by Mino time
 Mino time, $\tau$, is a parameter monotonic in affine parameter, $\tau'$, defined by
-$$
+
+```math
 d\tau = \Sigma(r,\theta)d\tau',
-$$
+```
+
 where
-$$
+
+```math
 \Sigma(r,\theta) = r^2 +a^2\cos^2\theta.
-$$
+```
+
 ![raytracing with Mino time](examples/raytrace.gif)
 ```@raw html
 <p style="text-align:center">Coordinate evolution with Mino time.</p>
