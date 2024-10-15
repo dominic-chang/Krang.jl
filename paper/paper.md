@@ -30,14 +30,14 @@ Such algorithms are of interest for modeling the sources seen by Very Long Basel
 # Statement of need
 
 Studies of the near horizon scale science around supermassive black holes have increased in interest due to results from the horizon scale observations of supermassive black holes by the Gravity Collaboration, the Atacama Large Millimeter Array (ALMA), and the EHTC.
-The Event Horizon Telescope, in particular [EHT, @M87PaperII], produced the first images of the shadows of the supermassive black holes in the centres of M87 [@M87PaperI] and the Milky Way [@SgrAPaperI] galaxies at event horzon scales.
+The Event Horizon Telescope, in particular [EHT, @M87PaperII], produced the first images of the shadows of the supermassive black holes in the centers of M87 [@M87PaperI] and the Milky Way [@SgrAPaperI] galaxies at event horizon scales.
 The emission from these sources originating from relativistic plasmas that are accreted by supermassive black holes in the presence of a magnetic field.
-Scientific analysis of the data from these sources often require complicated source modelling that includes various relativistic effects which leave characteristic signatures in the observed images.
-The large scale of the black holes allow for many of these effects to be described within the geometric optics limit of electro-magnetism. Ray tracing techniques thus present viable options for modeling images of super massive black holes.
+Scientific analysis of the data from these sources often requires complicated source modelling that includes various relativistic effects which leave characteristic signatures in the observed images.
+The large scale of the black holes allows for many of these effects to be described within the geometric optics limit of electro-magnetism. Ray tracing techniques thus present viable options for modeling images of super massive black holes.
 
 A relativistic image feature that has been theorized to exist, but is yet to be resolved, are the individual sub-image contributions to the overall image structure known as photon-rings, [@JohnsonRing].
 Photon rings are of particular interest because of their strong dependence on gravitational effects and their insensitivity to variations in the emission physics around the black hole.
-The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin, or help facilitate tests of gravity.
+The observation of a photon ring would therefore serve as effective probe for measurements of black hole characteristics like spin or help facilitate tests of gravity.
 This feature could potentially be seen in the near future with a recent as a space extension to the EHT aimed of detection and measurement [@lupsasca2024blackholeexplorerphoton].
 
 Scientific studies of black hole images within the current software landscape often requires great compromise due to the computational complexity of the problem.
