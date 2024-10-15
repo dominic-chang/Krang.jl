@@ -1,3 +1,5 @@
+<img width="300" alt="Krang" src="https://github.com/user-attachments/assets/bd42b144-c8b4-45aa-a331-944cfa9e9794">
+
 # Kerr Raytracer for Analytic Null Geodesics (KRANG)
 
 This Julia language package that accurately and efficiently solves for null geodesics in the Kerr spacetime.
@@ -14,6 +16,7 @@ These considerations allow our algorithms to be easily used in Machine Learning 
 [![Build Status](https://github.com/dominic-chang/Krang.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/dchang10/Krang.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![Coverage](https://codecov.io/gh/dominic-chang/Krang.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dchang10/Krang.jl)
+[![status](https://joss.theoj.org/papers/378df5c54cd21e293b92ac692c21c0ed/status.svg)](https://joss.theoj.org/papers/378df5c54cd21e293b92ac692c21c0ed)
 # Installation
 Launch your Julia session with then type `]` to move into Pkg mode. Once in pkg mode type
 ```julia
