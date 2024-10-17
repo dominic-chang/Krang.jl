@@ -29,10 +29,9 @@ Such algorithms are of interest for modeling the sources seen by Very Long Basel
 
 # Statement of need
 
-Studies of the near horizon scale science around supermassive black holes have increased in interest due to results from the horizon scale observations of supermassive black holes by the Gravity Collaboration, the Atacama Large Millimeter Array (ALMA), and the EHTC.
-The Event Horizon Telescope, in particular [EHT, @M87PaperII], produced the first images of the shadows of the supermassive black holes in the centers of M87 [@M87PaperI] and the Milky Way [@SgrAPaperI] galaxies at event horizon scales.
-The emission from these sources originating from relativistic plasmas that are accreted by supermassive black holes in the presence of a magnetic field.
-Scientific analysis of the data from these sources often requires complicated source modelling that includes various relativistic effects which leave characteristic signatures in the observed images.
+Studies of electromagnetic signatures around black holes have increased in interest due to results from the horizon scale observations of supermassive black holes by the Gravity Collaboration, the Atacama Large Millimeter Array (ALMA), and the EHTC.
+The Event Horizon Telescope, in particular [EHT, @M87PaperII], produced the first images of the shadows of the supermassive black holes in the centers of M87 [@M87PaperI] and the Milky Way [@SgrAPaperI] galaxies at event horizon scales, with emission being sourced from the interactions of accreting relativistic plasmas and magnetic fields within the vicinity of the black holes.
+Scientific analysis of the data from these sources often requires complicated source modelling that includes various relativistic effects which can leave characteristic signatures in the observed images.
 The large scale of the black holes allows for many of these effects to be described within the geometric optics limit of electro-magnetism. Ray tracing techniques thus present viable options for modeling images of super massive black holes.
 
 A relativistic image feature that has been theorized to exist, but is yet to be resolved, are the individual sub-image contributions to the overall image structure known as photon-rings, [@JohnsonRing].
@@ -55,6 +54,6 @@ Krang therefore benefits from the 'plug and play' nature of the julia programmin
 - `Gradus` [@Gradus]: A julia implementation of a numeric, general relativistic raytracer with radiative transfer.
 
 # Acknowledgements
-The authors thank Iniyan Natarajan, Alexander Plavin, and Paul Tiede for helpful discussions. Support for this work was provided by the NSF (AST-1935980, AST-2034306) and by the Gordon and Betty Moore Foundation through grant GBMF-10423. This work was supported by the Black Hole Initiative, which is funded by grants from the John Templeton Foundation (Grant #62286) and the Gordon and Betty Moore Foundation (Grant GBMF-8273), although the opinions expressed in this work are those of the author(s) and do not necessarily reflect the views of these Foundations.
+The authors thank Michael Johnson, Iniyan Natarajan, Alexander Plavin, and Paul Tiede for helpful discussions. Support for this work was provided by the NSF (AST-1935980, AST-2034306) and by the Gordon and Betty Moore Foundation through grant GBMF-10423. This work was supported by the Black Hole Initiative, which is funded by grants from the John Templeton Foundation (Grant #62286) and the Gordon and Betty Moore Foundation (Grant GBMF-8273), although the opinions expressed in this work are those of the author(s) and do not necessarily reflect the views of these Foundations.
 
 # References
