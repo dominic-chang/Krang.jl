@@ -11,9 +11,9 @@ authors:
     orcid: 0000-0001-9939-5257
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
 affiliations:
- - name: Department of Physics, Harvard University
+ - name: Department of Physics, Harvard University, USA
    index: 1
- - name: Black Hole Initiative at Harvard University
+ - name: Black Hole Initiative at Harvard University, USA
    index: 2
 date: 05 Sep 2024
 bibliography: paper.bib
@@ -21,11 +21,9 @@ bibliography: paper.bib
 ---
 
 # Summary
-`Krang` is a Julia[^1] [@Bezanson2015] package that implements efficient algorithms for raytracing emission geometries in the Kerr black hole space time.
+`Krang` is a [Julia](https://julialang.org) [@Bezanson2017] package that implements efficient algorithms for raytracing emission geometries in the Kerr black hole space time.
 It is GPU compatible and is specialized for studies of sub-image contributions from gravitational lensed sources [@JohnsonRing]. 
 Such algorithms are of interest for modeling the sources seen by Very Long Baseline Interferometry (VLBI) observations of Low Luminosity Active Galactic Nuclei (LLAGN) such as those imaged by the Event Horizon Telescope Collaboration (EHTC).
-
-[^1]: https://julialang.org
 
 # Statement of need
 
