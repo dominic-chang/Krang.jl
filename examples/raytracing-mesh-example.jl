@@ -20,11 +20,11 @@ bunny_mesh = translate(
     ), 2.0,7.0,-10.0
 );
 
-# Raytrace the mesh embedded in the Kerr space time. The emission picked up by a ray will be the sum of all the intersections of the ray with the mesh
+# Ray trace the mesh embedded in the Kerr space time. The emission picked up by a ray will be the sum of all the intersections of the ray with the mesh
 # The mesh is embedded in the space-time by assuming the world coordinates of the mesh is the same as the Boyer-Lindquist coordinates of the space time.
 # The ray tracing is done by scanning over the image one line at a time
 
-# Let us now raytrace the image to see what the mesh looks like from the observer's perspective.
+# Let us now ray trace the image to see what the mesh looks like from the observer's perspective.
 
 intersections = raytrace(camera, bunny_mesh);
 

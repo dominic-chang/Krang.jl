@@ -10,7 +10,7 @@ rng = Random.GLOBAL_RNG
 
 # Our model will take in spacetime coordinates and return observed intensity value for a given pixel:
 # 
-# We will first define a simple emisison model that will be raytraced.
+# We will first define a simple emisison model that will be ray traced.
 # The emission model will ge taken to be a simple fully connected Neural Network with 2 hidden layers
 
 emission_model = Chain(
@@ -24,7 +24,7 @@ ps, st = Lux.setup(rng, emission_model);
 # We will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to the spin axis in this example.
 # These parameters could be made to float in the optimization process.
 # We will do this by defining an `ImageModel` comprised of an emission layer and a raytracing layer.
-# We will create a struct for our image model and store our emission model as a layer to be raytraced.
+# We will create a struct for our image model and store our emission model as a layer to be ray traced.
 
 struct ImageModel{T <: Chain}
     emission_layer::T

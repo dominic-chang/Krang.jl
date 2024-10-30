@@ -36,7 +36,7 @@ end
     - `R::T`: The characteristic radius of the emissivity profile.
     - `p1::T`: The first power-law index.
     - `p2::T`: The second power-law index.
-    - `subimgs::NTuple{N, Int}`: The sub-images to raytrace.
+    - `subimgs::NTuple{N, Int}`: The sub-images to ray trace.
 """
 struct ElectronSynchrotronPowerLawIntensity{N, T} <: AbstractMaterial 
     magnetic_field::SVector{3, T}
@@ -75,7 +75,7 @@ struct ElectronSynchrotronPowerLawIntensity{N, T} <: AbstractMaterial
     - `R::T`: The characteristic radius of emissivity profile.
     - `p1::T`: The first power-law index.
     - `p2::T`: The second power-law index.
-    - `subimgs::NTuple{N, Int}`: The sub-images to raytrace.
+    - `subimgs::NTuple{N, Int}`: The sub-images to ray trace.
 
     # Returns
     - `ElectronSynchrotronPowerLawIntensity{N, T}`: A new instance of `ElectronSynchrotronPowerLawPolarization`.

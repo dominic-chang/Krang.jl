@@ -225,7 +225,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
 end
 
 """
-Raytrace a point that appears at the screen coordinate (`α`, `β`) for an observer located at inclination θo
+Ray trace a point that appears at the screen coordinate (`α`, `β`) for an observer located at inclination θo
 
 # Arguments
 

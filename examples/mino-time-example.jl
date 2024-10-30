@@ -1,6 +1,6 @@
 # # Rays parameterized with Mino time
 
-# In this example, we will raytrace the region around a Kerr black hole as seen by an observer stationed at infinity.
+# In this example, we will ray trace the region around a Kerr black hole as seen by an observer stationed at infinity.
 # We will return the coordinates associated with a ray by marching along the ray's Mino time parameter from the assymptotic observer.
 #
 # First, let's import Krang and CairoMakie for plotting.

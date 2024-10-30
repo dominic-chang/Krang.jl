@@ -21,7 +21,7 @@ set_theme!(merge!(curr_theme, theme_latexfonts()))
 
 #
 # We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
-# The emission to be raytraced is 
+# The emission to be ray traced is 
 metric = Krang.Kerr(0.94);
 θo = 17 * π / 180;
 ρmax = 10.0;
@@ -51,7 +51,7 @@ p2 = 4.411852974336667
 
 # Next we will define the geometries of each mesh. We will use a `ConeGeometry` with an opening angle of $75^\circ$.
 # The additional information needed for the material will be passed as attributes to the geometry.
-# This includes the sub-images to raytrace, which in our case will be the n=0 and n=1 sub-images.
+# This includes the sub-images to ray trace, which in our case will be the n=0 and n=1 sub-images.
 
 θs = (75 * π / 180)
 material1 = Krang.ElectronSynchrotronPowerLawPolarization(magfield1..., vel..., σ, R, p1, p2, (0,1,));

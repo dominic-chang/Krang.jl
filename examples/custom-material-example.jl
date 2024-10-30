@@ -1,11 +1,11 @@
 # # Defining a Custom Material and Saving Output
-# We will define a redshift material for raytracing, and export the raytraced quantities to a .npy file.
+# We will define a redshift material for raytracing, and export the ray traced quantities to a .npy file.
 
 using Krang
 
 # Materials should be functors (i.e. types with callable objects).
-# Our material will raytrace the redshifts associated with a zero angular momentum observer (ZAMO) on a cone for a given sub-image.
-# If the cone is self obscuring, then only the redshift on the side that is closest to the observer will be raytraced.
+# Our material will ray trace the redshifts associated with a zero angular momentum observer (ZAMO) on a cone for a given sub-image.
+# If the cone is self obscuring, then only the redshift on the side that is closest to the observer will be ray traced.
 struct ZAMORedshifts{T} <: Krang.AbstractMaterial
     n::Int
     rmin::T
@@ -42,13 +42,13 @@ function (m::ZAMORedshifts)(pix::Krang.AbstractPixel, geometry::Krang.ConeGeomet
 end
 
 # We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
-# The emission to be raytraced is 
+# The emission to be ray traced is 
 metric = Krang.Kerr(0.99);
 θo = 17 * π / 180;
 ρmax = 15.0;
 rmin = Krang.horizon(metric); # minimum radius to truncate cone
 rmax = 10.0; # maximum radius to truncate cone
-n = 1; # sub-image to raytrace
+n = 1; # sub-image to ray trace
 
 # Let's create a camera with a resolution of 400x400 pixels and our mesh.
 camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, 400);

@@ -1,4 +1,4 @@
-@testset "Raytracer Functions" begin
+@testset "Ray tracer Functions" begin
 
     @testset "Emission radius" begin
         a = 0.99

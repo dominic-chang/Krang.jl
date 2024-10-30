@@ -19,8 +19,8 @@ set_theme!(merge!(curr_theme, theme_latexfonts()))
 metric = Krang.Kerr(0.99f0); # Kerr metric with a spin of 0.99
 θo = 45f0 * π / 180; # inclination angle of the observer. θo ∈ (0, π)
 sze = 400; # resolution of the screen is sze x sze
-rmin = Krang.horizon(metric); # minimum radius to be raytraced
-rmax = 10f0; # maximum radius to be raytraced
+rmin = Krang.horizon(metric); # minimum radius to be ray traced
+rmax = 10f0; # maximum radius to be ray traced
 ρmax = 15f0; # horizontal and vertical limits of the screen
 
 # Create Figure

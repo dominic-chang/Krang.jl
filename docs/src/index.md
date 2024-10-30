@@ -5,8 +5,8 @@ layout: home
 
 hero:
   name: "KRANG.jl"
-  text: "Kerr Raytracer for Analytic Null Geodesics"
-  tagline: A performant accurate raytracer for problems in the Kerr spacetime.
+  text: "Kerr Ray-tracer for Analytic Null Geodesics"
+  tagline: A performant accurate ray tracer for problems in the Kerr spacetime.
   image:
     src: /Krang_logo.png
     alt: Krang.jl
