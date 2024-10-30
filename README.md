@@ -1,6 +1,6 @@
 <img width="300" alt="Krang" src="https://github.com/user-attachments/assets/bd42b144-c8b4-45aa-a331-944cfa9e9794">
 
-# Kerr Raytracer for Analytic Null Geodesics (KRANG)
+# Kerr Ray-tracer for Analytic Null Geodesics (KRANG)
 
 This Julia language package that accurately and efficiently solves for null geodesics in the Kerr spacetime.
 

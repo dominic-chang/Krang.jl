@@ -1,5 +1,5 @@
 ---
-title: 'Krang: Kerr Raytracer for Analytic Null Geodesics'
+title: 'Krang: Kerr Ray-tracer for Analytic Null Geodesics'
 tags:
   - julia
   - black hole 

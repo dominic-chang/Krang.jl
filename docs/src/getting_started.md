@@ -1,6 +1,6 @@
 # What is Krang.jl?
 
-Kerr Raytracer for Analytic Null Geodesics (Krang) is a raytracing code for geometries that are embedded in the Kerr spacetime.
+Kerr Ray-tracer for Analytic Null Geodesics (Krang) is a raytracing code for geometries that are embedded in the Kerr spacetime.
 Krang solves the Kerr geodesic problem using the analytic solutions that have been derived from the Hamilton-Jacobi Formalism.
 This choice makes the code efficient and accurate, and is an ideal formalism to isolated sub images that manifest from strong lensing.
 
