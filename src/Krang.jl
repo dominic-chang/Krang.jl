@@ -5,6 +5,7 @@ using JacobiElliptic
 using PolarizedTypes
 using GeometryBasics
 using Rotations
+using Roots
 using KernelAbstractions
 @template (FUNCTIONS, METHODS, MACROS) =
     """
@@ -14,11 +15,12 @@ using KernelAbstractions
 
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr/Kerr.jl")
-include("geometries/geometry_types.jl")
-include("geometries/mesh_geometry.jl")
 include("cameras/camera_types.jl")
 include("cameras/SlowLightIntensityCamera.jl")
 include("cameras/IntensityCamera.jl")
+include("geometries/geometry_types.jl")
+include("geometries/mesh_geometry.jl")
+include("geometries/level_set_geometry.jl")
 include("metrics/Kerr/misc.jl")
 include("metrics/Kerr/emission_coordinates.jl")
 include("materials/physicsUtils.jl")

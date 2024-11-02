@@ -94,7 +94,7 @@ function dot(a,b)
     return a[1]*b[1] + a[2]*b[2] + a[3]*b[3]
 end
 
-function raytrace(camera, mesh_geometry; res=100) 
+function raytrace(camera, mesh_geometry::MeshGeometry; res=100) 
     faces = begin
         temp = getfield(getfield(mesh_geometry, :simplices), :faces)
         len = length(temp)
