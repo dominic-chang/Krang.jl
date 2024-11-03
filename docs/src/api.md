@@ -70,6 +70,7 @@ Krang.synchrotronPolarization
 ```@docs
 Krang.Mesh
 Krang.MeshGeometry
+Krang.AbstractLevelSetGeometry
 Krang.ElectronSynchrotronPowerLawIntensity
 Krang.ElectronSynchrotronPowerLawPolarization
 ```
