@@ -7,11 +7,11 @@ end
 
 function render(pixel::AbstractPixel, scene::Scene)
     mesh = scene[1]
-    ans = mesh.material(pixel, mesh.geometry)
+    ans = raytrace(pixel, mesh)#mesh.material(pixel, mesh.geometry)
 
     for itr in 2:length(scene)
         mesh = scene[itr]
-        ans += mesh.material(pixel, mesh.geometry)
+        ans += raytrace(pixel, mesh)
     end
     return ans
 end

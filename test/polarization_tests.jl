@@ -90,7 +90,7 @@
                 mat = Krang.ElectronSynchrotronPowerLawIntensity(magfield..., βfluid..., spec, rpeak, p1, p2, subimgs)
                 geometry = Krang.ConeGeometry((θs))
 
-                int = mat(pix, geometry)
+                int = render(pix, (Krang.Mesh(geometry, mat),))
 
                 profile(r) = (r/rpeak)^p1/(1+(r/rpeak)^(p1+p2))
                 norm, redshift, lp = Krang.synchrotronIntensity(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
@@ -109,7 +109,7 @@
                 mat = Krang.ElectronSynchrotronPowerLawPolarization(magfield..., βfluid..., spec, rpeak, p1, p2, subimgs)
                 geometry = Krang.ConeGeometry((θs))
 
-                stokes = mat(pix, geometry)
+                stokes = render(pix, (Krang.Mesh(geometry, mat),))
 
                 eα, eβ, redshift, lp = Krang.synchrotronPolarization(metric, α, β, rs, θs, θo, magfield, βfluid, true, false)
                 q = (-(eα^2 - eβ^2) )

@@ -100,33 +100,22 @@ end
 """
     Functor for the the ElectronSynchrotronPowerLawIntensity material
 """
-function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(pix::AbstractPixel, geometry::ConeGeometry{T}) where {N,T}
-    (;magnetic_field, fluid_velocity, subimgs, R, p1, p2, spectral_index) = linpol
+function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(pix::AbstractPixel, intersection) where {N,T}
+    (;magnetic_field, fluid_velocity, R, p1, p2, spectral_index) = linpol
+    (;rs, θs, νr, νθ) = intersection
 
-    θs = geometry.opening_angle
     θo = inclination(pix)
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    observation = zero(T)
-
-    isindir = false
-    for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
-        isindir ⊻= true
-        for n in subimgs
-            νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            rs, νr, _ = emission_radius(pix, geometry.opening_angle, isindir, n)
-            if !(horizon(met) ≤ rs < T(Inf))
-                continue
-            end
-            norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
-
-            rat = (rs/R)
-            prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
-            i = norm^(1 + spectral_index) * lp * prof
-            observation += isnan(i) ? zero(T) : i
-            #observation += nan2zero(rs)
-        end
+    if !(horizon(met) ≤ rs < T(Inf))
+        return zero(T)
     end
-    return observation
+    norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
+
+    rat = (rs/R)
+    prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
+    return norm^(1 + spectral_index) * lp * prof
 end
+isFastLight(material::ElectronSynchrotronPowerLawIntensity) = true
+isAxisymmetric(material::ElectronSynchrotronPowerLawIntensity) = false

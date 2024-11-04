@@ -3,7 +3,7 @@ using DocStringExtensions
 using StaticArrays
 using JacobiElliptic
 using PolarizedTypes
-using GeometryBasics
+import GeometryBasics
 using Rotations
 using Roots
 using KernelAbstractions

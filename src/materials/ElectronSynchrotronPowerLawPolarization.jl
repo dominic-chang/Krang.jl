@@ -145,33 +145,30 @@ end
 """
     Functor for the ElectronSynchrotronPowerLawPolarization material
 """
-function (linpol::ElectronSynchrotronPowerLawPolarization)(pix::AbstractPixel, geometry::ConeGeometry{T,A}) where {T,A}
-    (;magnetic_field, fluid_velocity, spectral_index, R, p1, p2, subimgs) = linpol
+function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(pix::AbstractPixel, intersection) where {N,T}
+    (;magnetic_field, fluid_velocity, spectral_index, R, p1, p2) = linpol
+    (;rs, θs, νr, νθ) = intersection
+
     
-    θs = geometry.opening_angle
     θo = inclination(pix)
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
-
-    isindir = false
-    for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
-        isindir ⊻= true
-        for n in subimgs
-            #νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            rs, νr, νθ, _, issuccess = emission_radius(pix, geometry.opening_angle, isindir, n)
-            if issuccess
-                eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
-
-                rat = (rs/R)
-                prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
-                q = T(-(eα^2 - eβ^2) + eps(T))
-                u = T(-2 * eα * eβ + eps(T))
-                i = hypot(q, u)^(one(T) + spectral_index) * lp * prof
-                observation += StokesParams(i, q, u, zero(T))
-            end
-        end
+    if !(horizon(met) ≤ rs < T(Inf))
+        return StokesParams(zero(T), zero(T), zero(T), zero(T))
     end
-    return observation
+
+    eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
+
+    rat = (rs/R)
+    prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
+    q = T(-(eα^2 - eβ^2) + eps(T))
+    u = T(-2 * eα * eβ + eps(T))
+    i = hypot(q, u)^(one(T) + spectral_index) * lp * prof
+    return StokesParams(i, q, u, zero(T))
 end
+
+isOcclusive(::ElectronSynchrotronPowerLawPolarization) = false
+isFastLight(::ElectronSynchrotronPowerLawPolarization) = true
+isAxisymmetric(::ElectronSynchrotronPowerLawPolarization) = true
+yield(::ElectronSynchrotronPowerLawPolarization{N,T}) where {N,T} = StokesParams(zero(T), zero(T), zero(T), zero(T))

@@ -112,7 +112,7 @@ function raytrace(camera, mesh_geometry::MeshGeometry; res=100)
     return intersections
 end
 
-function raytrace(pixel::AbstractPixel{T}, faces::Matrix{OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
+function raytrace(pixel::AbstractPixel{T}, faces::Matrix{GeometryBasics.OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
     intersections = 0
     ray = zeros(T, 3, res)
     generate_ray!(ray, pixel, res)
