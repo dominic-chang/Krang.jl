@@ -35,12 +35,12 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T,
     τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
     issuccess || return zero(T), true, true, 0, false
 
-    # is θ̇s increasing or decreasing?
+    # νθ is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
     if isincone 
         νθ = (θo > θs) ⊻ (n % 2 == 1) 
     end
-    # is ṙs increasing or decreasing?
+
     ans, νr, numreals, issuccess = emission_radius(pix, τ)
     return ans, νr, νθ, numreals, issuccess
 end
@@ -141,26 +141,32 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 - `n` : Image index
 """
 function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where T
+    # NB: I do not return θs since it is already known, and returning it might encourage bad coding errors
     α, β = screen_coordinate(pix)
-    met = metric(pix)
     θo = inclination(pix)
-    if cos(θs) > abs(cos(θo))
+    met = metric(pix)
+    isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
+    if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-
-        (abs(β) + eps(T)) < βbound && return zero(T), zero(T), zero(T), false, false, false
+        ((abs(β) + eps(T)) < βbound) && return zero(T), zero(T), false, false, false
     end
 
     τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
-    issuccess || return (zero(T), zero(T), zero(T), false, false, false)
+    issuccess || return (zero(T), zero(T), false, false, false)
+
+    # is θ̇s increasing or decreasing?
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    if isincone 
+        νθ = (θo > θs) ⊻ (n % 2 == 1) 
+    end
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
-    issuccess || return (zero(T), zero(T), zero(T), false, false, false)
+    issuccess || return (zero(T), zero(T), false, false, false)
 
     ϕs = emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
-    νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
-    return rs, θs, ϕs, νr, νθ, issuccess
+    return rs, ϕs, νr, νθ, issuccess
 end
 
 """
@@ -185,14 +191,19 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return zero(T), zero(T), zero(T), zero(T), false, false, false
+            return zero(T), zero(T), zero(T), false, false, false
         end
     end
+
+    τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
+    issuccess || return zero(T), zero(T), zero(T), false, false, false
+
+    rs, νr, _, issuccess = emission_radius(pix, τ)
+    issuccess || return zero(T), zero(T), zero(T), false, false, false
 
     a = met.spin
 
     λtemp = λ(met, α, θo)
-    τ, _, _, _ = Gθ(pix, θs, isindir, n)
 
     νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     #isindir = !(((τ + sign(β)*τo - (νθ ? 1 : -1)*τs)/τhat) ≈ n) # TODO: Why is this here
@@ -200,10 +211,9 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
     if isnan(τ)
-        return zero(T), zero(T), zero(T), zero(T), false, false, false
+        return zero(T), zero(T), zero(T), false, false, false
     end
 
-    rs, νr, _, issuccess = emission_radius(pix, τ)
     I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
@@ -221,7 +231,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     # is θ̇s increasing or decreasing?
     νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
-    return emission_time_regularized, rs, θs, emission_azimuth, νr, νθ, issuccess
+    return emission_time_regularized, rs, emission_azimuth, νr, νθ, issuccess
 end
 
 """

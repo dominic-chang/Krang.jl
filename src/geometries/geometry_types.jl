@@ -20,9 +20,6 @@ isAxisymmetric(material::AbstractMaterial) = false
 #TODO: replace with trait
 isFastLight(material::AbstractMaterial) = false
 
-"""
-    $TYPEDEF
-"""
 struct Intersection{T}
     ts::T
     rs::T
@@ -32,9 +29,6 @@ struct Intersection{T}
     νθ::Bool
 end
 
-"""
-    returns a zero of the yield of the material
-"""
 yield(material::AbstractMaterial) = 0
 
 """
@@ -65,14 +59,6 @@ struct ConeGeometry{T, A} <: AbstractGeometry
     ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
 end
 
-function raytrace(camera, mesh::Mesh{<:ConeGeometry, <:AbstractMaterial}) 
-    intersections = zeros(Float64, size(camera.screen.pixels))
-    Threads.@threads for I in CartesianIndices(camera.screen.pixels)
-        intersections[I] = raytrace_fast_light_axi_symmetric(camera.screen.pixels[I], mesh)
-    end
-    return intersections
-end
-
 function raytrace(pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
     #(;magnetic_field, fluid_velocity, spectral_index, R, p1, p2, subimgs) = linpol
     
@@ -93,14 +79,14 @@ function raytrace(pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:Abstract
                     rs, νr, νθ, _, issuccess = emission_radius(pix, θs, isindir, n)
                     Intersection(zero(rs), rs, θs, zero(rs), νr, νθ), issuccess
                 else
-                    rs, θs, ϕs, νr, νθ, issuccess = emission_coordinates_fast_light(pix, θs, isindir, n)
+                    rs, ϕs, νr, νθ, issuccess = emission_coordinates_fast_light(pix, θs, isindir, n)
                     Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
                 end
             else
-                ts, rs, θs, ϕs, νr, νθ, issuccess = emission_coordinates(pix, θs, isindir, n)
+                ts, rs, ϕs, νr, νθ, issuccess = emission_coordinates(pix, θs, isindir, n)
                 Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
             end
-            if issuccess
+            if issuccess && (horizon(metric(pix)) < rs < T(Inf))
 
                 if isOcclusive(material)
                     observation = material(pix, intersection)

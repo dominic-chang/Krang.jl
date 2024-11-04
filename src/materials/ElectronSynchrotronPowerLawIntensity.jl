@@ -108,9 +108,6 @@ function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(pix::AbstractPixel,
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    if !(horizon(met) ≤ rs < T(Inf))
-        return zero(T)
-    end
     norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
 
     rat = (rs/R)

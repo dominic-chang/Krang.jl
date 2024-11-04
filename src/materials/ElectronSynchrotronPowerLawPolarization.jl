@@ -154,10 +154,6 @@ function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(pix::AbstractPix
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    if !(horizon(met) ≤ rs < T(Inf))
-        return StokesParams(zero(T), zero(T), zero(T), zero(T))
-    end
-
     eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
 
     rat = (rs/R)

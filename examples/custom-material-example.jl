@@ -7,7 +7,7 @@ using Krang
 # Our material will ray trace the redshifts associated with a zero angular momentum observer (ZAMO) on a cone for a given sub-image.
 # If the cone is self obscuring, then only the redshift on the side that is closest to the observer will be ray traced.
 struct ZAMORedshifts{T} <: Krang.AbstractMaterial
-    n::Int
+    subimgs::Tuple{Int}
     rmin::T
     rmax::T
 end
@@ -16,29 +16,24 @@ end
 # This functor will take in a pixel and a geometry and return the redshift associated with a given sub image.
 # You must include the relevant physics in the functor definition. 
 # Here we will include redshift effects associated with a zero angular momentum observer (ZAMO).
-function (m::ZAMORedshifts)(pix::Krang.AbstractPixel, geometry::Krang.ConeGeometry{T,A}) where {T,A}
+function (m::ZAMORedshifts)(pix::Krang.AbstractPixel{T}, intersection::Krang.Intersection) where {T}
+    (; rs, θs, νr, νθ) = intersection
+    α,β=Krang.screen_coordinate(pix)
 
-    observation = zero(T)
-    α,β = Krang.screen_coordinate(pix)
+    ηtemp = η(metric, α, β, θo)
+    λtemp = λ(metric, α, θo)
+    curr_p_bl_d = p_bl_d(metric, rs, θs, ηtemp, λtemp, νr, νθ)
 
-    θs = geometry.opening_angle
-    isindir = false
-    for _ in 1:2 
-        isindir ⊻= true
-        rs, νr, νθ, _, issuccess = emission_radius(pix, geometry.opening_angle, isindir, m.n)
-        if issuccess && m.rmin ≤ rs < m.rmax
-            ηtemp = η(metric, α, β, θo)
-            λtemp = λ(metric, α, θo)
-            curr_p_bl_d = p_bl_d(metric, rs, θs, ηtemp, λtemp, νr, νθ)
+    curr_p_bl_u = metric_uu(metric, rs, θs) * curr_p_bl_d
+    p_zamo_u = jac_zamo_u_bl_d(metric, rs, θs) * curr_p_bl_u
+    redshift = inv(p_zamo_u[1])
 
-            curr_p_bl_u = metric_uu(metric, rs, θs) * curr_p_bl_d
-            p_zamo_u = jac_zamo_u_bl_d(metric, rs, θs) * curr_p_bl_u
-            redshift = inv(p_zamo_u[1])
+    return max(redshift, eps(T))
+end
 
-            observation = max(redshift, eps(T))
-        end
-    end
-    return observation
+# We need to define the return type or the material for ray tracing. This can be things like a `Float` of a `StokesParams`. Let's use a float for this case.
+function Krang.yield(::ZAMORedshifts{T}) where T
+    return zero(T)
 end
 
 # We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
@@ -52,7 +47,7 @@ n = 1; # sub-image to ray trace
 
 # Let's create a camera with a resolution of 400x400 pixels and our mesh.
 camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, 400);
-mesh = Krang.Mesh(Krang.ConeGeometry((75 * π / 180)), ZAMORedshifts(n, rmin, rmax))
+mesh = Krang.Mesh(Krang.ConeGeometry((75 * π / 180)), ZAMORedshifts((n,), rmin, rmax))
 scene = Krang.Scene((mesh,))
 
 # Finally, we will render the scene with the camera and plot the redshifts.

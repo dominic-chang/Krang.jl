@@ -134,19 +134,17 @@
             @testset "$pixtype" for (pixtype, pix) in [("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)), ("Cached Slow Light Intensity Pixel", Krang.SlowLightIntensityPixel(met, α, β, θo))] 
 
                 τ = Krang.Gθ(pix, θs, isindir, 0)[1]
-                ts, testrs, testθs, ϕs, νr, νθ = Krang.emission_coordinates(pix, θs, isindir, 0)
-                testrs2, testθs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, 0)
-                ts3, testrs3, testθs3, ϕs3, νr3, νθ3 = Krang.emission_coordinates(pix, τ)
+                ts, testrs, ϕs, νr, νθ = Krang.emission_coordinates(pix, θs, isindir, 0)
+                testrs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, 0)
+                ts3, testrs3, testθs, ϕs3, νr3, νθ3 = Krang.emission_coordinates(pix, τ)
 
                 testτ = Krang.Ir(pix, isindir, testrs)[1]
                 @testset "Consistency between raytracing methods" begin
                     @test testrs/testrs2 ≈ 1.0 atol = 1e-5
-                    @test testθs/testθs2 ≈ 1.0 atol = 1e-5
                     @test ϕs2/ϕs ≈ 1.0 atol = 1e-5
                     @test νr == νr2
                     @test νθ == νθ2
                     @test testrs/testrs3 ≈ 1.0 atol = 1e-5
-                    @test testθs/testθs3 ≈ 1.0 atol = 1e-5
                     @test ϕs/ϕs3 ≈ 1.0 atol = 1e-5
                     @test νr == νr3
                     @test νθ == νθ3
