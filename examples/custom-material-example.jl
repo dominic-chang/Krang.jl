@@ -6,6 +6,8 @@ using Krang
 # Materials should be functors (i.e. types with callable objects).
 # Our material will ray trace the redshifts associated with a zero angular momentum observer (ZAMO) on a cone for a given sub-image.
 # If the cone is self obscuring, then only the redshift on the side that is closest to the observer will be ray traced.
+# ## Defining the material
+# All materials must be subtypes of `AbstractMaterial`.
 struct ZAMORedshifts{T} <: Krang.AbstractMaterial
     subimgs::Tuple{Int}
     rmin::T
@@ -36,6 +38,7 @@ function Krang.yield(::ZAMORedshifts{T}) where T
     return zero(T)
 end
 
+# ## Ray tracing the material
 # We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
 # The emission to be ray traced is 
 metric = Krang.Kerr(0.99);
@@ -53,6 +56,7 @@ scene = Krang.Scene((mesh,))
 # Finally, we will render the scene with the camera and plot the redshifts.
 redshifts = render(camera, scene)
 
+# ## Plotting the redshifts
 import CairoMakie as CMk
 
 theme = CMk.Theme(

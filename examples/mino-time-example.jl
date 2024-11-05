@@ -1,8 +1,10 @@
-# # Rays parameterized with Mino time
+# # Rays & Coordinate information with Mino time (τ) 
 
 # In this example, we will ray trace the region around a Kerr black hole as seen by an observer stationed at infinity.
 # We will return the coordinates associated with a ray by marching along the ray's Mino time parameter from the assymptotic observer.
-#
+# This information can be easily accessed using the `emission_coordinates!` function.
+
+# ## Setup
 # First, let's import Krang and CairoMakie for plotting.
 using Krang
 import GLMakie as GLMk
@@ -25,9 +27,7 @@ curr_theme = GLMk.Theme(# Makie theme
 
 GLMk.set_theme!(GLMk.merge(curr_theme, GLMk.theme_latexfonts()))
 
-# 
 # We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
-# 
 
 metric = Krang.Kerr(0.99); # Kerr spacetime with 0.99 spin
 θo = 85 * π / 180; # Observer inclination angle with respect to spin axis
@@ -35,16 +35,18 @@ sze = 200; # Number of pixels along each axis of the screen
 ρmax = 5; # Size of the screen
 
 # We will define a camera with the above parameters.
-# The SlowLightIntensityCamera pre-calculates information about the spacetime and the observer's screen to speed up the 
+# The `SlowLightIntensityCamera`` pre-calculates information about the spacetime and the observer's screen to speed up the 
 # raytracing for slow light applications.
 
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 
+# ## Plotting coordinates
+
+# We will create a loop to plot the emission coordinates for each `τ` using the `emission_coordinates!` function.
 # Let us now create a figure to plot the emission coordinates on.
 
 fig = GLMk.Figure(resolution=(500, 600));
 
-# We will create a loop to plot the emission coordinates for each θs.
 
 recording = GLMk.record(fig, "raytrace.gif", range(0.1, 3, length=290), framerate=15) do τ
     GLMk.empty!(fig)
@@ -80,6 +82,11 @@ end
 
 # ![image](raytrace.gif)
 
+# ## Plotting rays
+# Let's also plot the rays that are traced from the screen to the observer. 
+# Rays can be generated using the `generate_ray` function.
+
+# We will plot a ray for each pixel in the camera.
 camera = Krang.SlowLightIntensityCamera(metric, θo, -3, 3, -3, 3, 4);
 
 fig = GLMk.Figure()

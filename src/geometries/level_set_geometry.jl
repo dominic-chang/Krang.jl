@@ -3,7 +3,7 @@
 """
 abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
 
-function raytrace(camera, mesh::Mesh{<:AbstractLevelSetGeometry, <:AbstractMaterial}; res=100) 
+function raytrace(camera::AbstractCamera, mesh::Mesh{<:AbstractLevelSetGeometry, <:AbstractMaterial}; res=100) 
     intersections = zeros(Float64, size(camera.screen.pixels))
     Threads.@threads for I in CartesianIndices(camera.screen.pixels)
         intersections[I] = raytrace(camera.screen.pixels[I], mesh;res)
