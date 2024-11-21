@@ -59,7 +59,7 @@ struct ConeGeometry{T, A} <: AbstractGeometry
     ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
 end
 
-function raytrace(pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
+function raytrace(pix::AbstractPixel{T}, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
     #(;magnetic_field, fluid_velocity, spectral_index, R, p1, p2, subimgs) = linpol
     
     geometry = mesh.geometry
@@ -67,7 +67,7 @@ function raytrace(pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:Abstract
     θs = geometry.opening_angle
     subimgs= material.subimgs
 
-    observation = yield(material)#StokesParams(zero(T), zero(T), zero(T), zero(T))
+    observation = zero(T)#StokesParams(zero(T), zero(T), zero(T), zero(T))
 
     isindir = false
     for _ in 1:2 # Looping over isindir this way is needed to get Metal to work

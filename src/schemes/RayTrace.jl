@@ -2,58 +2,51 @@ export generate_ray, raytrace
 
 struct RayTrace <: AbstractScheme end
 
-function generate_ray!(ray::Matrix{T}, pixel::Krang.AbstractPixel, res::Int) where T
+function generate_ray!(ray::Vector{Intersection{T}}, pixel::Krang.AbstractPixel, res::Int) where T
     actual_res = unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res+1 : res 
     τf = total_mino_time(pixel)
 
     Δτ = τf/actual_res
     for I in range(1, res)
-
-        _, curr_rad, curr_inc, curr_az, _, _ = emission_coordinates(pixel, Δτ*I)
-        curr_az = curr_az % T(2π)
-        ray[1,I] = curr_rad * sin(curr_inc)*cos(curr_az)
-        ray[2,I] = curr_rad * sin(curr_inc)*sin(curr_az)
-        ray[3,I] = curr_rad * cos(curr_inc)
-
+        ts, rs, θs, ϕs, νr, νθ, _ = emission_coordinates(pixel, Δτ*I)
+        ϕs = ϕs % T(2π)
+        ray[I] = Intersection(ts, rs, θs, ϕs, νr, νθ)
     end
 end
 
 function generate_ray(pixel::AbstractPixel{T}, res::Int) where T
-    ray = zeros(T, 3, res)
+    ray = Vector{Intersection{T}}(undef,res)#zeros(T, 3, res)
     generate_ray!(ray, pixel, res)
     return ray
 end
 
-@kernel function _generate_rays!(rays::AbstractArray{T}, pixels::AbstractMatrix{P}, res::Int) where {T, P<:AbstractPixel}
-    (I,J,K,L) = @index(Global, NTuple)
-    l = Int(L)
+@kernel function _generate_rays!(rays::AbstractArray{Intersection{T}}, pixels::AbstractMatrix{P}, res::Int) where {T, P<:AbstractPixel}
+    (I,J,K) = @index(Global, NTuple)
+    k = Int(K)
     pixel = pixels[I,J]
     actual_res = unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res+1 : res 
     τf =  total_mino_time(pixel)
 
     Δτ = τf/actual_res
 
-    _, curr_rad, curr_inc, curr_az, _, _ = emission_coordinates(pixel, Δτ*l)
-    curr_az = curr_az % T(2π)
-    k = Int(K)
-    if k == 1
-        rays[I,J,K,L] = curr_rad * sin(curr_inc)*cos(curr_az)
-    elseif k == 2
-        rays[I,J,K,L] = curr_rad * sin(curr_inc)*sin(curr_az)
-    else
-        rays[I,J,K,L] = curr_rad * cos(curr_inc)
-    end
-end
+    ts, rs, θs, ϕs, νr, νθ = (2f0, 0f0, 0f0, 0f0, true, true)
+    rays[I,J,K] = Intersection(ts, rs, θs, ϕs, νr, νθ)
+    emission_coordinates(pixel, Δτ*k)
 
-function generate_rays(pixels::AbstractMatrix{P}, res::Int; A=Array)  where {P<: AbstractPixel{T}} where T
-    dims = (size(pixels)..., 3, res)
-    rays = A{T}(undef, dims...)
+    #ts, rs, θs, ϕs, νr, νθ = (2f0, 0f0, 0f0, 0f0, true, true)
+    #rays[I,J,K] = Intersection(ts, rs, θs, ϕs, νr, νθ)
+
+
+end
+function generate_rays(pixels::AbstractMatrix{P}, res::Int; A=Array)  where {P <: AbstractPixel{T}} where T
+    dims = (size(pixels)..., res)
+    rays = A{Intersection{T}}(undef, dims...)
     backend = get_backend(rays)
     _generate_rays!(backend)(rays, pixels, res, ndrange = dims)
     return rays
 end
 
-function line_intersection(origin::AbstractVector{T}, line_point_2, t_a, t_b, t_c) where T
+function line_intersection(origin::NTuple{3,T}, line_point_2, t_a, t_b, t_c) where T
     e1 = (t_b[1]-t_a[1], t_b[2]-t_a[2], t_b[3]-t_a[3])
     e2 = (t_c[1]-t_a[1], t_c[2]-t_a[2], t_c[3]-t_a[3])
 	s = (origin[1] - t_a[1], origin[2] - t_a[2], origin[3] - t_a[3])

@@ -50,11 +50,14 @@ end
 
 function raytrace(pixel::AbstractPixel{T}, faces::Matrix{GeometryBasics.OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
     intersections = 0
-    ray = zeros(T, 3, res)
+    ray = Vector{Intersection{T}}(undef,res)
     generate_ray!(ray, pixel, res)
-    origin = @view ray[:,1]
+    (;rs, θs, ϕs) = ray[1]
+    origin = (rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
+
     for i in 2:res
-        line_point_2 = @view ray[:,i]
+        (;rs, θs, ϕs) = ray[i]
+        line_point_2 = (rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
         for j in 1:(size(faces)[2])
             f1, f2, f3 = @view faces[:,j]
             v1 = @view vertices[:,f1]; 
