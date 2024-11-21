@@ -5,11 +5,11 @@ function render(camera::AbstractCamera, scene::Scene)
     return render.(camera.screen.pixels, Ref(scene))
 end
 
-function render(pixel::AbstractPixel, scene::Scene)
+function render(pixel::AbstractPixel{T}, scene::Scene) where {T}
     mesh = scene[1]
-    ans = raytrace(pixel, mesh)#mesh.material(pixel, mesh.geometry)
+    ans = zero(T)#mesh.material(pixel, mesh.geometry)
 
-    for itr in 2:length(scene)
+    for itr in 1:length(scene)
         mesh = scene[itr]
         ans += raytrace(pixel, mesh)
     end
