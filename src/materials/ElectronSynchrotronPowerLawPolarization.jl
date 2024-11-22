@@ -138,6 +138,10 @@ struct ElectronSynchrotronPowerLawPolarization{N, T} <: AbstractMaterial
     end
 end
 
+function returnTrait(::ElectronSynchrotronPowerLawPolarization{N,T}) where {N,T}
+    return SimplePolarizationTrait()
+end
+
 function nan2zero(x)
     return isnan(x) ? zero(eltype(x)) : x
 end

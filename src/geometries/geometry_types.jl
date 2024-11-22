@@ -6,20 +6,6 @@ Abstract Geometry
 """
 abstract type AbstractGeometry end
 
-"""
-    $TYPEDEF
-
-Abstract Material
-"""
-abstract type AbstractMaterial end
-
-#TODO: replace with trait
-isOcclusive(material::AbstractMaterial) = false
-#TODO: replace with trait
-isAxisymmetric(material::AbstractMaterial) = false
-#TODO: replace with trait
-isFastLight(material::AbstractMaterial) = false
-
 struct Intersection{T}
     ts::T
     rs::T
@@ -28,8 +14,6 @@ struct Intersection{T}
     νr::Bool
     νθ::Bool
 end
-
-yield(material::AbstractMaterial) = 0
 
 """
     $TYPEDEF
@@ -59,7 +43,22 @@ struct ConeGeometry{T, A} <: AbstractGeometry
     ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
 end
 
-function raytrace(pix::AbstractPixel{T}, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
+function raytrace(pixel::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
+    return_trait = returnTrait(mesh.material)
+    return raytrace(return_trait, pixel, mesh)
+end
+
+function raytrace(::AbstractReturnTrait, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
+    observation = zero(T)
+    return _raytrace(observation, pix, mesh)
+end
+
+function raytrace(::SimplePolarizationTrait, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
+    observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
+    return _raytrace(observation, pix, mesh)
+end
+
+function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
     #(;magnetic_field, fluid_velocity, spectral_index, R, p1, p2, subimgs) = linpol
     
     geometry = mesh.geometry
@@ -67,7 +66,7 @@ function raytrace(pix::AbstractPixel{T}, mesh::Mesh{<:ConeGeometry{T,A}, <:Abstr
     θs = geometry.opening_angle
     subimgs= material.subimgs
 
-    observation = zero(T)#StokesParams(zero(T), zero(T), zero(T), zero(T))
+    #observation = yield(material)#StokesParams(zero(T), zero(T), zero(T), zero(T))
 
     isindir = false
     for _ in 1:2 # Looping over isindir this way is needed to get Metal to work

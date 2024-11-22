@@ -5,15 +5,26 @@ function render(camera::AbstractCamera, scene::Scene)
     return render.(camera.screen.pixels, Ref(scene))
 end
 
-function render(pixel::AbstractPixel{T}, scene::Scene) where {T}
+function render(pixel::AbstractPixel, scene::Scene) 
+     render(returnTrait(scene[1].material), pixel, scene)
+end
+
+function render(::AbstractReturnTrait, pixel::AbstractPixel{T}, scene::Scene) where {T}
+    return _render(zero(T), pixel, scene)
+end
+
+function render(::AbstractPolarizationTrait, pixel::AbstractPixel{T}, scene::Scene) where {T}
+    return _render(StokesParams(zero(T), zero(T), zero(T), zero(T)), pixel, scene)
+end
+
+function _render(observation, pixel::AbstractPixel{T}, scene::Scene) where {T}
     mesh = scene[1]
-    ans = zero(T)#mesh.material(pixel, mesh.geometry)
 
     for itr in 1:length(scene)
         mesh = scene[itr]
-        ans += raytrace(pixel, mesh)
+        observation += raytrace(pixel, mesh)
     end
-    return ans
+    return observation
 end
 
 @kernel function _render!(store, pixels, mesh::Mesh)
