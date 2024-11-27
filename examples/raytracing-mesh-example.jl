@@ -74,7 +74,8 @@ recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate=120) do i
         GLMk.mesh!(a, sphere, color=:black) 
     end
 
-    GLMk.lines!(ax3, line, color=:red)
+    cart_line = map(x->(x.rs*sin(x.θs)*cos(x.ϕs), x.rs*sin(x.θs)*sin(x.ϕs), x.rs*cos(x.θs)), line)
+    GLMk.lines!(ax3, cart_line, color=:red)
     GLMk.heatmap!(ax, img, colormap=:afmhot, colorrange=(0, 8))
 end
 # ```@raw html 

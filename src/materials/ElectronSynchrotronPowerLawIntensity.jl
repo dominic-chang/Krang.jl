@@ -115,4 +115,4 @@ function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(pix::AbstractPixel,
     return norm^(1 + spectral_index) * lp * prof
 end
 isFastLight(material::ElectronSynchrotronPowerLawIntensity) = true
-isAxisymmetric(material::ElectronSynchrotronPowerLawIntensity) = false
+isAxisymmetric(material::ElectronSynchrotronPowerLawIntensity) = true

@@ -100,7 +100,14 @@ lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 5_000)
 sphere = GLMk.Sphere(GLMk.Point(0.0,0.0,0.0), horizon(metric))
 GLMk.mesh!(ax, sphere, color=:black) # Sphere to represent black hole
 
-for i in lines_to_plot; GLMk.lines!(ax, i) end
+for i in lines_to_plot; 
+    ray = map(x-> begin
+    (;rs, θs, ϕs) = x
+    [rs*sin(θs)*cos(ϕs), rs*sin(θs)*sin(ϕs), rs*cos(θs)]
+    end, i)
+    ray = hcat(ray...)
+    GLMk.lines!(ax, ray) 
+end
 fig
 
 GLMk.save("mino_time_rays.png", fig)
