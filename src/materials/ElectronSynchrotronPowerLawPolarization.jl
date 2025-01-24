@@ -164,7 +164,9 @@ function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(pix::AbstractPix
     prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
     q = T(-(eα^2 - eβ^2) + eps(T))
     u = T(-2 * eα * eβ + eps(T))
-    i = hypot(q, u)^(one(T) + spectral_index) * lp * prof
+
+    # Add a clamp to lp to help remove hot pixels
+    i = hypot(q, u)^(one(T) + spectral_index) * min(lp,T(1e2)) * prof
     return StokesParams(i, q, u, zero(T))
 end
 
