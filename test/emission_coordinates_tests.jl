@@ -137,6 +137,7 @@
                 ts, testrs, ϕs, νr, νθ = Krang.emission_coordinates(pix, θs, isindir, 0)
                 testrs2, ϕs2, νr2, νθ2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, 0)
                 ts3, testrs3, testθs, ϕs3, νr3, νθ3 = Krang.emission_coordinates(pix, τ)
+                testrs4, θs4, ϕs4, νr4, νθ4 = Krang.emission_coordinates_fast_light(pix, τ)
 
                 testτ = Krang.Ir(pix, isindir, testrs)[1]
                 @testset "Consistency between raytracing methods" begin
@@ -148,6 +149,12 @@
                     @test ϕs/ϕs3 ≈ 1.0 atol = 1e-5
                     @test νr == νr3
                     @test νθ == νθ3
+                    @test testrs/testrs4 ≈ 1.0 atol = 1e-5
+                    @test θs4/θs ≈ 1.0 atol = 1e-5
+                    @test ϕs4/ϕs ≈ 1.0 atol = 1e-5
+                    @test νr == νr4
+                    @test νθ == νθ4
+
 
                     @test testθs/θs ≈ 1.0 atol = 1e-5
                     @test testτ/τ ≈ 1.0 atol = 1e-5

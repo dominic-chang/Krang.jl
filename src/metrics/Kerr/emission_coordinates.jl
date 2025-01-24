@@ -170,6 +170,52 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
 end
 
 """
+Ray trace a point that appears at the screen coordinate (`α`, `β`) for an observer located at inclination θo
+
+# Arguments
+
+- `pix` : Pixel information
+- `τ` : Mino Time
+"""
+function emission_coordinates_fast_light(pix::AbstractPixel, τ::T) where {T}
+    α, β = screen_coordinate(pix)
+    met = metric(pix)
+    θo = inclination(pix)
+
+    θs, τs, _, _, n, isindir = emission_inclination(pix, τ)
+    νθ = τs > 0
+
+    if cos(θs) > abs(cos(θo))
+        αmin = αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
+
+        if (abs(β) + eps(T)) < βbound
+            return zero(T), zero(T), zero(T), true, true, false
+        end
+    end
+
+    a = met.spin
+
+    λtemp = λ(met, α, θo)
+    rs, νr, _, issuccess = emission_radius(pix, τ)
+    issuccess || return zero(T), zero(T), zero(T), true, true, false
+    _, _, _, Ip, Im = radial_integrals(pix, rs, τ, νr)
+
+    rp = one(T) + √(one(T) - a^2)
+    rm = one(T) - √(one(T) - a^2)
+
+    Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
+
+    Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
+
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
+
+    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
+    return rs, θs, emission_azimuth, νr, νθ, issuccess
+end
+
+
+"""
 Emission radius and azimuthal angle for point originating at inclination θs whose nth order image appears at the screen
 coordinate (`α`, `β`) for an observer located at inclination θo.
 
