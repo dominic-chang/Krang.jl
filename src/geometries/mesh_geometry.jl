@@ -13,26 +13,26 @@ const MeshGeometry = GeometryBasics.Mesh
 
 function translate(mesh::MeshGeometry, x, y, z)
     points = (Ref([x, y, z]) .+ mesh.position)
-    faces = getfield(getfield(mesh, :simplices), :faces)
+    faces = getfield(mesh, :faces)
     return GeometryBasics.Mesh([GeometryBasics.Point(x) for x in points], faces)
 end
 
 function scale(mesh::MeshGeometry, multiple)
     points = (multiple .* mesh.position)
-    faces = getfield(getfield(mesh, :simplices), :faces)
+    faces = getfield(mesh, :faces)
     return GeometryBasics.Mesh([GeometryBasics.Point(x) for x in points], faces)
 end
 
 function rotate(mesh::MeshGeometry, angle, x, y, z)
     angleaxis = Rotations.AngleAxis(angle, x, y, z)
     points = Ref(angleaxis) .* (mesh.position)
-    faces = getfield(getfield(mesh, :simplices), :faces)
+    faces = getfield(mesh, :faces)
     return GeometryBasics.Mesh([GeometryBasics.Point(x) for x in points], faces)
 end
 
 function raytrace(camera::AbstractCamera, mesh_geometry::MeshGeometry; res=100) 
     faces = begin
-        temp = getfield(getfield(mesh_geometry, :simplices), :faces)
+        temp = getfield(mesh_geometry, :faces)
         len = length(temp)
         reshape([i[j] for i in temp for j in 1:3], 3, len)
     end
