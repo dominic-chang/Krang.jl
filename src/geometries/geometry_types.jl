@@ -43,30 +43,11 @@ struct ConeGeometry{T, A} <: AbstractGeometry
     ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
 end
 
-function raytrace(pixel::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
-    return_trait = returnTrait(mesh.material)
-    return raytrace(return_trait, pixel, mesh)
-end
-
-function raytrace(::AbstractReturnTrait, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
-    observation = zero(T)
-    return _raytrace(observation, pix, mesh)
-end
-
-function raytrace(::SimplePolarizationTrait, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
-    observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
-    return _raytrace(observation, pix, mesh)
-end
-
-function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}) where {T,A}
-    #(;magnetic_field, fluid_velocity, spectral_index, R, p1, p2, subimgs) = linpol
-    
+function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}; res) where {T,A}
     geometry = mesh.geometry
     material = mesh.material
     θs = geometry.opening_angle
     subimgs= material.subimgs
-
-    #observation = yield(material)#StokesParams(zero(T), zero(T), zero(T), zero(T))
 
     isindir = false
     for _ in 1:2 # Looping over isindir this way is needed to get Metal to work

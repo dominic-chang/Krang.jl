@@ -87,3 +87,25 @@ function dot(a,b)
     return a[1]*b[1] + a[2]*b[2] + a[3]*b[3]
 end
 
+function raytrace(pixel::AbstractPixel, mesh::Mesh; res=100)
+    return_trait = returnTrait(mesh.material)
+    return raytrace(return_trait, pixel, mesh; res=res)
+end
+
+function raytrace(::AbstractReturnTrait, pix::AbstractPixel{T}, mesh::Mesh; res=100) where {T}
+    observation = zero(T)
+    return _raytrace(observation, pix, mesh; res=res)
+end
+
+function raytrace(::SimplePolarizationTrait, pix::AbstractPixel{T}, mesh::Mesh; res=100) where {T}
+    observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
+    return _raytrace(observation, pix, mesh; res=res)
+end
+
+function raytrace(camera::AbstractCamera, mesh::Mesh{A}; res=100) where A
+    intersections = Array{typeof(yield(mesh.material))}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
+    Threads.@threads for I in CartesianIndices(camera.screen.pixels)
+        intersections[I] = raytrace(camera.screen.pixels[I], mesh; res=res)
+    end
+    return intersections
+end
