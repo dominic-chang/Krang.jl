@@ -20,6 +20,7 @@ function generate_ray(pixel::AbstractPixel{T}, res::Int) where T
     return ray
 end
 
+#TODO: debug this
 @kernel function _generate_rays!(rays::AbstractArray{Intersection{T}}, pixels::AbstractMatrix{P}, res::Int) where {T, P<:AbstractPixel}
     (I,J,K) = @index(Global, NTuple)
     k = Int(K)
@@ -32,9 +33,6 @@ end
     ts, rs, θs, ϕs, νr, νθ = (2f0, 0f0, 0f0, 0f0, true, true)
     rays[I,J,K] = Intersection(ts, rs, θs, ϕs, νr, νθ)
     emission_coordinates(pixel, Δτ*k)
-
-    #ts, rs, θs, ϕs, νr, νθ = (2f0, 0f0, 0f0, 0f0, true, true)
-    #rays[I,J,K] = Intersection(ts, rs, θs, ϕs, νr, νθ)
 
 
 end
@@ -109,3 +107,62 @@ function raytrace(camera::AbstractCamera, mesh::Mesh{A}; res=100) where A
     end
     return intersections
 end
+
+#https://journals.aps.org/prd/abstract/10.1103/PhysRevD.86.084049
+function t_kerr_schild(metric::Kerr{T}, tBL, rBL) where T
+    a = metric.spin
+    temp = sqrt(1-a^2)
+    rp = 1 + temp
+    rm = 1 - temp
+    num = rBL - rp
+    den = rBL - rm
+
+    term1 = (rp^2+a^2)*log(abs(num/den))/(2temp)
+    term2 = -2*log(2/(r-rm))
+    return tBL + term1 + term2
+end
+
+function ϕ_kerr_schild(metric::Kerr{T}, rBL, ϕBL) where T
+    a = metric.spin
+    temp = sqrt(1-a^2)
+    rp = 1 + temp
+    rm = 1 - temp
+    num = rBL - rp
+    den = rBL - rm
+
+    term1 = a*log(abs(num/den))/(2temp)
+    term2 = -atan(a/rBL)
+    return ϕBL +  term1 + term2
+end
+
+
+"""    
+    Transforms from Boyer-Lindquist to Kerr-Schild coordinates
+"""
+function boyer_lindquist_to_quasi_cartesian_kerr_schild(metric::Kerr, tBL, rBL, θBL, ϕBL)
+    a = metric.spin
+    t = t_kerr_schild(metric, tBL, rBL)
+    r = rBL
+    θ = θBL
+    ϕ = ϕ_kerr_schild(metric, rBL, ϕBL) - atan(a/rBL)
+    sθ = sin(θ)
+    sϕ = sin(ϕ)
+    cϕ = cos(ϕ)
+    return (t, sθ*(r*cϕ), sθ*(r*sϕ), r*cos(θ))
+end
+
+"""    
+    Transforms from Boyer-Lindquist to Kerr-Schild coordinates ignoring time
+"""
+function boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric::Kerr{T}, rBL, θBL, ϕBL) where {T}
+    a = metric.spin
+    r = rBL
+    θ = θBL
+    ϕ = ϕ_kerr_schild(metric,rBL, ϕBL)- atan(a/rBL)
+    sθ = sin(θ)
+    sϕ = sin(ϕ)
+    cϕ = cos(ϕ)
+
+    return (sθ*(r*cϕ+a*sϕ), sθ*(r*sϕ-a*cϕ), r*cos(θ))
+end
+
