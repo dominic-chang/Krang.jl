@@ -10,7 +10,7 @@ function _raytrace(observation, pixel::AbstractPixel{T}, mesh::Mesh{<:AbstractLe
     generate_ray!(ray, pixel, res)
     (;rs, θs, ϕs, νr, νθ) =  ray[1]
     origin = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs) 
-    for i in 1:res
+    for i in 2:res
         (;ts, rs, θs, ϕs, νr, νθ) =  ray[i]
         if rs <= Krang.horizon(pixel.metric)
             continue

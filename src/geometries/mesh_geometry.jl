@@ -49,15 +49,19 @@ function raytrace(camera::AbstractCamera, mesh_geometry::MeshGeometry; res=100)
 end
 
 function raytrace(pixel::AbstractPixel{T}, faces::Matrix{GeometryBasics.OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
+    metric = pixel.metric
     intersections = 0
     ray = Vector{Intersection{T}}(undef,res)
     generate_ray!(ray, pixel, res)
     (;rs, θs, ϕs) = ray[1]
-    origin = (rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
+    origin = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs)#(rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
 
     for i in 2:res
         (;rs, θs, ϕs) = ray[i]
-        line_point_2 = (rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
+        if rs <= Krang.horizon(pixel.metric)
+            continue
+        end
+        line_point_2 = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs)
         for j in 1:(size(faces)[2])
             f1, f2, f3 = @view faces[:,j]
             v1 = @view vertices[:,f1]; 

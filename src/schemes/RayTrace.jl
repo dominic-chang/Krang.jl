@@ -118,7 +118,7 @@ function t_kerr_schild(metric::Kerr{T}, tBL, rBL) where T
     den = rBL - rm
 
     term1 = (rp^2+a^2)*log(abs(num/den))/(2temp)
-    term2 = -2*log(2/(r-rm))
+    term2 = -2*log(2/(rBL-rm))
     return tBL + term1 + term2
 end
 
@@ -144,7 +144,7 @@ function boyer_lindquist_to_quasi_cartesian_kerr_schild(metric::Kerr, tBL, rBL, 
     t = t_kerr_schild(metric, tBL, rBL)
     r = rBL
     θ = θBL
-    ϕ = ϕ_kerr_schild(metric, rBL, ϕBL) - atan(a/rBL)
+    ϕ = ϕ_kerr_schild(metric, rBL, ϕBL) 
     sθ = sin(θ)
     sϕ = sin(ϕ)
     cϕ = cos(ϕ)
@@ -158,7 +158,7 @@ function boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric::Kerr{
     a = metric.spin
     r = rBL
     θ = θBL
-    ϕ = ϕ_kerr_schild(metric,rBL, ϕBL)- atan(a/rBL)
+    ϕ = ϕ_kerr_schild(metric,rBL, ϕBL)
     sθ = sin(θ)
     sϕ = sin(ϕ)
     cϕ = cos(ϕ)

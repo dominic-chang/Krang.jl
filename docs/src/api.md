@@ -125,5 +125,7 @@ Krang.Ir_s
 Krang.AbstractGeometry
 Krang.radial_inf_integrals_case2 
 Krang.It_inf 
+Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild
+Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light 
 ```
 
