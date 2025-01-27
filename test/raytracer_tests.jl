@@ -45,7 +45,7 @@
             subimgs::NTuple{N,Int}
         end
         Krang.horizon(metric)
-        function (mat::XMaterial)(pix, intersection) where T
+        function (mat::XMaterial)(pix, intersection) 
             (;rs,) = intersection
             return horizon(pix.metric)<rs <10.0
         end
