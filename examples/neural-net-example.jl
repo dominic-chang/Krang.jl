@@ -35,7 +35,7 @@ function (m::ImageModel)(x, ps, st)
     emission_vals = zeros(Float64, 1, sze*sze)
     for n in 0:1
         for i in 1:sze
-            for j in 1:sze
+            Threads.@threads for j in 1:sze
                 pix = pixels[i+(j-1)*sze]
                 α, β = Krang.screen_coordinate(pix)
                 T = typeof(α)
@@ -115,7 +115,6 @@ using Optimization
 using OptimizationOptimisers
 using StatsBase
 using ComponentArrays
-Enzyme.Compiler.RunAttributor[] = false
 
 function mse(img1::Matrix{T}, img2::Matrix{T}) where T
     mean(((img1 ./ sum(img1))  .- (img2 ./ sum(img2))) .^ 2)
