@@ -161,7 +161,7 @@ function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(pix::AbstractPix
     eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
 
     rat = (rs/R)
-    prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
+    prof = rat^p1/(1+rat^(p1+p2)) * redshift^(T(3) + spectral_index)
     q = T(-(eα^2 - eβ^2) + eps(T))
     u = T(-2 * eα * eβ + eps(T))
 

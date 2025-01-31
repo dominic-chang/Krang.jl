@@ -3,13 +3,14 @@
 """
 abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
 
-function _raytrace(observation, pixel::AbstractPixel{T}, mesh::Mesh{<:AbstractLevelSetGeometry, <:AbstractMaterial}; res=100) where T
+function _raytrace(observation::A, pixel::AbstractPixel{T}, mesh::Mesh{<:AbstractLevelSetGeometry, <:AbstractMaterial}; res=100) where {A,T}
     geometry = mesh.geometry
     material = mesh.material
     ray = Vector{Intersection{T}}(undef, res)
     generate_ray!(ray, pixel, res)
     (;rs, θs, ϕs, νr, νθ) =  ray[1]
     origin = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs) 
+    z = zero(A)
     for i in 2:res
         (;ts, rs, θs, ϕs, νr, νθ) =  ray[i]
         if rs <= Krang.horizon(pixel.metric)

@@ -101,12 +101,27 @@ function raytrace(::SimplePolarizationTrait, pix::AbstractPixel{T}, mesh::Mesh; 
 end
 
 function raytrace(camera::AbstractCamera, mesh::Mesh{A}; res=100) where A
-    intersections = Array{typeof(yield(mesh.material))}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
-    Threads.@threads for I in CartesianIndices(camera.screen.pixels)
+    return_trait = returnTrait(mesh.material)
+    return raytrace(return_trait, camera, mesh; res=res)
+end
+
+function raytrace(::AbstractReturnTrait, camera::AbstractCamera, mesh::Mesh{A}; res=100) where {A}
+    intersections = Array{typeof(camera.metric).parameters[1]}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
+    for I in CartesianIndices(camera.screen.pixels)
         intersections[I] = raytrace(camera.screen.pixels[I], mesh; res=res)
     end
     return intersections
 end
+
+function raytrace(::SimplePolarizationTrait, camera::AbstractCamera, mesh::Mesh{A}; res=100) where {A}
+    intersections = Array{StokesParams}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
+    for I in CartesianIndices(camera.screen.pixels)
+        intersections[I] = raytrace(camera.screen.pixels[I], mesh; res=res)
+    end
+    return intersections
+end
+
+
 
 #https://journals.aps.org/prd/abstract/10.1103/PhysRevD.86.084049
 function t_kerr_schild(metric::Kerr{T}, tBL, rBL) where T
@@ -163,6 +178,6 @@ function boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric::Kerr{
     sϕ = sin(ϕ)
     cϕ = cos(ϕ)
 
-    return (sθ*(r*cϕ+a*sϕ), sθ*(r*sϕ-a*cϕ), r*cos(θ))
+    return r .* (sθ*cϕ, sθ*sϕ, cos(θ))
 end
 

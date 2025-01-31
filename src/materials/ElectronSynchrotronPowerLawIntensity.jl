@@ -108,13 +108,16 @@ function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(pix::AbstractPixel,
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
+
     norm, redshift, lp = synchrotronIntensity(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
 
+
     rat = (rs/R)
-    prof = rat^p1/(1+rat^(p1+p2)) * max(redshift, eps(T))^(T(3) + spectral_index)
+    prof = rat^p1/(one(T)+rat^(p1+p2)) * redshift^(T(3) + spectral_index)
 
     # Add a clamp to lp to help remove hot pixels
-    return norm^(1 + spectral_index) * min(lp,T(1e2)) * prof
+    return norm^(one(T) + spectral_index) * min(lp,T(1e2)) * prof
 end
+
 isFastLight(material::ElectronSynchrotronPowerLawIntensity) = true
 isAxisymmetric(material::ElectronSynchrotronPowerLawIntensity) = true
