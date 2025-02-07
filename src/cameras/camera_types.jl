@@ -30,8 +30,8 @@ Get the screen coordinates of a given pixel.
 # Returns
 - The screen coordinates of the pixel.
 """
-function screen_coordinate(pix::AbstractPixel) 
-    return pix.screen_coordinate 
+function screen_coordinate(pix::AbstractPixel)
+    return pix.screen_coordinate
 end
 
 """
@@ -45,8 +45,8 @@ Get the space time metric.
 # Returns
 - The space time metric
 """
-function metric(pix::AbstractPixel) 
-    return pix.metric 
+function metric(pix::AbstractPixel)
+    return pix.metric
 end
 
 """
@@ -60,8 +60,8 @@ Get the inclination angle (θo) of a given pixel.
 # Returns
 - The inclination angle (θo) of the pixel.
 """
-function inclination(pix::AbstractPixel) 
-    return pix.θo 
+function inclination(pix::AbstractPixel)
+    return pix.θo
 end
 
 """

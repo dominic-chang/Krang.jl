@@ -17,8 +17,8 @@ yield(material::AbstractMaterial) = 0
 abstract type AbstractReturnTrait end
 abstract type AbstractPolarizationTrait <: AbstractReturnTrait end
 struct SimplePolarizationTrait <: AbstractPolarizationTrait end
-struct SimpleIntensityTrait <: AbstractReturnTrait end 
+struct SimpleIntensityTrait <: AbstractReturnTrait end
 
 function returnTrait(mat::AbstractMaterial)
-    return SimpleIntensityTrait() 
+    return SimpleIntensityTrait()
 end

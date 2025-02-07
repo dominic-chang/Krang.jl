@@ -19,7 +19,18 @@ evpa(fα, fβ) = atan(-fα, fβ)
 """
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magnetic_field::SVector{3,T}, βfluid::SVector{3,T}, νr::Bool, θsign::Bool) where {T}
+function synchrotronPolarization(
+    metric::Kerr{T},
+    α,
+    β,
+    ri,
+    θs,
+    θo,
+    magnetic_field::SVector{3,T},
+    βfluid::SVector{3,T},
+    νr::Bool,
+    θsign::Bool,
+) where {T}
 
     a = metric.spin
     βv = βfluid[1]
@@ -36,7 +47,11 @@ function synchrotronPolarization(metric::Kerr{T}, α, β, ri, θs, θo, magnetic
     p_fluid_u = jac_fluid_u_zamo_d(metric, βv, θz, ϕz) * p_zamo_u
     magnetic_fieldx, magnetic_fieldy, magnetic_fieldz = magnetic_field
     _, p_fluid_ux, p_fluid_uy, p_fluid_uz = p_fluid_u ./ p_fluid_u[1]
-    vec = @SVector[p_fluid_uy * magnetic_fieldz - p_fluid_uz * magnetic_fieldy, p_fluid_uz * magnetic_fieldx - p_fluid_ux * magnetic_fieldz, p_fluid_ux * magnetic_fieldy - p_fluid_uy * magnetic_fieldx]
+    vec = @SVector[
+        p_fluid_uy * magnetic_fieldz - p_fluid_uz * magnetic_fieldy,
+        p_fluid_uz * magnetic_fieldx - p_fluid_ux * magnetic_fieldz,
+        p_fluid_ux * magnetic_fieldy - p_fluid_uy * magnetic_fieldx,
+    ]
     norm = √sum(vec .* vec) + eps(T)
     f_fluid_u = SVector(zero(eltype(vec)), vec[1], vec[2], vec[3])
     f_zamo_u = jac_fluid_u_zamo_d(metric, -βv, θz, ϕz) * f_fluid_u
@@ -79,15 +94,15 @@ end
     - `p2::T`: The second power-law index.
     - `subimgs::NTuple{N, Int}`: The sub-images to ray trace.
 """
-struct ElectronSynchrotronPowerLawPolarization{N, T} <: AbstractMaterial 
-    magnetic_field::SVector{3, T}
-    fluid_velocity::SVector{3, T}
+struct ElectronSynchrotronPowerLawPolarization{N,T} <: AbstractMaterial
+    magnetic_field::SVector{3,T}
+    fluid_velocity::SVector{3,T}
     spectral_index::T
     R::T
     p1::T
     p2::T
-    subimgs::NTuple{N, Int}
-    
+    subimgs::NTuple{N,Int}
+
     @doc """
         ElectronSynchrotronPowerLawPolarization(
         magnetic_fieldx::T, 
@@ -120,21 +135,29 @@ struct ElectronSynchrotronPowerLawPolarization{N, T} <: AbstractMaterial
 
     # Returns
     - `ElectronSynchrotronPowerLawPolarization{N, T}`: A new instance of `ElectronSynchrotronPowerLawPolarization`.
-"""   
+"""
     function ElectronSynchrotronPowerLawPolarization(
-        magnetic_fieldx::T, 
-        magnetic_fieldy::T, 
-        magnetic_fieldz::T, 
-        fluid_speed::T, 
-        fluid_inclination_angle::T, 
-        fluid_azimuthal_angle::T, 
+        magnetic_fieldx::T,
+        magnetic_fieldy::T,
+        magnetic_fieldz::T,
+        fluid_speed::T,
+        fluid_inclination_angle::T,
+        fluid_azimuthal_angle::T,
         spectral_index::T,
         R::T,
         p1::T,
         p2::T,
-        subimgs::NTuple{N, Int},
-    ) where {N, T}
-    new{N, T}(SVector(magnetic_fieldx, magnetic_fieldy, magnetic_fieldz), SVector(fluid_speed, fluid_inclination_angle, fluid_azimuthal_angle), spectral_index, R, p1, p2, subimgs)
+        subimgs::NTuple{N,Int},
+    ) where {N,T}
+        new{N,T}(
+            SVector(magnetic_fieldx, magnetic_fieldy, magnetic_fieldz),
+            SVector(fluid_speed, fluid_inclination_angle, fluid_azimuthal_angle),
+            spectral_index,
+            R,
+            p1,
+            p2,
+            subimgs,
+        )
     end
 end
 
@@ -149,28 +172,43 @@ end
 """
     Functor for the ElectronSynchrotronPowerLawPolarization material
 """
-function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(pix::AbstractPixel, intersection) where {N,T}
-    (;magnetic_field, fluid_velocity, spectral_index, R, p1, p2) = linpol
-    (;rs, θs, νr, νθ) = intersection
+function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(
+    pix::AbstractPixel,
+    intersection,
+) where {N,T}
+    (; magnetic_field, fluid_velocity, spectral_index, R, p1, p2) = linpol
+    (; rs, θs, νr, νθ) = intersection
 
-    
+
     θo = inclination(pix)
     met = metric(pix)
     α, β = screen_coordinate(pix)
 
-    eα, eβ, redshift, lp = synchrotronPolarization(met, α, β, rs, θs, θo, magnetic_field, fluid_velocity, νr, νθ)
+    eα, eβ, redshift, lp = synchrotronPolarization(
+        met,
+        α,
+        β,
+        rs,
+        θs,
+        θo,
+        magnetic_field,
+        fluid_velocity,
+        νr,
+        νθ,
+    )
 
-    rat = (rs/R)
-    prof = rat^p1/(1+rat^(p1+p2)) * redshift^(T(3) + spectral_index)
+    rat = (rs / R)
+    prof = rat^p1 / (1 + rat^(p1 + p2)) * redshift^(T(3) + spectral_index)
     q = T(-(eα^2 - eβ^2) + eps(T))
     u = T(-2 * eα * eβ + eps(T))
 
     # Add a clamp to lp to help remove hot pixels
-    i = hypot(q, u)^(one(T) + spectral_index) * min(lp,T(1e2)) * prof
+    i = hypot(q, u)^(one(T) + spectral_index) * min(lp, T(1e2)) * prof
     return StokesParams(i, q, u, zero(T))
 end
 
 isOcclusive(::ElectronSynchrotronPowerLawPolarization) = false
 isFastLight(::ElectronSynchrotronPowerLawPolarization) = true
 isAxisymmetric(::ElectronSynchrotronPowerLawPolarization) = true
-yield(::ElectronSynchrotronPowerLawPolarization{N,T}) where {N,T} = StokesParams(zero(T), zero(T), zero(T), zero(T))
+yield(::ElectronSynchrotronPowerLawPolarization{N,T}) where {N,T} =
+    StokesParams(zero(T), zero(T), zero(T), zero(T))

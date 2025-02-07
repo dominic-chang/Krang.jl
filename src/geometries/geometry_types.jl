@@ -24,8 +24,8 @@ struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
     material::M
 end
 
-const Scene = NTuple{N, Mesh} where {N}
-Scene() = NTuple{0, Mesh}()
+const Scene = NTuple{N,Mesh} where {N}
+Scene() = NTuple{0,Mesh}()
 
 function add(scene::Scene, mesh::Mesh)
     return (scene..., mesh)
@@ -36,21 +36,27 @@ end
 
 Cone Geometry with half opening angle `opening_angle`.
 """
-struct ConeGeometry{T, A} <: AbstractGeometry
+struct ConeGeometry{T,A} <: AbstractGeometry
     opening_angle::T
     attributes::A
-    ConeGeometry(opening_angle::T) where {T} = new{T, Nothing}(opening_angle)
-    ConeGeometry(opening_angle::T, attributes::A) where {T,A} = new{T, A}(opening_angle,attributes)
+    ConeGeometry(opening_angle::T) where {T} = new{T,Nothing}(opening_angle)
+    ConeGeometry(opening_angle::T, attributes::A) where {T,A} =
+        new{T,A}(opening_angle, attributes)
 end
 
-function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,A}, <:AbstractMaterial}; res) where {T,A}
+function _raytrace(
+    observation,
+    pix::AbstractPixel,
+    mesh::Mesh{<:ConeGeometry{T,A},<:AbstractMaterial};
+    res,
+) where {T,A}
     geometry = mesh.geometry
     material = mesh.material
     θs = geometry.opening_angle
-    subimgs= material.subimgs
+    subimgs = material.subimgs
 
     isindir = false
-    for _ in 1:2 # Looping over isindir this way is needed to get Metal to work
+    for _ = 1:2 # Looping over isindir this way is needed to get Metal to work
         isindir ⊻= true
         for n in subimgs
             #νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
@@ -59,7 +65,8 @@ function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,
                     rs, νr, νθ, _, issuccess = emission_radius(pix, θs, isindir, n)
                     Intersection(zero(rs), rs, θs, zero(rs), νr, νθ), issuccess
                 else
-                    rs, ϕs, νr, νθ, issuccess = emission_coordinates_fast_light(pix, θs, isindir, n)
+                    rs, ϕs, νr, νθ, issuccess =
+                        emission_coordinates_fast_light(pix, θs, isindir, n)
                     Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
                 end
             else
@@ -80,5 +87,4 @@ function _raytrace(observation, pix::AbstractPixel, mesh::Mesh{<:ConeGeometry{T,
 end
 
 
-Disk(;attributes=nothing) = ConeGeometry(π/2;attributes=attributes)
-
+Disk(; attributes = nothing) = ConeGeometry(π / 2; attributes = attributes)

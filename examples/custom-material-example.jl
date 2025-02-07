@@ -18,9 +18,12 @@ end
 # This functor will take in a pixel and a geometry and return the redshift associated with a given sub image.
 # You must include the relevant physics in the functor definition. 
 # Here we will include redshift effects associated with a zero angular momentum observer (ZAMO).
-function (m::ZAMORedshifts)(pix::Krang.AbstractPixel{T}, intersection::Krang.Intersection) where {T}
+function (m::ZAMORedshifts)(
+    pix::Krang.AbstractPixel{T},
+    intersection::Krang.Intersection,
+) where {T}
     (; rs, θs, νr, νθ) = intersection
-    α,β=Krang.screen_coordinate(pix)
+    α, β = Krang.screen_coordinate(pix)
 
     ηtemp = η(metric, α, β, θo)
     λtemp = λ(metric, α, θo)
@@ -34,7 +37,7 @@ function (m::ZAMORedshifts)(pix::Krang.AbstractPixel{T}, intersection::Krang.Int
 end
 
 # We need to define the return type or the material for ray tracing. This can be things like a `Float` of a `StokesParams`. Let's use a float for this case.
-function Krang.yield(::ZAMORedshifts{T}) where T
+function Krang.yield(::ZAMORedshifts{T}) where {T}
     return zero(T)
 end
 
@@ -61,19 +64,19 @@ import CairoMakie as CMk
 
 theme = CMk.Theme(
     Axis = (
-        xticksvisible = false, 
+        xticksvisible = false,
         xticklabelsvisible = false,
         yticksvisible = false,
         yticklabelsvisible = false,
-        ),
+    ),
 )
 
 CMk.set_theme!(CMk.merge!(theme, CMk.theme_latexfonts()))
 
-fig = CMk.Figure(resolution=(700, 700));
-ax = CMk.Axis(fig[1, 1], title="Redshifts", titlesize=20, aspect=1)
-hm = CMk.heatmap!(ax, redshifts, colormap=:afmhot)
-CMk.Colorbar(fig[1, 2], hm, label="Redshifts", labelsize=20)
+fig = CMk.Figure(resolution = (700, 700));
+ax = CMk.Axis(fig[1, 1], title = "Redshifts", titlesize = 20, aspect = 1)
+hm = CMk.heatmap!(ax, redshifts, colormap = :afmhot)
+CMk.Colorbar(fig[1, 2], hm, label = "Redshifts", labelsize = 20)
 CMk.save("redshifts.png", fig)
 
 # ![redshifts](redshifts.png)

@@ -2,11 +2,19 @@
 # Functions generically return 0 when the emission coordinates do not exist for a given screen coordinate to play nice 
 # with Enzyme's AD.
 
-export emission_radius, emission_inclination, emission_coordinates_fast_light, emission_coordinates, emission_coordinates!
+export emission_radius,
+    emission_inclination,
+    emission_coordinates_fast_light,
+    emission_coordinates,
+    emission_coordinates!
 
-function emission_coordinates!(coordinates::Array{T,3}, camera::AbstractCamera, τ::T) where {T} 
+function emission_coordinates!(
+    coordinates::Array{T,3},
+    camera::AbstractCamera,
+    τ::T,
+) where {T}
     for I in CartesianIndices(camera.screen.pixels)
-        coordinates[:,I] .= emission_coordinates(camera.screen.pixels[I], τ)[1:4]
+        coordinates[:, I] .= emission_coordinates(camera.screen.pixels[I], τ)[1:4]
     end
 end
 
@@ -21,11 +29,16 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T, Bool, Bool, Int, Bool} where {T}
+function emission_radius(
+    pix::Krang.AbstractPixel,
+    θs::T,
+    isindir,
+    n,
+)::Tuple{T,Bool,Bool,Int,Bool} where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
+    isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
     if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
@@ -37,8 +50,8 @@ function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n)::Tuple{T,
 
     # νθ is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    if isincone 
-        νθ = (θo > θs) ⊻ (n % 2 == 1) 
+    if isincone
+        νθ = (θo > θs) ⊻ (n % 2 == 1)
     end
 
     ans, νr, numreals, issuccess = emission_radius(pix, τ)
@@ -54,7 +67,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 -`pix` : Pixel information
 - `τ` : Mino time
 """
-function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T, Bool, Int, Bool} where {T}
+function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T,Bool,Int,Bool} where {T}
     met = metric(pix)
     a = met.spin
     ans = zero(T)
@@ -126,7 +139,7 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
 
-    return -(Iϕ + λtemp * Gϕtemp + T(π/2))
+    return -(Iϕ + λtemp * Gϕtemp + T(π / 2))
 end
 
 """
@@ -140,12 +153,12 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where T
+function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where {T}
     # NB: I do not return θs since it is already known, and returning it might encourage bad coding errors
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    isincone = θo ≤ θs ≤ (π-θo) || (π-θo) ≤ θs ≤ θo
+    isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
     if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
@@ -157,8 +170,8 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
 
     # is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    if isincone 
-        νθ = (θo > θs) ⊻ (n % 2 == 1) 
+    if isincone
+        νθ = (θo > θs) ⊻ (n % 2 == 1)
     end
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
@@ -208,7 +221,7 @@ function emission_coordinates_fast_light(pix::AbstractPixel, τ::T) where {T}
 
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     return rs, θs, emission_azimuth, νr, νθ, issuccess
@@ -265,13 +278,17 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
 
-    It = 4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) + 4 * I0 + 2 * I1 + I2
+    It =
+        4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) +
+        4 * I0 +
+        2 * I1 +
+        I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
@@ -315,13 +332,17 @@ function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
 
-    It = 4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) + 4 * I0 + 2 * I1 + I2
+    It =
+        4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) +
+        4 * I0 +
+        2 * I1 +
+        I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
     Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
     Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
 
-    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π/2))
+    emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
     emission_time_regularized = (It + a^2 * Gttemp)
 
     νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
@@ -361,7 +382,7 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         argr = (JacobiElliptic.sn(absτs / tempfac, k))^2
         ans = acos((θo > T(π / 2) ? -one(T) : one(T)) * √((up - um) * argr + um))
         sign = ans > T(π / 2) ? -one(T) : one(T)
-        τo = sign  * τo
+        τo = sign * τo
     else
         argo = clamp(cos(θo) / √(up), -one(T), one(T))
         k = m
@@ -371,7 +392,7 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
         τhat = Ghat_2 + Ghat_2
         Δτtemp = (τ % τhat + signβ * τo)
         n = floor(τ / τhat)
-        sign = (n%2 == 1) ? -one(T) : one(T)
+        sign = (n % 2 == 1) ? -one(T) : one(T)
         τs = argmin(abs, (sign * signβ * (τhat - Δτtemp), sign * signβ * Δτtemp))
         newargs = JacobiElliptic.sn(τs / tempfac, k)
         ans = acos(√up * newargs)
@@ -382,17 +403,14 @@ function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
     if isincone
         νθ = (n % 2 == 1) ⊻ (θo > ans)
         τ1 = (n + 1) * τhat - signβ * τo + (νθ ? 1 : -1) * τs
-        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
+        isindir = isapprox(τ1, τ, rtol = sqrt(eps(T)))
     elseif ans < T(π / 2)
         τ1 = (n + 1) * τhat - signβ * τo - τs
-        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
+        isindir = isapprox(τ1, τ, rtol = sqrt(eps(T)))
     else
         τ1 = (n + 1) * τhat - signβ * τo + τs
-        isindir = isapprox(τ1, τ, rtol=sqrt(eps(T)))
+        isindir = isapprox(τ1, τ, rtol = sqrt(eps(T)))
     end
 
     return ans, τs, τo, τhat, n, isindir
 end
-
-
-

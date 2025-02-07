@@ -16,6 +16,9 @@ end
 Returns the inverse metric in some representation (usually as an nxn matrix).
 """
 function metric_uu(metric::AbstractMetric, args...)
-    try return inv(metric_dd(metric, args...)) catch err throw(err) end 
+    try
+        return inv(metric_dd(metric, args...))
+    catch err
+        throw(err)
+    end
 end
-

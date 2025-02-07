@@ -7,11 +7,10 @@ import GeometryBasics
 using Rotations
 using Roots
 using KernelAbstractions
-@template (FUNCTIONS, METHODS, MACROS) =
-    """
-    $(TYPEDSIGNATURES)
-    $(DOCSTRING)
-    """
+@template (FUNCTIONS, METHODS, MACROS) = """
+                                         $(TYPEDSIGNATURES)
+                                         $(DOCSTRING)
+                                         """
 
 include("metrics/AbstractMetric.jl")
 include("metrics/Kerr/Kerr.jl")

@@ -30,43 +30,49 @@ function rotate(mesh::MeshGeometry, angle, x, y, z)
     return GeometryBasics.Mesh([GeometryBasics.Point(x) for x in points], faces)
 end
 
-function raytrace(camera::AbstractCamera, mesh_geometry::MeshGeometry; res=100) 
+function raytrace(camera::AbstractCamera, mesh_geometry::MeshGeometry; res = 100)
     faces = begin
         temp = getfield(mesh_geometry, :faces)
         len = length(temp)
-        reshape([i[j] for i in temp for j in 1:3], 3, len)
+        reshape([i[j] for i in temp for j = 1:3], 3, len)
     end
     vertices = begin
         temp = mesh_geometry.position
         len = length(temp)
-       reshape([(i[j]) for i in temp for j in 1:3], 3, len)
+        reshape([(i[j]) for i in temp for j = 1:3], 3, len)
     end
     intersections = zeros(Int, size(camera.screen.pixels))
     Threads.@threads for I in CartesianIndices(camera.screen.pixels)
-        intersections[I] = raytrace(camera.screen.pixels[I], faces, vertices;res)
+        intersections[I] = raytrace(camera.screen.pixels[I], faces, vertices; res)
     end
     return intersections
 end
 
-function raytrace(pixel::AbstractPixel{T}, faces::Matrix{GeometryBasics.OffsetInteger{-1, UInt32}}, vertices::Matrix{T}; res=100) where T
+function raytrace(
+    pixel::AbstractPixel{T},
+    faces::Matrix{GeometryBasics.OffsetInteger{-1,UInt32}},
+    vertices::Matrix{T};
+    res = 100,
+) where {T}
     metric = pixel.metric
     intersections = 0
-    ray = Vector{Intersection{T}}(undef,res)
+    ray = Vector{Intersection{T}}(undef, res)
     generate_ray!(ray, pixel, res)
-    (;rs, θs, ϕs) = ray[1]
+    (; rs, θs, ϕs) = ray[1]
     origin = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs)#(rs * sin(θs)*cos(ϕs), rs * sin(θs)*sin(ϕs), rs * cos(θs))
 
-    for i in 2:res
-        (;rs, θs, ϕs) = ray[i]
+    for i = 2:res
+        (; rs, θs, ϕs) = ray[i]
         if rs <= Krang.horizon(pixel.metric)
             continue
         end
-        line_point_2 = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs)
-        for j in 1:(size(faces)[2])
-            f1, f2, f3 = @view faces[:,j]
-            v1 = @view vertices[:,f1]; 
-            v2 = @view vertices[:,f2]; 
-            v3 = @view vertices[:,f3];
+        line_point_2 =
+            boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs)
+        for j = 1:(size(faces)[2])
+            f1, f2, f3 = @view faces[:, j]
+            v1 = @view vertices[:, f1]
+            v2 = @view vertices[:, f2]
+            v3 = @view vertices[:, f3]
             didintersect, point = line_intersection(origin, line_point_2, v1, v2, v3)
             intersections += didintersect ? 1 : 0
         end

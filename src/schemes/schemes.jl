@@ -1,26 +1,30 @@
 export render, render!, render_cpu_threaded!
 abstract type AbstractScheme end
 
-function render(camera::AbstractCamera, scene::Scene)  
+function render(camera::AbstractCamera, scene::Scene)
     return render.(camera.screen.pixels, Ref(scene))
 end
 
-function render(pixel::AbstractPixel, scene::Scene) 
-     render(returnTrait(scene[1].material), pixel, scene)
+function render(pixel::AbstractPixel, scene::Scene)
+    render(returnTrait(scene[1].material), pixel, scene)
 end
 
 function render(::AbstractReturnTrait, pixel::AbstractPixel{T}, scene::Scene) where {T}
     return _render(zero(T), pixel, scene)
 end
 
-function render(::AbstractPolarizationTrait, pixel::AbstractPixel{T}, scene::Scene) where {T}
+function render(
+    ::AbstractPolarizationTrait,
+    pixel::AbstractPixel{T},
+    scene::Scene,
+) where {T}
     return _render(StokesParams(zero(T), zero(T), zero(T), zero(T)), pixel, scene)
 end
 
 function _render(observation, pixel::AbstractPixel{T}, scene::Scene) where {T}
     mesh = scene[1]
 
-    for itr in 1:length(scene)
+    for itr = 1:length(scene)
         mesh = scene[itr]
         observation += raytrace(pixel, mesh)
     end
@@ -32,18 +36,21 @@ end
     @inbounds store[I] = mesh.material(pixels[I], mesh.geometry)
 end
 
-function render!(store, camera::AbstractCamera, scene::Scene)  
+function render!(store, camera::AbstractCamera, scene::Scene)
     backend = get_backend(store)
     @assert backend == get_backend(camera.screen.pixels)
     @assert size(store) == size(camera.screen.pixels)
     mapreduce(
-        mesh -> begin _render!(backend)(store, camera.screen.pixels, mesh, ndrange=size(store)); store end,
+        mesh -> begin
+            _render!(backend)(store, camera.screen.pixels, mesh, ndrange = size(store))
+            store
+        end,
         +,
-        scene
+        scene,
     )
 end
 
-function render_cpu_threaded!(store, camera::AbstractCamera, scene::Scene)  
+function render_cpu_threaded!(store, camera::AbstractCamera, scene::Scene)
     @assert size(store) == size(camera.screen.pixels)
     mapreduce(
         mesh -> begin
@@ -53,6 +60,6 @@ function render_cpu_threaded!(store, camera::AbstractCamera, scene::Scene)
             store
         end,
         +,
-        scene
+        scene,
     )
 end

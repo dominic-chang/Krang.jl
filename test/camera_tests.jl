@@ -1,22 +1,18 @@
 @testset "Camera" begin
     met = Krang.Kerr(0.0)
-    α = √27*cos(π/4)
-    β = √27*sin(π/4)
-    θo = π/4
+    α = √27 * cos(π / 4)
+    β = √27 * sin(π / 4)
+    θo = π / 4
     crit_roots = (-6.0 + 0im, 0.0 + 0im, 3.0 + 0im, 3.0 + 0im)
     @testset "Abstract Camera" begin
 
         @testset "Abstract Pixel" begin
             struct TestPixel{T} <: Krang.AbstractPixel{T}
                 metric::Kerr{T}
-                screen_coordinate::NTuple{2, T}
+                screen_coordinate::NTuple{2,T}
                 θo::T
                 function TestPixel(met::Kerr{T}, α, β, θo) where {T}
-                    new{T}(
-                        met,
-                        (α, β), 
-                        θo
-                    )
+                    new{T}(met, (α, β), θo)
                 end
             end
             abspix = TestPixel(met, α, β, θo)

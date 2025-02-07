@@ -1,4 +1,13 @@
-export p_bl_d, penrose_walker, screen_polarization, PowerLaw, evpa, jac_zamo_d_bl_u, jac_bl_d_zamo_u, jac_zamo_u_bl_d, jac_bl_u_zamo_d, jac_fluid_u_zamo_d
+export p_bl_d,
+    penrose_walker,
+    screen_polarization,
+    PowerLaw,
+    evpa,
+    jac_zamo_d_bl_u,
+    jac_bl_d_zamo_u,
+    jac_zamo_u_bl_d,
+    jac_bl_u_zamo_d,
+    jac_fluid_u_zamo_d
 ##----------------------------------------------------------------------------------------------------------------------
 #Polarization stuff
 ##----------------------------------------------------------------------------------------------------------------------
@@ -8,9 +17,10 @@ export p_bl_d, penrose_walker, screen_polarization, PowerLaw, evpa, jac_zamo_d_b
 function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr::Bool, νθ::Bool) where {T}
     return @SVector[
         -one(T),
-        (νr ? one(T) : -one(T))* √max(zero(T), r_potential(metric, η, λ, r)) / Δ(metric, r),
-        (νθ ? one(T) : -one(T))* √max(zero(T), θ_potential(metric, η, λ, θ)),
-        λ
+        (νr ? one(T) : -one(T)) * √max(zero(T), r_potential(metric, η, λ, r)) /
+        Δ(metric, r),
+        (νθ ? one(T) : -one(T)) * √max(zero(T), θ_potential(metric, η, λ, θ)),
+        λ,
     ]
 end
 
@@ -107,7 +117,13 @@ end
 """
 Returns the Penrose walker constant for a photon with momentum p_u emitted from a fluid particle with momentum f_u.
 """
-function penrose_walker(metric::Kerr{T}, r, θ, p_u::AbstractVector, f_u::AbstractVector) where {T}# Eq 6 arXiv:2001.08750v1
+function penrose_walker(
+    metric::Kerr{T},
+    r,
+    θ,
+    p_u::AbstractVector,
+    f_u::AbstractVector,
+) where {T}# Eq 6 arXiv:2001.08750v1
     a = metric.spin
     pt, pr, pϕ, pθ = p_u
     ft, fr, fϕ, fθ = f_u
@@ -118,4 +134,3 @@ function penrose_walker(metric::Kerr{T}, r, θ, p_u::AbstractVector, f_u::Abstra
     B = ((r * r + a * a) * (pϕ * fθ - pθ * fϕ) - a * (pt * fθ - pθ * ft)) * sinθ
     return A * r - B * a * cosθ, -(A * a * cosθ + B * r)
 end
-
