@@ -2,7 +2,7 @@
 
 # Kerr Ray-tracer for Analytic Null Geodesics (KRANG)
 
-This Julia language package that accurately and efficiently solves for null geodesics in the Kerr spacetime.
+This Julia language package for a accurate and differentiable null geodesics in the Kerr spacetime.
 
 The package is intended mainly for scientic usage for astrophysical observations, and thus, have constrained the observer to lie at asymptotic infinity.
 These algorithms mainly follow the formalism of [Gralla & Lupsasca](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.044032), with the exception for a new sub image indexing scheme and a regularized time integral definition.
