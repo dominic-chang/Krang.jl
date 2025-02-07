@@ -1,5 +1,5 @@
 @testset "Mesh Geometry Manipulation" begin
-    bunny = load(
+    bunny = FileIO.load(
         download(
             "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
             "bunny.obj",
