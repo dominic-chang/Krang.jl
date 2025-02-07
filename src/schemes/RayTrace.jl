@@ -145,9 +145,9 @@ function ϕ_kerr_schild(metric::Kerr{T}, rBL, ϕBL) where T
     num = rBL - rp
     den = rBL - rm
 
-    term1 = a*log(abs(num/den))/(2temp)
+    term1 = a/(2temp)*log(abs(num/den))
     term2 = -atan(a/rBL)
-    return ϕBL +  term1 + term2
+    return ϕBL -  term1 - term2
 end
 
 
