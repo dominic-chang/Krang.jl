@@ -194,6 +194,11 @@ function ϕ_kerr_schild(metric::Kerr{T}, rBL, ϕBL) where {T}
 
     term1 = a / (2temp) * log(abs(num / den))
     term2 = -atan(a / rBL)
+    ans = ϕBL - term1 - term2
+    if isinf(ans)
+        @warn "ϕ_kerr_schild is inf at rs=$rBL. This usually happens if the ray intersects the horizon."
+        return ϕBL - term2
+    end
     return ϕBL - term1 - term2
 end
 

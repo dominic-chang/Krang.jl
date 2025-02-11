@@ -1,4 +1,4 @@
-# # Raytracing a Level set geometry
+# # Raytracing a Level Set geometry
 # A level set geoemtry is defined by a constraint equations $f(x,y,z)=0$.
 # We will ray trace an example parabaloid geometry in this example as a simple geometric jet model.
 using Krang
@@ -19,15 +19,16 @@ struct Parabaloid{T} <: Krang.AbstractLevelSetGeometry{T}
     rh::T
     index::T
 end
-function (geometry::Parabaloid)(x,y,z)
-    r = sqrt(x^2+y^2+z^2)
-    return 1-(r/geometry.rh)^geometry.index*(1-z/r)
+function (geometry::Parabaloid)(x, y, z)
+    r = sqrt(x^2 + y^2 + z^2)
+    return 1 - (r / geometry.rh)^geometry.index * (1 - z / r)
 end
 
 # The jet will be emit a constant intensity whose physics we define in the `XMaterial`.
-# [!NOTE] We are ignoring relativistic effects in this example. 
+# > [!NOTE] 
+# > We are ignoring relativistic effects in this example. 
 struct XMaterial <: Krang.AbstractMaterial end
-function (mat::XMaterial)(pix, intersection) where T
+function (mat::XMaterial)(pix, intersection)
     return 1.0
 end
 
@@ -38,7 +39,7 @@ fig = GLMk.Figure();
 ax = GLMk.Axis(fig[1, 1], aspect = 1)
 
 
-intersections = raytrace(camera, Krang.Mesh(parabaloid, XMaterial()), res = 1_00)
+intersections = raytrace(camera, Krang.Mesh(parabaloid, XMaterial()), res = 1_00);
 
 # And plot the image with GLMakie, 
 

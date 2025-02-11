@@ -209,10 +209,7 @@ loss_function(pixels, target_img, ps_trained, st_trained)
 using Printf
 
 fig = Figure(size = (700, 300))
-heatmap!(
-    Axis(fig[1, 1], aspect = 1, title = "Target Image"),
-    reshape(target_img, sze, sze),
-)
+heatmap!(Axis(fig[1, 1], aspect = 1, title = "Target Image"), reshape(target_img, sze, sze))
 heatmap!(
     Axis(
         fig[1, 2],

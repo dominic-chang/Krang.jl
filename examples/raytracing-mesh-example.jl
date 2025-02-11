@@ -29,7 +29,7 @@ bunny_mesh = translate(
         0.0,
     ),
     2.0,
-    7.0,
+    10.0,
     -10.0,
 );
 
@@ -109,7 +109,12 @@ recording = GLMk.record(fig, "mesh.mp4", 1:sze*sze, framerate = 120) do i
     end
 
     cart_line = map(
-        x -> (x.rs * sin(x.θs) * cos(x.ϕs), x.rs * sin(x.θs) * sin(x.ϕs), x.rs * cos(x.θs)),
+        x -> Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
+            metric,
+            x.rs,
+            x.θs,
+            x.ϕs,
+        ),
         line,
     )
     GLMk.lines!(ax3, cart_line, color = :red)

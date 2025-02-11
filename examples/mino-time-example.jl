@@ -45,7 +45,7 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 # We will create a loop to plot the emission coordinates for each `τ` using the `emission_coordinates!` function.
 # Let us now create a figure to plot the emission coordinates on.
 
-fig = GLMk.Figure(resolution = (500, 600));
+fig = GLMk.Figure(size = (500, 600));
 
 
 recording =
