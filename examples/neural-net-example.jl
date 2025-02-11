@@ -35,7 +35,7 @@ function (m::ImageModel)(x, ps, st)
     emission_vals = zeros(Float64, 1, sze * sze)
     for n = 0:1
         for i = 1:sze
-            Threads.@threads for j = 1:sze
+            for j = 1:sze
                 pix = pixels[i+(j-1)*sze]
                 α, β = Krang.screen_coordinate(pix)
                 T = typeof(α)
@@ -108,7 +108,7 @@ heatmap!(
     Axis(fig[1, 2], aspect = 1, title = "Image Model (Lensed Emission Model)"),
     received_intensity,
 )
-save("emission_model_and_target_model.png", fig)
+CairoMakie.save("emission_model_and_target_model.png", fig)
 
 # ![image](emission_model_and_target_model.png)
 
@@ -154,7 +154,7 @@ heatmap!(
     received_intensity,
     colormap = :afmhot,
 )
-save("emission_model_and_image_model.png", fig)
+CairoMakie.save("emission_model_and_image_model.png", fig)
 
 # ![image](emission_model_and_image_model.png)
 
@@ -205,30 +205,32 @@ received_intensity, st =
 acc_intensity, st = ((x) -> (reshape(x[1], sze, sze), x[2]))(image_model(pixels, ps, st))
 loss_function(pixels, target_img, ps, st)
 loss_function(pixels, target_img, ps_trained, st_trained)
+
 using Printf
-begin
-    fig = Figure(size = (700, 300))
-    heatmap!(
-        Axis(fig[1, 1], aspect = 1, title = "Target Image"),
-        reshape(target_img, sze, sze),
-    )
-    heatmap!(
-        Axis(
-            fig[1, 2],
-            aspect = 1,
-            title = "Starting State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps, st)[1])))",
-        ),
-        acc_intensity,
-    )
-    heatmap!(
-        Axis(
-            fig[1, 3],
-            aspect = 1,
-            title = "Fitted State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps_trained, st_trained)[1])))",
-        ),
-        received_intensity,
-    )
-    save("neural_net_results.png", fig)
-end
+
+fig = Figure(size = (700, 300))
+heatmap!(
+    Axis(fig[1, 1], aspect = 1, title = "Target Image"),
+    reshape(target_img, sze, sze),
+)
+heatmap!(
+    Axis(
+        fig[1, 2],
+        aspect = 1,
+        title = "Starting State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps, st)[1])))",
+    ),
+    acc_intensity,
+)
+heatmap!(
+    Axis(
+        fig[1, 3],
+        aspect = 1,
+        title = "Fitted State (loss=$(@sprintf("%0.2e", loss_function(pixels, target_img, ps_trained, st_trained)[1])))",
+    ),
+    received_intensity,
+)
+fig
+
+save("neural_net_results.png", fig)
 
 # ![image](neural_net_results.png)
