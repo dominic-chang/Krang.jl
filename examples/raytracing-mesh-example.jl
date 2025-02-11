@@ -73,9 +73,9 @@ ax3 = GLMk.Axis3(fig[2, 1], aspect = (1, 1, 1), title = "Isometric view of scene
 ax = GLMk.Axis(fig[2, 2], aspect = 1, title = "Heatmap of ray intersections with mesh")
 
 for a in [ax1, ax2, ax3]
-    GLMk.xlims!(a, (-10, 10))
-    GLMk.ylims!(a, (-10, 10))
-    GLMk.zlims!(a, (-10, 10))
+    GLMk.xlims!(a, (-20, 20))
+    GLMk.ylims!(a, (-20, 20))
+    GLMk.zlims!(a, (-20, 20))
     GLMk.hidedecorations!(a)
 end
 
