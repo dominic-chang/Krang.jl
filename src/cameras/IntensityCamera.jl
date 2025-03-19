@@ -44,7 +44,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         tempλ = Krang.λ(met, α, θo)
         roots = Krang.get_radial_roots(met, tempη, tempλ)
         numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
+        if (numreals == 2) && (abs(imag(roots[4])/real(roots[4])) < eps(T))
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
         I0_inf = Krang.Ir_inf(met, roots)
