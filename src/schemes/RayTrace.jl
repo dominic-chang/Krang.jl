@@ -189,8 +189,8 @@ function ϕ_kerr_schild(metric::Kerr{T}, rBL, ϕBL) where {T}
     temp = sqrt(1 - a^2)
     rp = 1 + temp
     rm = 1 - temp
-    num = rBL - rp
-    den = rBL - rm
+    num = rBL - rp + eps()
+    den = rBL - rm + eps()
 
     term1 = a / (2temp) * log(abs(num / den))
     term2 = -atan(a , rBL)
