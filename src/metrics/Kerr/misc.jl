@@ -1694,7 +1694,7 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} w
     Δθ = (one(T) - (ηtemp + λtemp^2) / a2) / 2
     Δθ2 = Δθ^2
     desc = √(Δθ2 + ηtemp / a2)
-    up = Δθ + desc
+    up = min(Δθ + desc, one(T) - eps(T))
     um = Δθ - desc
     m = up / um
     k = m
@@ -1747,7 +1747,7 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     Gs, isvortical = zero(T), ηtemp < zero(T)
 
     Δθ = T(0.5) * (one(T) - (ηtemp + λtemp^2) / a^2)
-    up = Δθ + √(Δθ^2 + ηtemp / a^2)
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
@@ -1808,7 +1808,7 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = Δθ + √(Δθ^2 + ηtemp / a^2)
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
@@ -1870,7 +1870,7 @@ function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = Δθ + √(Δθ^2 + ηtemp / a^2)
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
@@ -1924,7 +1924,7 @@ function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     Δθ = (one(T) - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
     desc = √max(Δθ2 + η / a2, 0)
-    up = Δθ + desc
+    up = min(Δθ + desc, one(T) - eps(T))
     um = Δθ - desc
     m = up / um
     k = m
@@ -1962,7 +1962,7 @@ function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = Δθ + √(Δθ^2 + η / a^2)
+    up = min(Δθ + √(Δθ^2 + η / a^2), one(T) - eps(T))
     um = Δθ - √(Δθ^2 + η / a^2)
     m = up / um
     k = m
@@ -2001,7 +2001,7 @@ function _absGto_Gthat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = Δθ + √(Δθ^2 + η / a^2)
+    up = min(Δθ + √(Δθ^2 + η / a^2), one(T) - eps(T))
     um = Δθ - √(Δθ^2 + η / a^2)
     m = up / um
     k = m
