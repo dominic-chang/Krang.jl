@@ -134,10 +134,10 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     α, _ = pix.screen_coordinate
     λtemp = λ(met, α, θo)
     Iϕ = Krang.Iϕ(pix, rs, τ, νr)
-    (isnan(Iϕ) || !isfinite(Iϕ)) && return T(NaN)
+    (isnan(Iϕ) || !isfinite(Iϕ)) && return Iϕ
 
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
-    (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return T(NaN)
+    (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return Iϕ
 
     return -(Iϕ + λtemp * Gϕtemp + T(π / 2))
 end

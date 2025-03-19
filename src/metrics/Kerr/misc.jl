@@ -493,7 +493,13 @@ function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
     Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Πm_o = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
+    Πm_o = coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k)
 
     Ipo_inf_m_I0_terms = -Πp_o
     Imo_inf_m_I0_terms = -Πm_o
@@ -627,7 +633,12 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
     Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
+    Πm_s = coef_m * JacobiElliptic.Pi(arg, asin(x2_s), k)
 
     Ip = -τ / rp3 - (-1)^νr * Πp_s
     Im = -τ / rm3 - (-1)^νr * Πm_s
@@ -774,7 +785,12 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
     Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Πm_o = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
+    Πm_o = coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k) # Seems to cause NaNs
 
     Ip_total = -Πp_o
     Im_total = -Πm_o
@@ -972,6 +988,11 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
     Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
     Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
 
     Ip_total = -τ / rp3 - (-1)^νr * Πp_s
@@ -1147,7 +1168,12 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
 
     Ipo_m_I0_terms = -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    Imo_m_I0_terms = -coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_o), k)
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
+    Imo_m_I0_terms = -coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k)
 
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 
@@ -1314,7 +1340,12 @@ function radial_w_I0_terms_integrals_case2(
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
     Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    arg = rm3 * r41 / (rm4 * r31)
+    # TODO: Come up with a better solve for this
+    if arg == k # Fix for ∂_m Pi blowing up when n = m
+        arg += eps(T)
+    end
+    Πm_s = coef_m * JacobiElliptic.Pi(arg, asin(x2_s), k)
 
     Ip_total = τ / rp3 + (-1)^νr * Πp_s
     Im_total = τ / rm3 + (-1)^νr * Πm_s
@@ -1957,6 +1988,7 @@ function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
             return Go, Ghat
         end
         tempfac = inv(√abs(um * a^2))
+
         Go = tempfac * JacobiElliptic.Pi(up, asin(argo), k)
         Ghat = 2tempfac * JacobiElliptic.Pi(up, k)
     end
