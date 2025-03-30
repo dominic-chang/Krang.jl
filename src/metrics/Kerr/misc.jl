@@ -85,18 +85,22 @@ function f2(α, sinφ, j)
 end
 
 function R1(α::T, φ::T, j) where {T}
-    return one(T) / (one(T) - α^2) *
-           (JacobiElliptic.Pi(α^2 / (α^2 - one(T)), φ, j) - α * f1(α, sin(φ), j))
+    #FIXME: This function is undefined when α2 = 1
+    denom = ((one(T) - α^2)-eps(T))
+    return one(T) / denom * 
+           (JacobiElliptic.Pi(-α^2 / denom+eps(), φ, j) - α * f1(α, sin(φ), j))
 end
 
 function R2(α::T, φ::T, j) where {T}
-    return one(T) / (one(T) - α^2) * (
+    #FIXME: This function is undefined when α*cos(φ) = 1
+    denom = ((one(T) - α^2)-eps(T))
+    return one(T) / denom * (
         JacobiElliptic.F(φ, j) -
         α^2 / (j + (one(T) - j) * α^2) * (
             JacobiElliptic.E(φ, j) -
-            α * sin(φ) * √(one(T) - j * sin(φ)^2) / (one(T) + α * cos(φ))
+            α * sin(φ) * √(one(T) - j * sin(φ)^2) / ((one(T) + α * cos(φ)) + eps(T))
         )
-    ) + inv(j + (one(T) - j) * α^2) * (2 * j - α^2 / (α^2 - one(T))) * R1(α, φ, j)
+    ) + inv(j + (one(T) - j) * α^2) * (2 * j - α^2 / ((α^2 - one(T))+eps(T))) * R1(α, φ, j)
 end
 
 function S1(α, φ, j)
@@ -1393,7 +1397,6 @@ function radial_w_I0_terms_integrals_case3(
 
     Π1_s = coef * R1(αo, φ_s, k3)
     Π2_s = (coef^2) * R2(αo, φ_s, k3)
-
 
     I0_total = τ
     # Removed logarithmic divergence
