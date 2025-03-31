@@ -1171,7 +1171,7 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
 
-    Ipo_m_I0_terms = -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
+    Ipo_m_I0_terms = -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31) + eps(T), asin(x2_o), k)
     arg = rm3 * r41 / (rm4 * r31)
     # TODO: Come up with a better solve for this
     if arg == k # Fix for ∂_m Pi blowing up when n = m
@@ -1568,6 +1568,9 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} wher
     _, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
 
     k = r32 * r41 / (r31 * r42)
+    if (rh == r3)
+        rh += eps(T)
+    end
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
     Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
