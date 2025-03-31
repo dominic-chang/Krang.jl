@@ -85,22 +85,22 @@ function f2(α, sinφ, j)
 end
 
 function R1(α::T, φ::T, j) where {T}
-    #FIXME: This function is undefined when α2 = 1
-    denom = ((one(T) - α^2)-eps(T))
+    #FIXME: This function is undefined when n=1 in Pi(n, ϕ, m) and when α^2 =1
+    denom = ((one(T) - α^2)+eps(T))
     return one(T) / denom * 
-           (JacobiElliptic.Pi(-α^2 / denom+eps(), φ, j) - α * f1(α, sin(φ), j))
+           (JacobiElliptic.Pi(-α^2 / denom+eps(T), φ, j) - α * f1(α, sin(φ), j))
 end
 
 function R2(α::T, φ::T, j) where {T}
     #FIXME: This function is undefined when α*cos(φ) = 1
-    denom = ((one(T) - α^2)-eps(T))
+    denom = ((one(T) - α^2)+eps(T))
     return one(T) / denom * (
         JacobiElliptic.F(φ, j) -
         α^2 / (j + (one(T) - j) * α^2) * (
             JacobiElliptic.E(φ, j) -
             α * sin(φ) * √(one(T) - j * sin(φ)^2) / ((one(T) + α * cos(φ)) + eps(T))
         )
-    ) + inv(j + (one(T) - j) * α^2) * (2 * j - α^2 / ((α^2 - one(T))+eps(T))) * R1(α, φ, j)
+    ) + inv(j + (one(T) - j) * α^2) * (2 * j + α^2 / ((one(T) - α^2)+eps(T))) * R1(α, φ, j)
 end
 
 function S1(α, φ, j)
