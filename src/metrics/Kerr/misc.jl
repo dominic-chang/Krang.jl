@@ -490,6 +490,10 @@ function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_o = √(r31 / r41)
@@ -628,6 +632,10 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √max((rs - r4) / (rs - r3) * r31 / r41, zero(T))
@@ -772,6 +780,10 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_o = √abs(r31 / r41)
@@ -962,6 +974,10 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
@@ -1154,6 +1170,10 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_o = √abs(r31 / r41)
@@ -1315,6 +1335,11 @@ function radial_w_I0_terms_integrals_case2(
     rp4 = rp - r4
     rm3 = rm - r3
     rm4 = rm - r4
+
+    #FIXME: This is a hack to avoid the division by zero
+    if (rp3 == zero(T)) 
+        rp3 = eps(T)
+    end
 
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
