@@ -41,7 +41,7 @@ function (m::ImageModel)(x, ps, st)
                 T = typeof(α)
                 rs, ϕs =
                     Krang.emission_coordinates_fast_light(pix, Float64(π / 2), β > 0, n)[1:3]
-                ϕks = Krang.ϕ_kerr_schild(met, rs, ϕs)
+                ϕks = Krang.ϕ_kerr_schild(metric, rs, ϕs)
                 xs = rs * cos(ϕks)
                 ys = rs * sin(ϕks)
                 if hypot(xs, ys) ≤ Krang.horizon(metric)
