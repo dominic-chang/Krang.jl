@@ -121,7 +121,6 @@ heatmap!(
     Axis(fig[1, 2], aspect = 1, title = "Image Model (Lensed Emission Model)"),
     received_intensity,
 )
-fig
 CairoMakie.save("emission_model_and_target_model.png", fig)
 
 # ![image](emission_model_and_target_model.png)
