@@ -8,6 +8,7 @@
 using Lux
 using Krang
 using Random
+using Accessors
 Random.seed!(123)
 rng = Random.GLOBAL_RNG
 
@@ -15,46 +16,55 @@ rng = Random.GLOBAL_RNG
 # We will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to the spin axis in this example.
 # These parameters are fixed for this example, but could be made to vary in the optimization process.
 
-# Lets define an `ImageModel` which will be comprised of an emission layer that we will raytrace.
+# Lets define an `KerrNerF` which will be comprised of an emission layer that we will raytrace.
 # We will do this by first creating a struct to represent our image model that will store our emission model as a layer.
 
-struct ImageModel{T<:Chain}
+struct KerrNeRF{T<:Chain}
     emission_layer::T
 end
 
 # The models in Lux are functors that take in features, parameters and model state, and return the output and model state.
-# Lets define the function associated with our `ImageModel` type.
+# Lets define the function associated with our `KerrNerF` type.
 # We will assume that the emission is coming from emission that originates in the equatorial plane.
-function (m::ImageModel)(x, ps, st)
-    metric = Krang.Kerr(0.99e0)
-    θo = Float64(20 / 180 * π)
-    pixels = Krang.IntensityPixel.(Ref(metric), x[1, :], x[2, :], θo)
+function (m::KerrNeRF)(x, ps, st)
+    metric = Krang.Kerr(ps.spin)
+    θo = ps.θo * π
+    pixels = Krang.SlowLightIntensityPixel.(Ref(metric), x[1, :], x[2, :], θo)
 
     sze = unsafe_trunc(Int, sqrt(size(x)[2]))
     coords = zeros(Float64, 2, sze * sze)
+    redshifts = zeros(Float64, 1, sze * sze)
     emission_vals = zeros(Float64, 1, sze * sze)
     for n = 0:1
         for i = 1:sze
             for j = 1:sze
                 pix = pixels[i+(j-1)*sze]
                 α, β = Krang.screen_coordinate(pix)
+                ηtemp = η(metric, α, β, θo)
+                λtemp = λ(metric, α, θo)
+                rs, ϕs, νr, νθ, _ = Krang.emission_coordinates_fast_light(pix, Float64(π / 2), β > 0, n)
+
                 T = typeof(α)
-                rs, ϕs =
-                    Krang.emission_coordinates_fast_light(pix, Float64(π / 2), β > 0, n)[1:3]
-                ϕks = Krang.ϕ_kerr_schild(metric, rs, ϕs)
-                xs = rs * cos(ϕks)
-                ys = rs * sin(ϕks)
-                if hypot(xs, ys) ≤ Krang.horizon(metric)
+                if rs ≤ Krang.horizon(metric)
                     coords[1, i+(j-1)*sze] = zero(T)
                     coords[2, i+(j-1)*sze] = zero(T)
+                    redshifts[(i-1)*sze+j] = zero(T) 
                 else
-                    coords[1, i+(j-1)*sze] = xs
-                    coords[2, i+(j-1)*sze] = ys
+                    ϕks = Krang.ϕ_kerr_schild(metric, rs, ϕs)
+                    xs = rs * cos(ϕks)
+                    ys = rs * sin(ϕks)
+
+                    curr_p_bl_d = p_bl_d(metric, rs, π/2, ηtemp, λtemp, νr, νθ)
+                    curr_p_bl_u = metric_uu(metric, rs, π/2) * curr_p_bl_d
+                    p_zamo_u = jac_zamo_u_bl_d(metric, rs, π/2) * curr_p_bl_u
+                    coords[1, (i-1)*sze+j] = xs
+                    coords[2, (i-1)*sze+j] = ys
+                    redshifts[(i-1)*sze+j] = inv(p_zamo_u[1])
                 end
 
             end
         end
-        emission_vals .+= m.emission_layer(coords, ps, st)[1]
+        emission_vals .+= m.emission_layer(coords, ps, st)[1] .* redshifts
     end
     emission_vals, st
 end
@@ -63,27 +73,29 @@ end
 # The emission layer will take in 2D coordinates on an equatorial disk in the bulk spacetime and return a scalar intensity value.
 
 emission_model = Chain(
-    Dense(2 => 20, Lux.sigmoid),
-    Dense(20 => 20, Lux.sigmoid),
+    Dense(2 => 20, Lux.tanh_fast),
+    Dense(20 => 20, Lux.tanh_fast),
     Dense(20 => 1, Lux.sigmoid),
 )
 
 ps, st = Lux.setup(rng, emission_model); # Get the emission model parameters and state
+ps = @insert ps.spin = 0.94 # Set the spin of the black hole
+ps = @insert ps.θo = 20.0  /180 # Set the inclination angle of the observer
 
 # We can now create an image model with our emission layer.
-image_model = ImageModel(emission_model)
+image_model = KerrNeRF(emission_model)
 
 ## Plotting the model
 
 # Lets create an 20x20 pixel image of the `image_model` with a field of view of $10 MG/c^2$.
 
-sze = 20
+sze = 30
 ρmax = 10e0
 pixels = zeros(Float64, 2, sze * sze)
 for (iiter, i) in enumerate(range(-ρmax, ρmax, sze))
     for (jiter, j) in enumerate(range(-ρmax, ρmax, sze))
-        pixels[1, iiter+(jiter-1)*sze] = Float64(i)
-        pixels[2, iiter+(jiter-1)*sze] = Float64(j)
+        pixels[2, iiter+(jiter-1)*sze] = Float64(i)
+        pixels[1, iiter+(jiter-1)*sze] = Float64(j)
     end
 end
 
@@ -109,12 +121,13 @@ heatmap!(
     Axis(fig[1, 2], aspect = 1, title = "Image Model (Lensed Emission Model)"),
     received_intensity,
 )
+fig
 CairoMakie.save("emission_model_and_target_model.png", fig)
 
 # ![image](emission_model_and_target_model.png)
 
 # ## Fitting the NeRF model
-# This will be a toy example showing the mechanics of fitting our ImageModel to a target image using the normalized cross correlation as a kernel for our loss function.
+# This will be a toy example showing the mechanics of fitting our KerrNerF to a target image using the normalized cross correlation as a kernel for our loss function.
 # This will be the image we will try to fit our model to.
 target_img = reshape(received_intensity, 1, sze * sze);
 
@@ -138,7 +151,9 @@ end
 mse(target_img, target_img)
 
 ps, st = Lux.setup(rng, emission_model);
-image_model = ImageModel(emission_model);
+ps = @insert ps.spin = 0.5
+ps = @insert ps.θo = 60.0 / 180
+image_model = KerrNerF(emission_model);
 
 emitted_intensity = reshape(emission_model(pixels, ps, st)[1], sze, sze)
 received_intensity = reshape(image_model(pixels, ps, st)[1], sze, sze)
