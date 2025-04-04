@@ -208,7 +208,7 @@ ps_trained, st_trained = let st = Ref(st), x = pixels, y = reshape(target_img, 1
     solution = Optimization.solve(
         optprob,
         OptimizationOptimisers.Adam(),
-        maxiters = 20_000,
+        maxiters = 25_000,
         callback = Callback(100, () -> nothing),
     )
 
