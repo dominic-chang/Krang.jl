@@ -42,21 +42,22 @@ function (m::KerrNeRF)(x, ps, st)
                 α, β = Krang.screen_coordinate(pix)
                 ηtemp = η(metric, α, β, θo)
                 λtemp = λ(metric, α, θo)
-                rs, ϕs, νr, νθ, _ = Krang.emission_coordinates_fast_light(pix, Float64(π / 2), β > 0, n)
+                rs, ϕs, νr, νθ, _ =
+                    Krang.emission_coordinates_fast_light(pix, Float64(π / 2), β > 0, n)
 
                 T = typeof(α)
                 if rs ≤ Krang.horizon(metric)
                     coords[1, i+(j-1)*sze] = zero(T)
                     coords[2, i+(j-1)*sze] = zero(T)
-                    redshifts[(i-1)*sze+j] = zero(T) 
+                    redshifts[(i-1)*sze+j] = zero(T)
                 else
                     ϕks = Krang.ϕ_kerr_schild(metric, rs, ϕs)
                     xs = rs * cos(ϕks)
                     ys = rs * sin(ϕks)
 
-                    curr_p_bl_d = p_bl_d(metric, rs, π/2, ηtemp, λtemp, νr, νθ)
-                    curr_p_bl_u = metric_uu(metric, rs, π/2) * curr_p_bl_d
-                    p_zamo_u = jac_zamo_u_bl_d(metric, rs, π/2) * curr_p_bl_u
+                    curr_p_bl_d = p_bl_d(metric, rs, π / 2, ηtemp, λtemp, νr, νθ)
+                    curr_p_bl_u = metric_uu(metric, rs, π / 2) * curr_p_bl_d
+                    p_zamo_u = jac_zamo_u_bl_d(metric, rs, π / 2) * curr_p_bl_u
                     coords[1, (i-1)*sze+j] = xs
                     coords[2, (i-1)*sze+j] = ys
                     redshifts[(i-1)*sze+j] = inv(p_zamo_u[1])
@@ -80,7 +81,7 @@ emission_model = Chain(
 
 ps, st = Lux.setup(rng, emission_model); # Get the emission model parameters and state
 ps = @insert ps.spin = 0.94 # Set the spin of the black hole
-ps = @insert ps.θo = 20.0  /180 # Set the inclination angle of the observer
+ps = @insert ps.θo = 20.0 / 180 # Set the inclination angle of the observer
 
 # We can now create an image model with our emission layer.
 image_model = KerrNeRF(emission_model)
