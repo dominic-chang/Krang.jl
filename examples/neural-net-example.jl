@@ -16,7 +16,7 @@ rng = Random.GLOBAL_RNG
 # We will use 0.99 spin Kerr metric with an observer sitting at 20 degrees inclination with respect to the spin axis in this example.
 # These parameters are fixed for this example, but could be made to vary in the optimization process.
 
-# Lets define an `KerrNerF` which will be comprised of an emission layer that we will raytrace.
+# Lets define an `KerrNeRF` which will be comprised of an emission layer that we will raytrace.
 # We will do this by first creating a struct to represent our image model that will store our emission model as a layer.
 
 struct KerrNeRF{T<:Chain}
@@ -24,7 +24,7 @@ struct KerrNeRF{T<:Chain}
 end
 
 # The models in Lux are functors that take in features, parameters and model state, and return the output and model state.
-# Lets define the function associated with our `KerrNerF` type.
+# Lets define the function associated with our `KerrNeRF` type.
 # We will assume that the emission is coming from emission that originates in the equatorial plane.
 function (m::KerrNeRF)(x, ps, st)
     metric = Krang.Kerr(ps.spin)
@@ -127,7 +127,7 @@ CairoMakie.save("emission_model_and_target_model.png", fig)
 # ![image](emission_model_and_target_model.png)
 
 # ## Fitting the NeRF model
-# This will be a toy example showing the mechanics of fitting our KerrNerF to a target image using the normalized cross correlation as a kernel for our loss function.
+# This will be a toy example showing the mechanics of fitting our KerrNeRF to a target image using the normalized cross correlation as a kernel for our loss function.
 # This will be the image we will try to fit our model to.
 target_img = reshape(received_intensity, 1, sze * sze);
 
@@ -153,7 +153,7 @@ mse(target_img, target_img)
 ps, st = Lux.setup(rng, emission_model);
 ps = @insert ps.spin = 0.5
 ps = @insert ps.θo = 60.0 / 180
-image_model = KerrNerF(emission_model);
+image_model = KerrNeRF(emission_model);
 
 emitted_intensity = reshape(emission_model(pixels, ps, st)[1], sze, sze)
 received_intensity = reshape(image_model(pixels, ps, st)[1], sze, sze)
