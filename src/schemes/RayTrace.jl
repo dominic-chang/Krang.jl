@@ -148,7 +148,7 @@ function raytrace(
     res = 100,
 ) where {A}
     intersections =
-        Array{typeof(camera.metric).parameters[1]}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
+        Array{typeof(camera.metric).parameters[1]}(undef, size(camera.screen.pixels)...)
     for I in CartesianIndices(camera.screen.pixels)
         intersections[I] = raytrace(camera.screen.pixels[I], mesh; res = res)
     end
@@ -161,7 +161,7 @@ function raytrace(
     mesh::Mesh{A};
     res = 100,
 ) where {A}
-    intersections = Array{StokesParams}(undef, size(camera.screen.pixels)...)#zeros(yield(mesh.material), size(camera.screen.pixels))
+    intersections = Array{StokesParams}(undef, size(camera.screen.pixels)...)
     for I in CartesianIndices(camera.screen.pixels)
         intersections[I] = raytrace(camera.screen.pixels[I], mesh; res = res)
     end

@@ -210,5 +210,3 @@ end
 isOcclusive(::ElectronSynchrotronPowerLawPolarization) = false
 isFastLight(::ElectronSynchrotronPowerLawPolarization) = true
 isAxisymmetric(::ElectronSynchrotronPowerLawPolarization) = true
-yield(::ElectronSynchrotronPowerLawPolarization{N,T}) where {N,T} =
-    StokesParams(zero(T), zero(T), zero(T), zero(T))

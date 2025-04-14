@@ -12,8 +12,6 @@ isAxisymmetric(material::AbstractMaterial) = false
 #TODO: replace with trait
 isFastLight(material::AbstractMaterial) = false
 
-yield(material::AbstractMaterial) = 0
-
 abstract type AbstractReturnTrait end
 abstract type AbstractPolarizationTrait <: AbstractReturnTrait end
 struct SimplePolarizationTrait <: AbstractPolarizationTrait end

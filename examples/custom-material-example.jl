@@ -36,11 +36,6 @@ function (m::ZAMORedshifts)(
     return max(redshift, eps(T))
 end
 
-# We need to define the return type or the material for ray tracing. This can be things like a `Float` of a `StokesParams`. Let's use a float for this case.
-function Krang.yield(::ZAMORedshifts{T}) where {T}
-    return zero(T)
-end
-
 # ## Ray tracing the material
 # We will use a $0.94$ spin Kerr black hole viewed by an asymptotic observer at an inclination angle of $θo=17^\circ$. 
 # The emission to be ray traced is 
