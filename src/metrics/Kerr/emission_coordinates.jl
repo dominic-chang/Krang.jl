@@ -97,7 +97,7 @@ Emission inclination for point originating at inclination rs whose nth order ima
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 """
 function emission_inclination(pix::AbstractPixel, rs, νr)
-    return emission_inclination(pix, Ir(pix, νr, rs), θo)
+    return emission_inclination(pix, Ir(pix, νr, rs))
 end
 
 """
