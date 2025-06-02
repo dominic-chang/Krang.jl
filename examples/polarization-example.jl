@@ -110,7 +110,7 @@ CMk.Colorbar(fig[2, 4], hms[4], labelsize = 20)
 
 fig
 
-save("polarization_example.pdf", fig)
+CMk.save("polarization_example.pdf", fig)
 
 # ![polarization of emission model](polarization_example.pdf)
 
