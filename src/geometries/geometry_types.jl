@@ -74,12 +74,7 @@ function _raytrace(
                 Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
             end
             if issuccess && (horizon(metric(pix)) < rs < T(Inf))
-
-                if isOcclusive(material)
-                    observation = material(pix, intersection)
-                else
-                    observation += material(pix, intersection)
-                end
+                observation += material(pix, intersection)
             end
         end
     end

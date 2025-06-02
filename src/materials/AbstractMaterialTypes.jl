@@ -6,8 +6,6 @@ Abstract Material
 abstract type AbstractMaterial end
 
 #TODO: replace with trait
-isOcclusive(material::AbstractMaterial) = false
-#TODO: replace with trait
 isAxisymmetric(material::AbstractMaterial) = false
 #TODO: replace with trait
 isFastLight(material::AbstractMaterial) = false

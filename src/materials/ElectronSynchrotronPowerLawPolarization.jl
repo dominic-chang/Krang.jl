@@ -211,6 +211,5 @@ function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(
     return StokesParams(i, q, u, zero(T))
 end
 
-isOcclusive(::ElectronSynchrotronPowerLawPolarization) = false
 isFastLight(::ElectronSynchrotronPowerLawPolarization) = true
 isAxisymmetric(::ElectronSynchrotronPowerLawPolarization) = true
