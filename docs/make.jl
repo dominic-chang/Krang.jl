@@ -35,7 +35,7 @@ makedocs(;
     build = "build",
     pages = [
         "Home" => "index.md",
-        "Getting Started" => "getting_started.md",
+        "Getting Started" => ["what_is_krang.md", "meshes.md", "raytracing.md"],
         "Examples" => MD_FILES,
         "Theory" => [
             "Raytracing" => ["kerr_geodesic_summary.md", "time_regularization.md"],
