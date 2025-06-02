@@ -86,21 +86,24 @@ end
 
 function R1(α::T, φ::T, j) where {T}
     #FIXME: This function is undefined when n=1 in Pi(n, ϕ, m) and when α^2 =1
-    denom = ((one(T) - α^2)+eps(T))
-    return one(T) / denom * 
-           (JacobiElliptic.Pi(-α^2 / denom+eps(T), φ, j) - α * f1(α, sin(φ), j))
+    denom = ((one(T) - α^2) + eps(T))
+    return one(T) / denom *
+           (JacobiElliptic.Pi(-α^2 / denom + eps(T), φ, j) - α * f1(α, sin(φ), j))
 end
 
 function R2(α::T, φ::T, j) where {T}
     #FIXME: This function is undefined when α*cos(φ) = 1
-    denom = ((one(T) - α^2)+eps(T))
+    denom = ((one(T) - α^2) + eps(T))
     return one(T) / denom * (
         JacobiElliptic.F(φ, j) -
         α^2 / (j + (one(T) - j) * α^2) * (
             JacobiElliptic.E(φ, j) -
             α * sin(φ) * √(one(T) - j * sin(φ)^2) / ((one(T) + α * cos(φ)) + eps(T))
         )
-    ) + inv(j + (one(T) - j) * α^2) * (2 * j + α^2 / ((one(T) - α^2)+eps(T))) * R1(α, φ, j)
+    ) +
+           inv(j + (one(T) - j) * α^2) *
+           (2 * j + α^2 / ((one(T) - α^2) + eps(T))) *
+           R1(α, φ, j)
 end
 
 function S1(α, φ, j)
@@ -491,7 +494,7 @@ function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm3 = rm - r3
     rm4 = rm - r4
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 
@@ -633,7 +636,7 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     rm3 = rm - r3
     rm4 = rm - r4
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 
@@ -781,7 +784,7 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm3 = rm - r3
     rm4 = rm - r4
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 
@@ -975,7 +978,7 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
     rm3 = rm - r3
     rm4 = rm - r4
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 
@@ -1171,7 +1174,7 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     rm3 = rm - r3
     rm4 = rm - r4
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 
@@ -1191,7 +1194,8 @@ function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
 
-    Ipo_m_I0_terms = -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31) + eps(T), asin(x2_o), k)
+    Ipo_m_I0_terms =
+        -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31) + eps(T), asin(x2_o), k)
     arg = rm3 * r41 / (rm4 * r31)
     # TODO: Come up with a better solve for this
     if arg == k # Fix for ∂_m Pi blowing up when n = m
@@ -1337,7 +1341,7 @@ function radial_w_I0_terms_integrals_case2(
     rm4 = rm - r4
 
     #FIXME: This is a hack to avoid the division by zero
-    if (rp3 == zero(T)) 
+    if (rp3 == zero(T))
         rp3 = eps(T)
     end
 

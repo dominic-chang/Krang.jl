@@ -139,7 +139,7 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return Iϕ
 
-    return -(Iϕ + λtemp * Gϕtemp + T(π / 2))
+    return (Iϕ + λtemp * Gϕtemp + T(π / 2))
 end
 
 """

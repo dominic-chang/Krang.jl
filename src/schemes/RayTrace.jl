@@ -14,7 +14,6 @@ function generate_ray!(
     Δτ = τf / actual_res
     for I in range(1, res)
         ts, rs, θs, ϕs, νr, νθ, _ = emission_coordinates(pixel, Δτ * I)
-        ϕs = ϕs % T(2π)
         ray[I] = Intersection(ts, rs, θs, ϕs, νr, νθ)
     end
 end
