@@ -110,9 +110,9 @@ CMk.Colorbar(fig[2, 4], hms[4], labelsize = 20)
 
 fig
 
-CMk.save("polarization_example.pdf", fig)
+CMk.save("polarization_example.png", fig)
 
-# ![polarization of emission model](polarization_example.pdf)
+# ![polarization of emission model](polarization_example.png)
 
 # > [!IMPORTANT]
 # > You can also save the rendered image as a fits file for further analysis.
