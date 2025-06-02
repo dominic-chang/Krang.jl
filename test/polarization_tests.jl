@@ -174,11 +174,14 @@
                     true,
                     false,
                 )
-                q = (-(eα^2 - eβ^2))
-                u = (-2 * eα * eβ)
+                q_temp = (-(eα^2 - eβ^2))
+                u_temp = (-2 * eα * eβ)
 
                 profile(r) = (r / rpeak)^p1 / (1 + (r / rpeak)^(p1 + p2))
-                int2 = hypot(q, u)^(1 + spec) * lp * profile(rs) * redshift^(3 + spec)
+                mag = hypot(q_temp, u_temp)
+                int2 = mag^(1 + spec) * lp * profile(rs) * redshift^(3 + spec)
+                q = int2 * q_temp / mag
+                u = int2 * u_temp / mag
                 @test stokes ≈ Krang.StokesParams(int2, q, u, 0.0)
             end
         end

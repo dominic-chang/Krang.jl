@@ -74,7 +74,7 @@ stokesvals = render(camera, scene)
 # We will import CairoMakie for plotting the results.
 import CairoMakie as CMk
 
-curr_theme = Theme(
+curr_theme = CMk.Theme(
     Axis = (
         xticksvisible = false,
         xticklabelsvisible = false,
@@ -82,7 +82,7 @@ curr_theme = Theme(
         yticklabelsvisible = false,
     ),
 )
-set_theme!(merge!(curr_theme, theme_latexfonts()))
+CMk.set_theme!(merge!(curr_theme, CMk.theme_latexfonts()))
 
 fig = CMk.Figure(resolution = (700, 700));
 ax1 = CMk.Axis(fig[1, 1], aspect = 1, title = "I")
@@ -101,7 +101,7 @@ hms =
             getproperty.(stokesvals, :V),
         ],
         colormaps,
-    ) .|> x -> heatmap!(x[1], x[2], colormap = x[3], rasterize = true)
+    ) .|> x -> CMk.heatmap!(x[1], x[2], colormap = x[3], rasterize = true)
 CMk.Colorbar(fig[1, 2], hms[1], labelsize = 20)
 CMk.Colorbar(fig[1, 4], hms[2], labelsize = 20)
 CMk.Colorbar(fig[2, 2], hms[3], labelsize = 20)
