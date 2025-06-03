@@ -52,7 +52,7 @@ $$\begin{align}
         &=\lim_{r_o\rightarrow\infty} \int_{r_s}^{r_o}\frac{dt}{dr}\,dr-2M\log\left(r_o e^{\frac{r_o}{2M}}\right),
 \end{align}$$
 
-The definition of this integral is possible in practice since $ I_t$ takes the forms of the sums of Elliptic Integrals of the first $(F)$, second $(E)$ and third $(\Pi)$ kind, as well as logarithms and linear functions of $r$.
+The definition of this integral is possible in practice since $I_t$ takes the forms of the sums of Elliptic Integrals of the first $(F)$, second $(E)$ and third $(\Pi)$ kind, as well as logarithms and linear functions of $r$.
 
 $$\begin{align}
     I_t(r\rightarrow\infty)
