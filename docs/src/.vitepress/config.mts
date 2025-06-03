@@ -36,7 +36,7 @@ export default defineConfig({
     },
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/getting_started' },
+      { text: 'Getting Started', link: '/what_is_krang' },
       { text: 'Examples', link: '/examples/coordinate-example' },
       { text: 'API', link: '/api' }
     ],

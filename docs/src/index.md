@@ -13,7 +13,7 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /getting_started
+      link: /what_is_krang
     - theme: alt
       text: View on Github
       link: https://github.com/dominic-chang/Krang.jl

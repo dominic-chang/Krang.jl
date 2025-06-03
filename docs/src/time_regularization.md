@@ -57,7 +57,7 @@ Another approch is to avoid the divergent quality of $I_t$ altogether by introdu
 \end{align}
 ```
 
-The definition of this integral is possible in practice since $ I_t$ takes the forms of the sums of Elliptic Integrals of the first $(F)$, second $(E)$ and third $(\Pi)$ kind, as well as logarithms and linear functions of $r$.
+The definition of this integral is possible in practice since $I_t$ takes the forms of the sums of Elliptic Integrals of the first $(F)$, second $(E)$ and third $(\Pi)$ kind, as well as logarithms and linear functions of $r$.
 
 ```math
 \begin{align}
