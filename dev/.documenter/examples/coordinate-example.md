@@ -51,7 +51,7 @@ colorrange = ((-20, 20), (0, rmax), (0, 2π))
 ```
 
 
-```
+```ansi
 ((-20, 20), (0, 10.0), (0, 6.283185307179586))
 ```
 
@@ -82,7 +82,7 @@ end
 ```
 
 
-```
+```ansi
 coordinate_point (generic function with 1 method)
 ```
 
@@ -119,7 +119,7 @@ end
 ```
 
 
-```
+```ansi
 draw! (generic function with 1 method)
 ```
 
@@ -144,7 +144,7 @@ axes_list = [
 ```
 
 
-```
+```ansi
 3-element Vector{Vector{Makie.Axis}}:
  [Axis (0 plots), Axis (0 plots), Axis (0 plots)]
  [Axis (0 plots), Axis (0 plots), Axis (0 plots)]
@@ -166,7 +166,7 @@ end
 ```
 
 
-```
+```ansi
 "coordinate.gif"
 ```
 

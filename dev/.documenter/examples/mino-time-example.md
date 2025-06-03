@@ -107,7 +107,7 @@ recording =
 ```
 
 
-```
+```ansi
 "raytrace.gif"
 ```
 

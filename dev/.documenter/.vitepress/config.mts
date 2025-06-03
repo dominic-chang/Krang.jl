@@ -42,7 +42,11 @@ export default defineConfig({
     ],
     sidebar: [
 { text: 'Home', link: '/index' },
-{ text: 'Getting Started', link: '/getting_started' },
+{ text: 'Getting Started', collapsed: false, items: [
+{ text: 'What is Krang.jl?', link: '/what_is_krang' },
+{ text: 'Meshes', link: '/meshes' },
+{ text: 'Raytracing', link: '/raytracing' }]
+ },
 { text: 'Examples', collapsed: false, items: [
 { text: 'Coordinates with inclination (θs)', link: '/examples/coordinate-example' },
 { text: 'Defining a Custom Material and Saving Output', link: '/examples/custom-material-example' },

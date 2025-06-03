@@ -71,7 +71,7 @@ scene = Krang.Scene((mesh,))
 ```
 
 
-```
+```ansi
 (Krang.Mesh{Krang.ConeGeometry{Float64, Nothing}, Main.var"Main".ZAMORedshifts{Float64}}(Krang.ConeGeometry{Float64, Nothing}(1.3089969389957472, nothing), Main.var"Main".ZAMORedshifts{Float64}((1,), 1.141067359796659, 10.0)),)
 ```
 
@@ -83,7 +83,7 @@ redshifts = render(camera, scene)
 ```
 
 
-```
+```ansi
 400×400 Matrix{Float64}:
  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  …  0.0  0.0  0.0  0.0  0.0  0.0  0.0
  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  0.0  0.0
@@ -132,9 +132,9 @@ CMk.save("redshifts.png", fig)
 ```
 
 
-```
-┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
-└ @ Makie ~/.julia/packages/Makie/dYDv2/src/scenes.jl:238
+```ansi
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFound `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
+[33m[1m└ [22m[39m[90m@ Makie ~/.julia/packages/Makie/dpDAM/src/scenes.jl:238[39m
 ```
 
 

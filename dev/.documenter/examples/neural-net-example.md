@@ -17,7 +17,7 @@ rng = Random.GLOBAL_RNG
 ```
 
 
-```
+```ansi
 Random._GLOBAL_RNG()
 ```
 
@@ -97,7 +97,7 @@ ps = @insert ps.θo = 20.0 / 180 # Set the inclination angle of the observer
 ```
 
 
-```
+```ansi
 (layer_1 = (weight = Float32[-1.9930933 0.13480707; 1.6587111 0.7846885; … ; 0.5545148 -0.21311225; -1.529758 -1.2062522], bias = Float32[0.028957667, 0.6422782, 0.06368262, 0.48916948, 0.5008789, 0.12268113, -0.52489245, -0.5348378, 0.59465873, -0.512276, -0.24440552, -0.6352531, -0.25062555, -0.16059795, 0.7026039, 0.4899658, -0.5401195, 0.05923529, 0.03167074, 0.3905907]), layer_2 = (weight = Float32[0.2090636 0.07168501 … 0.61720604 0.16018204; 0.092719935 -0.47666737 … -0.57773215 -0.29552248; … ; -0.21483387 0.40296352 … -0.6213537 0.090786815; -0.12311636 0.36841875 … 0.073762484 -0.36025298], bias = Float32[0.084122844, -0.115433946, -0.00920949, -0.019335521, 0.10757738, 0.018696364, -0.21156001, -0.089099385, -0.19688101, 0.09211258, -0.1802641, 0.19444387, 0.12264983, -0.21097833, -0.17754783, -0.112839594, 0.04218873, -0.14413916, -0.09799668, -0.13228038]), layer_3 = (weight = Float32[-0.27047503 0.20987642 … -0.06709826 -0.17421192], bias = Float32[0.20820317]), spin = 0.94, θo = 0.1111111111111111)
 ```
 
@@ -111,7 +111,7 @@ image_model = KerrNeRF(emission_model)
 ```
 
 
-```
+```ansi
 Main.var"Main".KerrNeRF{Lux.Chain{@NamedTuple{layer_1::Lux.Dense{typeof(NNlib.tanh_fast), Int64, Int64, Nothing, Nothing, Static.True}, layer_2::Lux.Dense{typeof(NNlib.tanh_fast), Int64, Int64, Nothing, Nothing, Static.True}, layer_3::Lux.Dense{typeof(NNlib.σ), Int64, Int64, Nothing, Nothing, Static.True}}, Nothing}}(Lux.Chain{@NamedTuple{layer_1::Lux.Dense{typeof(NNlib.tanh_fast), Int64, Int64, Nothing, Nothing, Static.True}, layer_2::Lux.Dense{typeof(NNlib.tanh_fast), Int64, Int64, Nothing, Nothing, Static.True}, layer_3::Lux.Dense{typeof(NNlib.σ), Int64, Int64, Nothing, Nothing, Static.True}}, Nothing}((layer_1 = Dense(2 => 20, tanh_fast), layer_2 = Dense(20 => 20, tanh_fast), layer_3 = Dense(20 => 1, σ)), nothing))
 ```
 
@@ -159,11 +159,11 @@ CairoMakie.save("emission_model_and_target_model.png", fig)
 ```
 
 
-```
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
+```ansi
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
 ```
 
 
@@ -224,14 +224,14 @@ CairoMakie.save("emission_model_and_image_model.png", fig)
 ```
 
 
-```
+```ansi
 WARNING: using ComponentArrays.Axis in module Main conflicts with an existing identifier.
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
 ```
 
 
@@ -288,8 +288,8 @@ end
 ```
 
 
-```
-((layer_1 = (weight = [1.329005007335165 0.8838021455699725; 0.527605806178257 0.6917051922681818; … ; -1.825044973915624 1.4743138226946404; 0.8093182825021916 -1.7802958468425494], bias = [0.5316780451323629, -0.37267967698596677, 0.45088269138873244, -0.6258476933876792, 0.06361568022559443, -0.41016274500338007, 0.5052383072088681, 0.2576584724841851, -0.2720400228247643, -0.4251299433587754, 0.20674661393638413, 0.28115907779960625, -0.34435651290468006, 0.1695934875890986, -0.7920840579474977, 0.4098829547571094, 0.4323710728261112, -0.27691493320975447, 0.5004872853066582, -0.4541808695034249]), layer_2 = (weight = [-0.12409402139733568 -0.6290292794271019 … -0.2751305558289715 0.28814550785486903; -0.4598441328984639 -0.5074738343991347 … -0.04083808727731008 -0.48626916777483425; … ; 0.30680121708814295 0.026531435305984053 … 0.25352407864731763 0.17955904334855313; 0.25302508227373627 -0.17542119723328747 … -0.5506025695308104 -0.05884840786402416], bias = [-0.08762127082433276, -0.009753187150239774, 0.23563907689138183, -0.18266456979014029, 0.10374214543140992, -0.12884091894441219, 0.004892911938814829, 0.1795191366293615, 0.15022564590845516, 0.25278764336956955, -0.02280271845715201, 0.13079595283282242, 0.21354343104298712, 0.09472453464730393, 0.4056442443776332, -0.10006486424907729, -0.056988116134481195, -0.5287872280532959, 0.09697543453029249, -0.0008830054635169743]), layer_3 = (weight = [0.21212666868332306 -0.5097755440370377 … -0.055049655153902144 0.3742142362466608], bias = [-0.28982081465742776]), spin = 0.8908645569546856, θo = 0.11803524422007712), (layer_1 = NamedTuple(), layer_2 = NamedTuple(), layer_3 = NamedTuple()))
+```ansi
+((layer_1 = (weight = [1.3249078546934832 0.9500290292559823; 0.69111939090044 0.855622665901749; … ; -1.7092588584579094 1.5877278365037484; 0.7929997707572288 -1.7977298477752472], bias = [0.5611976757233942, -0.3287628672671697, 0.4804452819414268, -0.6256178780932519, 0.08791081498070401, -0.46643526107142486, 0.4279653067290575, 0.1462739547645366, 0.08817950848030481, -0.39760069308131185, 0.1343489298832524, 0.2966527367563488, -0.3870851088376328, 0.033627674430305794, -0.7982181759659623, 0.3893446184322034, 0.45667945543148014, -0.27630086772830204, 0.5234592144521503, -0.3819815639390867]), layer_2 = (weight = [-0.10341438822292162 -0.6117218571929972 … -0.29219461220103615 0.2951984192956047; -0.5826378359902014 -0.47715696980334904 … -0.013496411398749412 -0.39868050138271455; … ; 0.2924887290388006 0.02562708608995944 … 0.26617847728946703 0.18888177963132974; 0.21223250200063332 -0.21169242613853428 … -0.5740613925894525 -0.10467501086481007], bias = [-0.10729451628987151, -0.15879287637610381, 0.16651729060073234, -0.15871652147993073, 0.08624281948932884, -0.07420156291813187, -0.019426954128548092, 0.3653563577411304, 0.12655672743984456, 0.25928948762677395, 0.0063768063635201155, 0.13723642916079534, 0.25974438029108116, 0.04906813941886291, 0.47166978620380584, -0.1871674982744314, -0.022186604522603376, -0.5233264761925738, 0.0982364222137053, 0.012786067715352414]), layer_3 = (weight = [0.18754382789000554 -0.505113443559862 … -0.07235836483834886 0.5225791216988995], bias = [-0.28828888843799333]), spin = 0.926347863035114, θo = 0.11438927802391642), (layer_1 = NamedTuple(), layer_2 = NamedTuple(), layer_3 = NamedTuple()))
 ```
 
 
@@ -328,13 +328,13 @@ save("neural_net_results.png", fig)
 ```
 
 
-```
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
-┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
-└ @ LuxLib.Impl ~/.julia/packages/LuxLib/Kj0os/src/impl/matmul.jl:194
+```ansi
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mMixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Matrix{Float64}]). Converting to common type to to attempt to use BLAS. This may be slow.
+[33m[1m└ [22m[39m[90m@ LuxLib.Impl ~/.julia/packages/LuxLib/1B1qw/src/impl/matmul.jl:194[39m
 ```
 
 
