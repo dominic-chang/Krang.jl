@@ -134,7 +134,7 @@ CMk.save("redshifts.png", fig)
 
 ```ansi
 [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFound `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
-[33m[1m└ [22m[39m[90m@ Makie ~/.julia/packages/Makie/dpDAM/src/scenes.jl:238[39m
+[33m[1m└ [22m[39m[90m@ Makie ~/.julia/packages/Makie/FUAHr/src/scenes.jl:238[39m
 ```
 
 
