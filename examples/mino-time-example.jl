@@ -1,7 +1,7 @@
 # # Rays & Coordinate information with Mino time (τ) 
 
 # In this example, we will ray trace the region around a Kerr black hole as seen by an observer stationed at infinity.
-# We will return the coordinates associated with a ray by marching along the ray's Mino time parameter from the assymptotic observer.
+# We will return the coordinates associated with a ray by marching along the ray's Mino time parameter from the asymptotic observer.
 # This information can be easily accessed using the `emission_coordinates!` function.
 
 # ## Setup

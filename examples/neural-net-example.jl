@@ -70,7 +70,7 @@ function (m::KerrNeRF)(x, ps, st)
     emission_vals, st
 end
 
-# Lets define an emisison layer for our model as a simple fully connected neural network with 2 hidden layers.
+# Lets define an emission layer for our model as a simple fully connected neural network with 2 hidden layers.
 # The emission layer will take in 2D coordinates on an equatorial disk in the bulk spacetime and return a scalar intensity value.
 
 emission_model = Chain(

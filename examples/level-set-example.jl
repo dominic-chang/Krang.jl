@@ -1,5 +1,5 @@
 # # Raytracing a Level Set geometry
-# A level set geoemtry is defined by a constraint equations $f(x,y,z)=0$.
+# A level set geometry is defined by a constraint equations $f(x,y,z)=0$.
 # We will ray trace an example parabaloid geometry in this example as a simple geometric jet model.
 using Krang
 import CairoMakie as GLMk

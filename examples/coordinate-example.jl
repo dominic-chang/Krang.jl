@@ -1,7 +1,7 @@
 # # Coordinates with inclination (θs)
 
 # This example shows how to access coordinate information from the raytracing process with inclination based functions.
-# We will ray trace the coordinate poings on a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity.
+# We will ray trace the coordinate points on a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity.
 # We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons that are emitted from the 
 # source, at a fixed inclination angles with respect to the black hole's spin axis.
 # ## Setup
@@ -9,6 +9,7 @@
 using Krang
 using CairoMakie
 
+#set the theme for the plots
 curr_theme = Theme(
     Axis = (
         xticksvisible = false,
@@ -41,9 +42,9 @@ colorrange = ((-20, 20), (0, rmax), (0, 2π))
 ## Defining a function to get the coordinates of the geometry
 # Let's define a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$.
 # Coordinate information can be accessed using the `emission_coordinates(pixel, θs, isindir, n)` function, which returns the 
-# coordiante information for a sub-image `n` associated with the ray at the pixel `pixel` which intersects a cone with opening angle `θs`.
+# coordinate information for a sub-image `n` associated with the ray at the pixel `pixel` which intersects a cone with opening angle `θs`.
 # We will define a function which introduces some basic occlusion effects by checking if the ray has intersected with the cone on 
-# the 'far-side' or the 'near-side' from the obsever.
+# the 'far-side' or the 'near-side' from the observer.
 function coordinate_point(
     pix::Krang.AbstractPixel,
     geometry::Krang.ConeGeometry{T,A},
@@ -66,7 +67,7 @@ function coordinate_point(
 end
 
 # ## Drawing coordinate points
-# This function plots the coordinates associated with the n=0,1,2 subimages of a cone with opening angle θs.
+# This function plots the coordinates associated with the n=0,1,2 sub-images of a cone with opening angle θs.
 function draw!(axes_list, camera, coordinates, rmin, rmax, θs)
     times, radii, azimuths = coordinates
     map(axes -> empty!.(axes), axes_list)
