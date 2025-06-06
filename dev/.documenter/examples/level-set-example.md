@@ -3,7 +3,7 @@
 
 # Raytracing a Level Set geometry {#Raytracing-a-Level-Set-geometry}
 
-A level set geoemtry is defined by a constraint equations $f(x,y,z)=0$. We will ray trace an example parabaloid geometry in this example as a simple geometric jet model.
+A level set geometry is defined by a constraint equations $f(x,y,z)=0$. We will ray trace an example parabaloid geometry in this example as a simple geometric jet model.
 
 ```julia
 using Krang

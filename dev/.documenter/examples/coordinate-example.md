@@ -3,7 +3,7 @@
 
 # Coordinates with inclination (θs) {#Coordinates-with-inclination-θs}
 
-This example shows how to access coordinate information from the raytracing process with inclination based functions. We will ray trace the coordinate poings on a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity. We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons that are emitted from the source, at a fixed inclination angles with respect to the black hole&#39;s spin axis.
+This example shows how to access coordinate information from the raytracing process with inclination based functions. We will ray trace the coordinate points on a sequence of cones in the region around a Kerr black hole as seen by an observer stationed at infinity. We will show the emission coordinates of the n=0 (direct) and n=1 (indirect) photons that are emitted from the source, at a fixed inclination angles with respect to the black hole&#39;s spin axis.
 
 ## Setup {#Setup}
 
@@ -13,6 +13,7 @@ First, let&#39;s import Krang and CairoMakie for plotting.
 using Krang
 using CairoMakie
 
+#set the theme for the plots
 curr_theme = Theme(
     Axis = (
         xticksvisible = false,
@@ -56,7 +57,7 @@ colorrange = ((-20, 20), (0, rmax), (0, 2π))
 ```
 
 
-Let&#39;s define a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$. Coordinate information can be accessed using the `emission_coordinates(pixel, θs, isindir, n)` function, which returns the coordiante information for a sub-image `n` associated with the ray at the pixel `pixel` which intersects a cone with opening angle `θs`. We will define a function which introduces some basic occlusion effects by checking if the ray has intersected with the cone on the &#39;far-side&#39; or the &#39;near-side&#39; from the obsever.
+Let&#39;s define a function that will return the coordinates of a ray when it intersects with a cone of opening angle $\theta_s$. Coordinate information can be accessed using the `emission_coordinates(pixel, θs, isindir, n)` function, which returns the coordinate information for a sub-image `n` associated with the ray at the pixel `pixel` which intersects a cone with opening angle `θs`. We will define a function which introduces some basic occlusion effects by checking if the ray has intersected with the cone on the &#39;far-side&#39; or the &#39;near-side&#39; from the observer.
 
 ```julia
 function coordinate_point(
@@ -89,7 +90,7 @@ coordinate_point (generic function with 1 method)
 
 ## Drawing coordinate points {#Drawing-coordinate-points}
 
-This function plots the coordinates associated with the n=0,1,2 subimages of a cone with opening angle θs.
+This function plots the coordinates associated with the n=0,1,2 sub-images of a cone with opening angle θs.
 
 ```julia
 function draw!(axes_list, camera, coordinates, rmin, rmax, θs)

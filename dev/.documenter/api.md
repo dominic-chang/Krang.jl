@@ -114,7 +114,7 @@ Emission radius for point originating at inclination θs whose nth order image a
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L21" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L21" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -136,7 +136,7 @@ Emission radius for point originating at at Mino time τ whose image appears at 
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L61" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L61" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -166,7 +166,7 @@ Emission inclination for point originating at inclination rs whose nth order ima
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L90" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L90" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -188,7 +188,7 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L103" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L103" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -221,7 +221,7 @@ Emission radius and azimuthal angle for point originating at inclination θs who
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L145" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L145" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -243,7 +243,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L185" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L185" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -276,7 +276,7 @@ Emission radius and azimuthal angle for point originating at inclination θs who
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L231" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L231" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -298,7 +298,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L300" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L300" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -324,7 +324,7 @@ Mino time of trajectory between an observer at infinity and point at radius rs
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L300" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L300" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -347,7 +347,7 @@ Mino time of trajectory between two inclinations for a given screen coordinate
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1680" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1680" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -366,7 +366,7 @@ abstract type AbstractMetric
 Abstract Metric Type
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/AbstractMetric.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/AbstractMetric.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -387,7 +387,7 @@ Kerr Metric in Boyer Lindquist Coordinates
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -405,7 +405,7 @@ metric_uu(metric::Krang.AbstractMetric, args...) -> Any
 Returns the inverse metric in some representation (usually as an nxn matrix).
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/AbstractMetric.jl#L15" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/AbstractMetric.jl#L15" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -418,7 +418,7 @@ metric_uu(metric::Kerr{T}, r, θ) -> Any
 Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L59" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L59" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -437,7 +437,7 @@ Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L77" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L77" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -455,7 +455,7 @@ metric_dd(metric::Krang.AbstractMetric, args...) -> Any
 Returns the metric in some representation (usually as an nxn matrix).
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/AbstractMetric.jl#L8" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/AbstractMetric.jl#L8" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -468,7 +468,7 @@ metric_dd(metric::Kerr{T}, r, θ) -> Any
 Kerr metric in Boyer Lindquist (BL) coordinates.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L90" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L90" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -487,7 +487,7 @@ Kerr metric in Boyer Lindquist (BL) coordinates.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L110" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L110" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -505,7 +505,7 @@ horizon(metric::Kerr{T}) -> Any
 Outer Horizon for the Kerr metric.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/Kerr.jl#L32" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/Kerr.jl#L32" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -536,7 +536,7 @@ Calculate the λ value for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L85" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L85" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -557,7 +557,7 @@ Energy reduced azimuthal angular momentum
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L125" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L125" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -588,7 +588,7 @@ Calculate the η value for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L67" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L67" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -611,7 +611,7 @@ Energy reduced Carter integral
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L138" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L138" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -641,7 +641,7 @@ Radial potential of spacetime
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L210" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L210" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -667,7 +667,7 @@ Returns roots of $r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η$
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L245" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L245" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -693,7 +693,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$. See [`r_p
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1526" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1526" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -723,7 +723,7 @@ Theta potential of a Kerr black hole
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L227" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L227" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -756,7 +756,7 @@ Returns the antiderivative $G_\theta=\int\frac{d\theta}{\sqrt{\Theta(\theta)}}$.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1694" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1694" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -784,7 +784,7 @@ Horizontal Bardeen Screen Coordinate
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L152" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L152" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -812,7 +812,7 @@ Vertical Bardeen Screen Coordinate
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L165" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L165" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -836,7 +836,7 @@ Defines a horizontal boundary on the assymptotic observer&#39;s screen that emis
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L179" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L179" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -864,7 +864,7 @@ Defines a vertical boundary on the assymptotic observer&#39;s screen that emissi
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L191" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L191" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -895,7 +895,7 @@ Returns the momentum form in the Boyer-Lindquist basis.
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L14" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L14" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -913,7 +913,7 @@ jac_bl_u_zamo_d(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts ZAMO vector to a Boyer-Lindquist basis
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L81" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L81" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -931,7 +931,7 @@ jac_zamo_u_bl_d(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts Boyer-Lindquist vector to a ZAMO basis
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L63" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L63" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -949,7 +949,7 @@ jac_bl_d_zamo_u(metric::Kerr{T}, r, θ) -> Any
 Jacobian which converts ZAMO covector to a Boyer-Lindquist basis
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L45" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L45" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -967,7 +967,7 @@ jac_zamo_d_bl_u(metric::Kerr{T}, r, θ) -> Any
 Returns the Jacobian which converts a Boyer-Lindquist covector to ZAMO basis.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L27" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L27" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -985,7 +985,7 @@ jac_fluid_u_zamo_d(_::Kerr{T}, β, θ, φ) -> Any
 Jacobian which expreases ZAMO vector in the fluid frame
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L99" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L99" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1011,7 +1011,7 @@ screen_polarization(
 Returns the screen polarization associated with a killing spinor κ as seen seen by an asymptotic observer.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1035,7 +1035,7 @@ penrose_walker(
 Returns the Penrose walker constant for a photon with momentum p_u emitted from a fluid particle with momentum f_u.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/physicsUtils.jl#L117" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/physicsUtils.jl#L117" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1064,7 +1064,7 @@ synchrotronIntensity(
 Calculates the intensity of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1093,7 +1093,7 @@ synchrotronPolarization(
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L19" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L19" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1110,7 +1110,7 @@ struct Mesh{G<:Krang.AbstractGeometry, M<:Krang.AbstractMaterial}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/geometries/geometry_types.jl#L18" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/geometries/geometry_types.jl#L18" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1131,7 +1131,7 @@ Load a mesh from a file.
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/geometries/mesh_geometry.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/geometries/mesh_geometry.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1146,7 +1146,7 @@ Level Sets should be a functor
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/geometries/level_set_geometry.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/geometries/level_set_geometry.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1176,7 +1176,7 @@ A struct representing the linear polarization intensity of synchrotron radiation
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L42" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/ElectronSynchrotronPowerLawIntensity.jl#L42" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1206,7 +1206,7 @@ A struct representing the linear polarization of synchrotron radiation from elec
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L83" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/ElectronSynchrotronPowerLawPolarization.jl#L83" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1241,7 +1241,7 @@ Calculate the absolute value of Gθo divided by Gθhat for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L266" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L266" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1272,7 +1272,7 @@ Calculate the I1 infinity minus I0 terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L162" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L162" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1305,7 +1305,7 @@ Calculate the radial infinity minus I0 terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L221" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L221" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1336,7 +1336,7 @@ Get the inclination angle (θo) of a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L52" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L52" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1367,7 +1367,7 @@ Get the space time metric.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L37" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L37" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1400,7 +1400,7 @@ Calculate the absolute value of Gto divided by Gthat for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L296" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L296" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1433,7 +1433,7 @@ Get the screen coordinates of a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L22" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L22" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1464,7 +1464,7 @@ Calculate the Ip infinity minus I0 terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L191" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L191" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1495,7 +1495,7 @@ Calculate the I2 infinity minus I0 terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L177" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L177" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1528,7 +1528,7 @@ Calculate the radial roots for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L103" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L103" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1559,7 +1559,7 @@ Calculate the Im infinity minus I0 terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L206" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L206" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1592,7 +1592,7 @@ Calculate the absolute value of Gϕo divided by Gϕhat for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L281" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L281" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1623,7 +1623,7 @@ Calculate the I0 infinity value for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L118" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L118" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1654,7 +1654,7 @@ Return the total possible Mino time for a ray associated with a pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L133" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L133" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -1678,7 +1678,7 @@ Returns the maximum mino time that can be accrued along a ray.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1500" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1500" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1698,7 +1698,7 @@ _isreal2(num::Complex{T}) -> Any
 Checks if a complex number is real to some tolerance
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L16" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L16" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1724,7 +1724,7 @@ Regularized elliptic integral of the third kind
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L26" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L26" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1745,7 +1745,7 @@ radial_inf_integrals_case4(
 Returns the radial integrals for the case where there are no real roots in the radial potential
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1253" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1253" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1782,7 +1782,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L944" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L944" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1813,7 +1813,7 @@ Calculate the Ir infinity value for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L147" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L147" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -1832,7 +1832,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$ evaluated 
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L313" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L313" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1870,7 +1870,7 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/emission_coordinates.jl#L119" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/emission_coordinates.jl#L119" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1887,7 +1887,7 @@ struct ConeGeometry{T, A} <: Krang.AbstractGeometry
 Cone Geometry with half opening angle `opening_angle`.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/geometries/geometry_types.jl#L34" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/geometries/geometry_types.jl#L34" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1915,7 +1915,7 @@ Returns the antiderivative $I_ϕ=\int\frac{a(2Mr-a\lambda)}{\sqrt{\Delta\mathcal
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1540" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1540" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1932,7 +1932,7 @@ struct SlowLightIntensityCamera{T, A} <: Krang.AbstractCamera
 Camera that caches slow light raytracing information for an observer sitting at radial infinity. The frame of this observer is alligned with the Boyer-Lindquist frame.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/SlowLightIntensityCamera.jl#L167" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/SlowLightIntensityCamera.jl#L167" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1964,7 +1964,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L603" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L603" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1981,7 +1981,7 @@ struct SlowLightIntensityPixel{T} <: Krang.AbstractPixel{T}
 Intensity Pixel Type.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/SlowLightIntensityCamera.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/SlowLightIntensityCamera.jl#L3" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2012,7 +2012,7 @@ Calculate the Iϕ infinity terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L236" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L236" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -2035,7 +2035,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L462" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L462" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2056,7 +2056,7 @@ radial_inf_integrals_case3(
 Returns the radial integrals for the case where there are two real roots in the radial potential
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1210" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1210" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2073,7 +2073,7 @@ abstract type AbstractPixel{T}
 Abstract Pixel Type
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L15" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L15" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2097,7 +2097,7 @@ radial_w_I0_terms_integrals_case2(
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1322" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1322" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2114,7 +2114,7 @@ struct SlowLightIntensityScreen{T, A<:(AbstractMatrix)} <: Krang.AbstractScreen
 Screen made of `SlowLightIntensityPixel`s.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/SlowLightIntensityCamera.jl#L89" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/SlowLightIntensityCamera.jl#L89" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2137,7 +2137,7 @@ radial_w_I0_terms_integrals_case4(
 Returns the radial integrals for the case where there are no real roots in the radial potential
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1448" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1448" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2168,7 +2168,7 @@ Return the radial integrals
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1579" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1579" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2185,7 +2185,7 @@ abstract type AbstractCamera
 Abstract Observer Type
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2202,7 +2202,7 @@ struct IntensityScreen{T, A<:(AbstractMatrix)} <: Krang.AbstractScreen
 Screen made of `IntensityPixel`s.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/IntensityCamera.jl#L65" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/IntensityCamera.jl#L65" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2230,7 +2230,7 @@ Returns the antiderivative $I_t=\int\frac{a(2Mr-a\lambda)}{\sqrt{\Delta\mathcal{
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1560" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1560" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2247,7 +2247,7 @@ struct IntensityPixel{T} <: Krang.AbstractPixel{T}
 Intensity Pixel Type.  Each Pixel is associated with a single ray, and caches some information about the ray.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/IntensityCamera.jl#L2" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/IntensityCamera.jl#L2" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2264,7 +2264,7 @@ abstract type AbstractMaterial
 Abstract Material
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/materials/AbstractMaterialTypes.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/materials/AbstractMaterialTypes.jl#L1" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2281,7 +2281,7 @@ abstract type AbstractScreen
 Abstract Screen Type
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L8" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L8" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2304,7 +2304,7 @@ radial_w_I0_terms_integrals_case3(
 Returns the radial integrals for the case where there are two real roots in the radial potential
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1390" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1390" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2321,7 +2321,7 @@ struct IntensityCamera{T, A} <: Krang.AbstractCamera
 Camera that caches fast light raytracing information for an observer sitting at radial infinity. The frame of this observer is alligned with the Boyer-Lindquist frame.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/IntensityCamera.jl#L145" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/IntensityCamera.jl#L145" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2349,7 +2349,7 @@ Returns the antiderivative $I_r=\int\frac{dr}{\sqrt{\mathcal{R(r)}}}$. See [`r_p
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L385" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L385" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2366,7 +2366,7 @@ abstract type AbstractGeometry
 Abstract Geometry
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/geometries/geometry_types.jl#L2" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/geometries/geometry_types.jl#L2" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2387,7 +2387,7 @@ radial_inf_integrals_case2(
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L1161" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L1161" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2418,7 +2418,7 @@ Calculate the It infinity terms for a given pixel.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/cameras/camera_types.jl#L251" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/cameras/camera_types.jl#L251" target="_blank" rel="noreferrer">source</a></Badge>
 
 
 
@@ -2445,7 +2445,7 @@ See [`r_potential(x)`](/api#Krang.r_potential) for an implementation of $\mathca
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/metrics/Kerr/misc.jl#L751" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/metrics/Kerr/misc.jl#L751" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2472,7 +2472,7 @@ Transforms from Boyer-Lindquist to Kerr-Schild coordinates
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/schemes/RayTrace.jl#L206" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/schemes/RayTrace.jl#L206" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -2498,7 +2498,7 @@ Transforms from Boyer-Lindquist to Kerr-Schild coordinates ignoring time
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/b8a0f1233817c077750aa86f67e743fcd46e5832/src/schemes/RayTrace.jl#L220" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/dominic-chang/Krang.jl/blob/72824f495c2a658449c532af875da1b1fb85811e/src/schemes/RayTrace.jl#L220" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
