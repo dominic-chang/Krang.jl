@@ -20,8 +20,6 @@ format = DocumenterVitepress.MarkdownVitepress(;
     repo = "https://github.com/dominic-chang/Krang.jl", # this must be the full URL!
     devbranch = "main",
     devurl = "dev",
-    build_vitepress = true,
-    #clean_md_output = true
 )
 
 makedocs(;
@@ -47,7 +45,6 @@ makedocs(;
 
 deploydocs(;
     repo = "github.com/dominic-chang/Krang.jl",
-    target = "build", # this is where Vitepress stores its output
     devbranch = "main",
     push_preview = true,
 )
