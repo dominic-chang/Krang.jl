@@ -43,7 +43,7 @@ makedocs(;
     ],
 )
 
-deploydocs(;
+DocumenterVitepress.deploydocs(;
     repo = "github.com/dominic-chang/Krang.jl",
     devbranch = "main",
     push_preview = true,
