@@ -19,10 +19,10 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     Iϕ_inf::T
     "Radial time antiderivative"
     It_inf::T
-    I1_inf_m_I0_terms::T
-    I2_inf_m_I0_terms::T
-    Ip_inf_m_I0_terms::T
-    Im_inf_m_I0_terms::T
+    I1_o_m_I0_terms::T
+    I2_o_m_I0_terms::T
+    Ip_o_m_I0_terms::T
+    Im_o_m_I0_terms::T
     "Angular antiderivative"
     absGθo_Gθhat::NTuple{2,T}
     "Angular ϕ antiderivative"
@@ -86,6 +86,48 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
             tempλ,
         )
     end
+
+    function SlowLightIntensityPixel(met::Kerr{T}, longitude::T, latitude::T, θo::T, ro::T) where {T}
+        @assert longitude >= -π/2 && longitude <= π/2 "Longitude must be in [-π/2, π/2]"
+        a = met.spin
+        red_α = sin(longitude)
+        red_β = sin(latitude)
+        p_local_u = [1, √abs(1-(red_α^2+red_β^2)), red_α, -red_β]
+        p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
+        E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
+        tempλ = L/E
+        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+
+        roots = Krang.get_radial_roots(met, tempη, tempλ)
+        numreals = sum(_isreal2.(roots))
+        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+            roots = (roots[1], roots[4], roots[2], roots[3])
+        end
+        I1, I2, Ip, Im = radial_o_m_I0_terms_integrals(met, ro, roots, true)
+
+        I0_o = Krang.Ir_s(met, ro, roots, true)
+        new{T}(
+            met,
+            (longitude, latitude),
+            roots,
+            I0_o,
+            total_mino_time(met, roots),
+            Krang.Iϕ_o_m_I0_terms(met, ro, roots, tempλ, true),
+            Krang.It_o_m_I0_terms(met, ro, roots, tempλ, true),
+            I1,
+            I2,
+            Ip,
+            Im,
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
+            Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ),
+            Krang._absGto_Gthat(met, θo, tempη, tempλ),
+            θo,
+            ro,
+            tempη,
+            tempλ,
+        )
+    end
+
 end
 
 """
@@ -117,6 +159,23 @@ struct SlowLightIntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
         α = αmin + (αmax - αmin) * (T(I) - 1) / (res - 1)
         β = βmin + (βmax - βmin) * (T(J) - 1) / (res - 1)
         screen[I, J] = SlowLightIntensityPixel(met, α, β, θo)
+    end
+
+    @kernel function _generate_screen!(
+        screen,
+        met::Kerr{T},
+        longitude_min,
+        longitude_max,
+        latitude_min,
+        latitude_max,
+        θo,
+        ro,
+        res,
+    ) where {T}
+        I, J = @index(Global, NTuple)
+        long = longitude_min + (longitude_max - longitude_min) * (T(I) - 1) / (res - 1)
+        lat = latitude_min + (latitude_max - latitude_min) * (T(J) - 1) / (res - 1)
+        screen[I, J] = SlowLightIntensityPixel(met, long, lat, θo, ro)
     end
     @doc """
         SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res; A=Matrix) where {T}
@@ -164,6 +223,37 @@ struct SlowLightIntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
 
         new{T,typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
+    function SlowLightIntensityScreen(
+        met::Kerr{T},
+        longitude_min,
+        longitude_max,
+        latitude_min,
+        latitude_max,
+        θo,
+        ro,
+        res;
+        A = Matrix,
+    ) where {T}
+        screen = A(Matrix{SlowLightIntensityPixel{T}}(undef, res, res))
+
+        backend = get_backend(screen)
+
+        _generate_screen!(backend)(
+            screen,
+            met,
+            longitude_min,
+            longitude_max,
+            latitude_min,
+            latitude_max,
+            θo,
+            ro,
+            res,
+            ndrange = (res, res),
+        )
+
+        new{T,typeof(screen)}((longitude_min, longitude_max), (latitude_min, latitude_max), screen)
+    end
+
 end
 
 """
@@ -209,6 +299,21 @@ struct SlowLightIntensityCamera{T,A} <: AbstractCamera
         screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A)
         new{T,typeof(screen.pixels)}(met, screen, (T(Inf), θo))
     end
+
+    function SlowLightIntensityCamera(
+        met::Kerr{T},
+        θo,
+        ro,
+        longitude_min,
+        longitude_max,
+        latitude_min,
+        latitude_max,
+        res;
+        A = Matrix,
+    ) where {T}
+        screen = SlowLightIntensityScreen(met, longitude_min, longitude_max, latitude_min, latitude_max, θo, ro, res; A)
+        new{T,typeof(screen.pixels)}(met, screen, (ro, θo))
+    end
 end
 
 function η(pix::SlowLightIntensityPixel)
@@ -235,23 +340,23 @@ end
 function Ir_inf(pix::SlowLightIntensityPixel)
     return pix.I0_inf
 end
-function I1_inf_m_I0_terms(pix::SlowLightIntensityPixel)
-    return pix.I1_inf_m_I0_terms
+function I1_o_m_I0_terms(pix::SlowLightIntensityPixel)
+    return pix.I1_o_m_I0_terms
 end
-function I2_inf_m_I0_terms(pix::SlowLightIntensityPixel)
-    return pix.I2_inf_m_I0_terms
+function I2_o_m_I0_terms(pix::SlowLightIntensityPixel)
+    return pix.I2_o_m_I0_terms
 end
-function Ip_inf_m_I0_terms(pix::SlowLightIntensityPixel)
-    return pix.Ip_inf_m_I0_terms
+function Ip_o_m_I0_terms(pix::SlowLightIntensityPixel)
+    return pix.Ip_o_m_I0_terms
 end
-function Im_inf_m_I0_terms(pix::SlowLightIntensityPixel)
-    return pix.Im_inf_m_I0_terms
+function Im_o_m_I0_terms(pix::SlowLightIntensityPixel)
+    return pix.Im_o_m_I0_terms
 end
-function radial_inf_integrals_m_I0_terms(pix::SlowLightIntensityPixel)
-    return I1_inf_m_I0_terms(pix),
-    I2_inf_m_I0_terms(pix),
-    Ip_inf_m_I0_terms(pix),
-    Im_inf_m_I0_terms(pix)
+function radial_o_integrals_m_I0_terms(pix::SlowLightIntensityPixel)
+    return I1_o_m_I0_terms(pix),
+    I2_o_m_I0_terms(pix),
+    Ip_o_m_I0_terms(pix),
+    Im_o_m_I0_terms(pix)
 end
 function Iϕ_inf(pix::SlowLightIntensityPixel)
     return pix.Iϕ_inf

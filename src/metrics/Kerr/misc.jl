@@ -857,6 +857,10 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     return -2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
 end
 
+function Iϕ_o_m_I0_terms(metric::Kerr{T}, rs, roots::NTuple{4}, λ, νr) where {T}
+    return Iϕ_w_I0_terms(metric, rs, 0, roots, νr, λ)
+end
+
 """
 Returns the antiderivative \$I_t=\\int\\frac{r^2\\Delta+2Mr(r^2+a^2-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$ 
 evaluated at infinity without I0 terms.
@@ -1112,10 +1116,10 @@ function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr)
     )
 
     #equation B37
-    I1_total = r3 * I0_total + r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
+    I1_total = r3 * I0_total + r43 * (-1)^νr * Π1_s
     #equation B38
     I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = -(r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s# asymptotic Divergent piece is not included
+    I2_total = -(r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1253,6 +1257,14 @@ function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
         2 * I1_total +
         I2_total
     )# + (logdiv + lineardiv)
+end
+
+function It_o_m_I0_terms(metric::Kerr{T}, ro, roots::NTuple{4}, λ, νr) where {T}
+    return It_w_I0_terms(metric, ro, 0, roots, λ, νr)
+end
+
+function radial_o_m_I0_terms_integrals(met::Kerr{T}, ro::T, roots::NTuple{4}, νr) where {T}
+    return radial_w_I0_terms_integrals(met, ro, roots, zero(T), νr)
 end
 
 function radial_inf_integrals(met::Kerr{T}, roots::NTuple{4}) where {T}
@@ -1690,10 +1702,19 @@ Return the radial integrals
 """
 function radial_integrals(pix::AbstractPixel, rs, τ, νr)
     met = metric(pix)
-    I1_o, I2_o, Ip_o, Im_o = radial_inf_integrals_m_I0_terms(pix)
+    I1_o, I2_o, Ip_o, Im_o = radial_o_integrals_m_I0_terms(pix)
     I1_s, I2_s, Ip_s, Im_s = radial_w_I0_terms_integrals(met, rs, pix.roots, τ, νr)
     return τ, I1_o - I1_s, I2_o - I2_s, Ip_o - Ip_s, Im_o - Im_s
 end
+
+function radial_o_integrals_m_I0_terms(pix::AbstractPixel)
+    if isinf(pix.ro)
+        return radial_inf_integrals(metric(pix), pix.roots)
+    else
+        return radial_w_I0_terms_integrals(metric(pix), pix.ro, pix.roots, 0, true)
+    end
+end
+
 
 function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     radial_roots = real.(roots(pix))
@@ -1872,11 +1893,11 @@ function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} w
 end
 
 function Gs(pix::AbstractPixel, τ::T) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
     signβ = sign(β)
 
     τ == T(NaN) && return T(NaN)
@@ -1924,13 +1945,13 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
 end
 
 function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
 
     signβ = sign(β)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
 
     a = met.spin
     Go, Ghat = absGϕo_Gϕhat(pix)
@@ -1987,13 +2008,13 @@ function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
 end
 
 function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
     signβ = sign(β)
 
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
     a = met.spin
     Go, Ghat = absGto_Gthat(pix)
     Gs, ans, isvortical = zero(T), zero(T), ηtemp < zero(T)

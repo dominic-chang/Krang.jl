@@ -7,7 +7,7 @@ Each Pixel is associated with a single ray, and caches some information about th
 """
 struct IntensityPixel{T} <: AbstractPixel{T}
     metric::Kerr{T}
-    "Bardeen coordiantes if ro is \`Inf`, otherwise latitude and longitude"
+    "Bardeen coordiantes if ro is \`Inf`, otherwise longitude and latitude"
     screen_coordinate::NTuple{2,T}
     "Radial roots"
     roots::NTuple{4,Complex{T}}
@@ -64,11 +64,11 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         )
     end
 
-    function IntensityPixel(met::Kerr{T}, latitude::T, longitude::T, θo::T, ro::T) where {T}
-        @assert longitude >= -π/2 && longitude <= π/2 "Longitude must be in [-π/2, π/2]"
+    function IntensityPixel(met::Kerr{T}, longitude::T, latitude::T, θo::T, ro::T) where {T}
+        @assert latitude >= -π/2 && latitude <= π/2 "latitude must be in [-π/2, π/2]"
         a = met.spin
-        red_α = sin(latitude)
-        red_β = sin(longitude)
+        red_α = sin(longitude)
+        red_β = sin(latitude)
         p_local_u = [1, √abs(1-(red_α^2+red_β^2)), red_α, -red_β]
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
@@ -83,7 +83,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         I0_o = Krang.Ir_s(met, ro, roots, true)
         new{T}(
             met,
-            (latitude, longitude),
+            (longitude, latitude),
             roots,
             I0_o,
             total_mino_time(met, roots),
@@ -130,18 +130,18 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
     @kernel function _generate_screen!(
         screen,
         met::Kerr{T},
-        latitude_min,
-        latitude_max,
         longitude_min,
         longitude_max,
+        latitude_min,
+        latitude_max,
         θo,
         ro,
         res,
     ) where {T}
         I, J = @index(Global, NTuple)
-        lat = latitude_min + (latitude_max - latitude_min) * (T(I) - 1) / (res - 1)
-        long = longitude_min + (longitude_max - longitude_min) * (T(J) - 1) / (res - 1)
-        screen[I, J] = IntensityPixel(met, lat, long, θo, ro)
+        long = latitude_min + (latitude_max - latitude_min) * (T(I) - 1) / (res - 1)
+        lat = longitude_min + (longitude_max - longitude_min) * (T(J) - 1) / (res - 1)
+        screen[I, J] = IntensityPixel(met, long, lat, θo, ro)
     end
 
     @doc """
@@ -189,14 +189,14 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
             ndrange = (res, res),
         )
 
-        new{T,A}((αmin, αmax), (βmin, βmax), screen)
+        new{T,typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
     function IntensityScreen(
         met::Kerr{T},
-        αmin::T,
-        αmax::T,
-        βmin::T,
-        βmax::T,
+        longitude_min::T,
+        longitude_max::T,
+        latitude_min::T,
+        latitude_max::T,
         θo::T,
         ro::T,
         res;
@@ -209,17 +209,17 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
         _generate_screen!(backend)(
             screen,
             met,
-            αmin,
-            αmax,
-            βmin,
-            βmax,
+            longitude_min,
+            longitude_max,
+            latitude_min,
+            latitude_max,
             θo,
             ro,
             res,
             ndrange = (res, res),
         )
 
-        new{T,A}((αmin, αmax), (βmin, βmax), screen)
+        new{T,typeof(screen)}((longitude_min, longitude_max), (latitude_min, latitude_max), screen)
     end
 end
 
@@ -264,9 +264,11 @@ struct IntensityCamera{T,A} <: AbstractCamera
         res::Int;
         A = Matrix,
     ) where {T}
-        new{T,A}(
+
+        screen = IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A = A)
+        new{T,typeof(screen.pixels)}(
             met,
-            IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A = A),
+            screen,
             (T(Inf), θo),
         )
     end
@@ -274,16 +276,18 @@ struct IntensityCamera{T,A} <: AbstractCamera
         met::Kerr{T},
         θo,
         ro,
-        αmin,
-        αmax,
-        βmin,
-        βmax,
+        longitude_min,
+        longitude_max,
+        latitude_min,
+        latitude_max,
         res::Int;
         A = Matrix,
     ) where {T}
-        new{T,A}(
+
+        screen = IntensityScreen(met, longitude_min, longitude_max, latitude_min, latitude_max, θo, ro, res; A = A)
+        new{T,typeof(screen.pixels)}(
             met,
-            IntensityScreen(met, αmin, αmax, βmin, βmax, θo, ro, res; A = A),
+            screen,
             (ro, θo),
         )
     end

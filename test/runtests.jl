@@ -5,6 +5,7 @@ using LinearAlgebra
 using Integrals
 using StaticArrays
 using FileIO
+import Downloads
 using Rotations
 using GeometryBasics
 

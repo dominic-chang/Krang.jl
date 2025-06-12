@@ -193,6 +193,11 @@ function I1_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[1]
 end
 
+function I1_o_m_I0_terms(pix::AbstractPixel)
+    return radial_o_integrals(metric(pix), roots(pix))[1]
+end
+
+
 """
     I2_inf_m_I0_terms(pix::AbstractPixel)
 
@@ -207,6 +212,12 @@ Calculate the I2 infinity minus I0 terms for a given pixel.
 function I2_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[2]
 end
+
+function I2_o_m_I0_terms(pix::AbstractPixel)
+    return radial_o_integrals(metric(pix), roots(pix))[2]
+end
+
+
 """
     Ip_inf_m_I0_terms(pix::AbstractPixel)
 
@@ -221,6 +232,11 @@ Calculate the Ip infinity minus I0 terms for a given pixel.
 function Ip_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[3]
 end
+
+function Ip_o_m_I0_terms(pix::AbstractPixel)
+    return radial_o_integrals(metric(pix), roots(pix))[3]
+end
+
 
 """
     Im_inf_m_I0_terms(pix::AbstractPixel)
@@ -237,6 +253,11 @@ function Im_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[4]
 end
 
+function Im_o_m_I0_terms(pix::AbstractPixel)
+    return radial_o_integrals(metric(pix), roots(pix))[4]
+end
+
+
 """
     radial_inf_integrals_m_I0_terms(pix::AbstractPixel)
 
@@ -251,6 +272,11 @@ Calculate the radial infinity minus I0 terms for a given pixel.
 function radial_inf_integrals_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))
 end
+
+function radial_o_integrals(pix::AbstractPixel)
+    return radial_o_integrals_m_I0_terms(metric(pix), roots(pix))
+end
+
 
 """
     Iϕ_inf(pix::AbstractPixel)
