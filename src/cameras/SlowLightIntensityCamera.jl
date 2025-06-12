@@ -31,6 +31,7 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     absGto_Gthat::NTuple{2,T}
     "Half orbit of angular t antiderivative"
     θo::T
+    ro::T
     η::T
     λ::T
     @doc """
@@ -80,6 +81,7 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
             Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ),
             Krang._absGto_Gthat(met, θo, tempη, tempλ),
             θo,
+            T(Inf),
             tempη,
             tempλ,
         )

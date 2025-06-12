@@ -7,17 +7,19 @@ Each Pixel is associated with a single ray, and caches some information about th
 """
 struct IntensityPixel{T} <: AbstractPixel{T}
     metric::Kerr{T}
+    "Bardeen coordiantes if ro is \`Inf`, otherwise latitude and longitude"
     screen_coordinate::NTuple{2,T}
     "Radial roots"
     roots::NTuple{4,Complex{T}}
     "Radial antiderivative"
-    I0_inf::T
+    I0_o::T
     "Total possible Mino time"
     total_mino_time::T
     "Angular antiderivative"
     absGθo_Gθhat::NTuple{2,T}
     "Inclination"
     θo::T
+    ro::T
     η::T
     λ::T
     @doc """
@@ -56,6 +58,38 @@ struct IntensityPixel{T} <: AbstractPixel{T}
             total_mino_time(met, roots),
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
             θo,
+            T(Inf),
+            tempη,
+            tempλ,
+        )
+    end
+
+    function IntensityPixel(met::Kerr{T}, latitude::T, longitude::T, θo::T, ro::T) where {T}
+        @assert longitude >= -π/2 && longitude <= π/2 "Longitude must be in [-π/2, π/2]"
+        a = met.spin
+        red_α = sin(latitude)
+        red_β = sin(longitude)
+        p_local_u = [1, √abs(1-(red_α^2+red_β^2)), red_α, -red_β]
+        p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
+        E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
+        tempλ = L/E
+        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+
+        roots = Krang.get_radial_roots(met, tempη, tempλ)
+        numreals = sum(_isreal2.(roots))
+        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+            roots = (roots[1], roots[4], roots[2], roots[3])
+        end
+        I0_o = Krang.Ir_s(met, ro, roots, true)
+        new{T}(
+            met,
+            (latitude, longitude),
+            roots,
+            I0_o,
+            total_mino_time(met, roots),
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
+            θo,
+            ro,
             tempη,
             tempλ,
         )
@@ -68,11 +102,11 @@ end
 Screen made of `IntensityPixel`s.
 """
 struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
-    "Minimum and Maximum Bardeen α values"
-    αrange::NTuple{2,T}
+    "Minimum and Maximum x coordinate values"
+    xrange::NTuple{2,T}
 
-    "Minimum and Maximum Bardeen β values"
-    βrange::NTuple{2,T}
+    "Minimum and Maximum y coordinate values"
+    yrange::NTuple{2,T}
 
     "Data type that stores screen pixel information"
     pixels::A
@@ -91,6 +125,23 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
         α = αmin + (αmax - αmin) * (T(I) - 1) / (res - 1)
         β = βmin + (βmax - βmin) * (T(J) - 1) / (res - 1)
         screen[I, J] = IntensityPixel(met, α, β, θo)
+    end
+
+    @kernel function _generate_screen!(
+        screen,
+        met::Kerr{T},
+        latitude_min,
+        latitude_max,
+        longitude_min,
+        longitude_max,
+        θo,
+        ro,
+        res,
+    ) where {T}
+        I, J = @index(Global, NTuple)
+        lat = latitude_min + (latitude_max - latitude_min) * (T(I) - 1) / (res - 1)
+        long = longitude_min + (longitude_max - longitude_min) * (T(J) - 1) / (res - 1)
+        screen[I, J] = IntensityPixel(met, lat, long, θo, ro)
     end
 
     @doc """
@@ -140,6 +191,36 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
 
         new{T,A}((αmin, αmax), (βmin, βmax), screen)
     end
+    function IntensityScreen(
+        met::Kerr{T},
+        αmin::T,
+        αmax::T,
+        βmin::T,
+        βmax::T,
+        θo::T,
+        ro::T,
+        res;
+        A = Matrix,
+    ) where {T}
+        screen = A(Matrix{IntensityPixel{T}}(undef, res, res))
+
+        backend = get_backend(screen)
+
+        _generate_screen!(backend)(
+            screen,
+            met,
+            αmin,
+            αmax,
+            βmin,
+            βmax,
+            θo,
+            ro,
+            res,
+            ndrange = (res, res),
+        )
+
+        new{T,A}((αmin, αmax), (βmin, βmax), screen)
+    end
 end
 
 """
@@ -152,8 +233,8 @@ struct IntensityCamera{T,A} <: AbstractCamera
     metric::Kerr{T}
     "Data type that stores screen pixel information"
     screen::IntensityScreen{T,A}
-    "Observer screen_coordinate"
-    screen_coordinate::NTuple{2,T}
+    "camera location"
+    camera_location::NTuple{2,T}
 
     @doc """
         IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int; A=Matrix) where {T}
@@ -189,6 +270,24 @@ struct IntensityCamera{T,A} <: AbstractCamera
             (T(Inf), θo),
         )
     end
+    function IntensityCamera(
+        met::Kerr{T},
+        θo,
+        ro,
+        αmin,
+        αmax,
+        βmin,
+        βmax,
+        res::Int;
+        A = Matrix,
+    ) where {T}
+        new{T,A}(
+            met,
+            IntensityScreen(met, αmin, αmax, βmin, βmax, θo, ro, res; A = A),
+            (ro, θo),
+        )
+    end
+
 end
 
 function η(pix::IntensityPixel)
@@ -206,15 +305,13 @@ end
 function inclination(pix::IntensityPixel)
     return pix.θo
 end
-function I0_inf(pix::IntensityPixel)
-    return pix.I0_inf
+function I0_o(pix::IntensityPixel)
+    return pix.I0_o
 end
 function total_mino_time(pix::IntensityPixel)
     return pix.total_mino_time
 end
-function Ir_inf(pix::IntensityPixel)
-    return pix.I0_inf
-end
+
 function absGθo_Gθhat(pix::IntensityPixel)
     return pix.absGθo_Gθhat
 end

@@ -11,7 +11,12 @@ export λ,
     get_radial_roots,
     Ir,
     Gθ,
-    total_mino_time
+    total_mino_time,
+    jac_zamo_d_bl_u,
+    jac_bl_d_zamo_u,
+    jac_zamo_u_bl_d,
+    jac_bl_u_zamo_d,
+    jac_fluid_u_zamo_d
 
 """
 Checks if a complex number is real to some tolerance
@@ -121,6 +126,110 @@ function S2(α, φ, j)
         α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3
     ) + (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
 end
+
+"""
+    Returns the momentum form in the Boyer-Lindquist basis.
+"""
+function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr::Bool, νθ::Bool) where {T}
+    return @SVector[
+        -one(T),
+        (νr ? one(T) : -one(T)) * √max(zero(T), r_potential(metric, η, λ, r)) /
+        Δ(metric, r),
+        (νθ ? one(T) : -one(T)) * √max(zero(T), θ_potential(metric, η, λ, θ)),
+        λ,
+    ]
+end
+
+"""
+Returns the Jacobian which converts a Boyer-Lindquist covector to ZAMO basis.
+"""
+function jac_zamo_d_bl_u(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    # coords = {t, r, θ, ϕ}
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [# Eq 3.1 1972ApJ...178..347B
+        √(At / (Σt * Δt)) zero(T) zero(T) 2*a*r/√(At * Δt * Σt)
+        zero(T) √(Δt / Σt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) √(Σt / At)*csc(θ)
+        zero(T) zero(T) -inv(√Σt) zero(T)
+    ]
+end
+
+"""
+Jacobian which converts ZAMO covector to a Boyer-Lindquist basis
+"""
+function jac_bl_d_zamo_u(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [
+        # coords = {t, r, ϕ, θ}
+        √((Σt * Δt) / At) zero(T) -2*a*r*sin(θ)/√(At * Σt) zero(T)
+        zero(T) √(Σt / Δt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) -√Σt
+        zero(T) zero(T) √(At / Σt)*sin(θ) zero(T)
+    ]
+end
+
+"""
+Jacobian which converts Boyer-Lindquist vector to a ZAMO basis
+"""
+function jac_zamo_u_bl_d(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [#  Eq 3.2 1972ApJ...178..347B
+        # coords = {t, r, ϕ, θ}
+        √((Σt * Δt) / At) zero(T) zero(T) zero(T)
+        zero(T) √(Σt / Δt) zero(T) zero(T)
+        -(2a * r * sin(θ))/√(At * Σt) zero(T) zero(T) √(At / Σt)*sin(θ)
+        zero(T) zero(T) -√Σt zero(T)
+    ]
+end
+
+"""
+Jacobian which converts ZAMO vector to a Boyer-Lindquist basis
+"""
+function jac_bl_u_zamo_d(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [
+        # coords = {t, r, ϕ, θ}
+        √(At / (Σt * Δt)) zero(T) zero(T) zero(T)
+        zero(T) √(Δt / Σt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) -inv(√Σt)
+        2a*r/√(Σt * Δt * At) zero(T) √(Σt / At)*csc(θ) zero(T)
+    ]
+end
+
+"""
+Jacobian which expreases ZAMO vector in the fluid frame
+"""
+function jac_fluid_u_zamo_d(::Kerr{T}, β, θ, φ) where {T}
+    γ = inv(√(1 - β^2))
+    sinφ = sin(φ)
+    cosφ = cos(φ)
+    sinθ = sin(θ)
+    cosθ = cos(θ)
+
+    return @SMatrix [
+        γ -β*γ*cosφ*sinθ -β*γ*sinφ*sinθ -β*γ*cosθ
+        -β*γ*cosφ*sinθ cosθ^2*cosφ^2+γ*cosφ^2*sinθ^2+sinφ^2 (γ-1)*cosφ*sinθ^2*sinφ (γ-1)*cosθ*cosφ*sinθ
+        -β*γ*sinθ*sinφ (γ-1)*cosφ*sinθ^2*sinφ cosφ^2+(cosθ^2+γ*sinθ^2)*sinφ^2 (γ-1)*cosθ*sinθ*sinφ
+        -β*γ*cosθ (γ-1)*cosθ*cosφ*sinθ (γ-1)*cosθ*sinθ*sinφ γ*cosθ^2+sinθ^2
+    ]
+end
+
 
 """
 Energy reduced azimuthal angular momentum
@@ -1365,10 +1474,10 @@ function radial_w_I0_terms_integrals_case2(
     )
 
     #equation B37
-    I1_total = -r3 * I0_total - r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
+    I1_total = -r3 * I0_total - r43 * (-1)^νr * Π1_s
     #equation B38
     I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s# asymptotic Divergent piece is not included
+    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1428,9 +1537,7 @@ function radial_w_I0_terms_integrals_case3(
     Π2_s = (coef^2) * R2(αo, φ_s, k3)
 
     I0_total = τ
-    # Removed logarithmic divergence
     I1_total = -(B * r2 + A * r1) / (B + A) * I0_total + Π1_s
-    # Removed linear divergence
     I2_total = -(
         (((B * r2 + A * r1) / (B + A))^2) * I0_total -
         2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * (-Π2_s)
@@ -1478,14 +1585,11 @@ function radial_w_I0_terms_integrals_case4(
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-    #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
     Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
     Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
 
-    # Removed logarithmic divergence
     I1_total = -(a2 / go - b1) * τ + (-Π1_s)
 
-    # Removed linear divergence
     I2_total = -((a2 / go - b1)^2) * τ + 2(a2 / go - b1) * (-Π1_s) - (-Π2_s)
     Ip_total =
         -go / (a2 * (1 - go * x4_p)) *
@@ -1604,7 +1708,7 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} wher
     coef = 2 / √real(r31 * r42)
     Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
 
     r4 < rh && τ > (fo - Ir_s) && return zero(T), false, false# invalid case2
 
@@ -1623,7 +1727,7 @@ function _rs_case3(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     r1, r2, r21 = real.((r1, r2, r21))
 
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
     A = √abs(r32 * r42)
     B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
@@ -1663,7 +1767,7 @@ function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     coef = 2 / (C + D)
     Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
     τ > (fo - Ir_s) && return zero(T), false, false
 
     X4 = (C + D) / T(2) * (fo - τ)

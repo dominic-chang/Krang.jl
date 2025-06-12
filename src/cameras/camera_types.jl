@@ -130,6 +130,25 @@ function I0_inf(pix::AbstractPixel)
     return Ir_inf(metric(pix), roots(pix))
 end
 
+
+"""
+    I0_o(pix::AbstractPixel)
+
+Calculate the I0 anti-derivative value for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The I0 anti-derivative of the pixel.
+"""
+function I0_o(pix::AbstractPixel)
+    if isinf(pix.ro)
+        return I0_inf(pix)
+    end
+    return Ir_s(metric(pix), pix.ro, roots(pix), true)
+end
+
 """
     total_mino_time(pix::AbstractPixel)
 
