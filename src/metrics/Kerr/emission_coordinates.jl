@@ -265,7 +265,6 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     λtemp = λ(pix)
 
     νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    #isindir = !(((τ + sign(β)*τo - (νθ ? 1 : -1)*τs)/τhat) ≈ n) # TODO: Why is this here
     if (abs(cosθs) < abs(cosθo))
         isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
@@ -292,7 +291,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
-    νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
 
     return emission_time_regularized, rs, emission_azimuth, νr, νθ, issuccess
 end
