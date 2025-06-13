@@ -47,7 +47,7 @@ function _raytrace(
     return observation
 end
 
-function line_intersection(
+@inline function line_intersection(
     origin::NTuple{3,T},
     line_point_2,
     geometry::AbstractLevelSetGeometry{T},

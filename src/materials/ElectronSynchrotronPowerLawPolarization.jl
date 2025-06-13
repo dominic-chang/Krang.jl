@@ -1,7 +1,7 @@
 """
 Returns the screen polarization associated with a killing spinor κ as seen seen by an asymptotic observer.
 """
-function screen_polarization(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}# Eq 31 10.1103/PhysRevD.104.044060
+@inline function screen_polarization(metric::Kerr{T}, κ::Complex, θ, α, β) where {T}# Eq 31 10.1103/PhysRevD.104.044060
     a = metric.spin
     κ1 = real(κ)
     κ2 = imag(κ)
@@ -19,7 +19,7 @@ evpa(fα, fβ) = atan(-fα, fβ)
 """
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function synchrotronPolarization(
+@inline function synchrotronPolarization(
     metric::Kerr{T},
     α,
     β,
@@ -172,7 +172,7 @@ end
 """
     Functor for the ElectronSynchrotronPowerLawPolarization material
 """
-function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(
+@inline function (linpol::ElectronSynchrotronPowerLawPolarization{N,T})(
     pix::AbstractPixel,
     intersection,
 ) where {N,T}

@@ -1,7 +1,7 @@
 """
 Calculates the intensity of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
 """
-function synchrotronIntensity(
+@inline function synchrotronIntensity(
     metric::Kerr{T},
     α,
     β,
