@@ -73,10 +73,10 @@ end
                 ts, rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates(pix, θs, isindir, n)
                 Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
             end
-        end
 
-        if issuccess && (horizon(metric(pix)) < rs < T(Inf))
-            observation += @inline(material(pix, intersection))
+            if issuccess && (horizon(metric(pix)) < rs < T(Inf))
+                observation += @inline(material(pix, intersection))
+            end
         end
     end
 
