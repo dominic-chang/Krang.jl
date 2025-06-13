@@ -111,9 +111,9 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
 @inline function emission_inclination(pix::AbstractPixel, τ)
     met = metric(pix)
     θo = inclination(pix)
-    α, β = pix.screen_coordinate
+    _, β = pix.screen_coordinate
 
-    return _θs(met, sign(β), θo, η(met, α, β, θo), λ(met, α, θo), τ)
+    return _θs(met, sign(β), θo, η(pix), λ(pix), τ)
 end
 
 """
@@ -132,7 +132,7 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
     θo = inclination(pix)
 
     α, _ = pix.screen_coordinate
-    λtemp = λ(met, α, θo)
+    λtemp = λ(pix)
     Iϕ = Krang.Iϕ(pix, rs, τ, νr)
     (isnan(Iϕ) || !isfinite(Iϕ)) && return Iϕ
 
@@ -209,7 +209,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 
     a = met.spin
 
-    λtemp = λ(met, α, θo)
+    λtemp = λ(pix)
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return zero(T), zero(T), zero(T), true, true, false
     _, _, _, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
@@ -262,7 +262,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 
     a = met.spin
 
-    λtemp = λ(met, α, θo)
+    λtemp = λ(pix)
 
     νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     #isindir = !(((τ + sign(β)*τo - (νθ ? 1 : -1)*τs)/τhat) ≈ n) # TODO: Why is this here
@@ -310,8 +310,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     met = metric(pix)
     θo = inclination(pix)
 
-    θs, τs, _, _, n, isindir = @inline emission_inclination(pix, τ)
-    νθ = τs > 0
+    θs, _, _, _, n, isindir = @inline emission_inclination(pix, τ)
 
     if cos(θs) > abs(cos(θo))
         αmin = @inline αboundary(met, θs)
@@ -324,7 +323,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 
     a = met.spin
 
-    λtemp = λ(met, α, θo)
+    λtemp = λ(pix)
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return zero(T), zero(T), zero(T), zero(T), true, true, false
     I0, I1, I2, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
