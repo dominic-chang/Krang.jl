@@ -16,7 +16,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 [compat]
 DocStringExtensions = "0.9"
 GeometryBasics = "0.5"
-JacobiElliptic = "0.1, 0.2, 0.3"
+JacobiElliptic = "0.3"
 KernelAbstractions = "0.9"
 PolarizedTypes = "0.1"
 Roots = "2"
