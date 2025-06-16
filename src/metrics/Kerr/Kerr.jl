@@ -59,7 +59,7 @@ end
 """
 Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 """
-function metric_uu(metric::Kerr{T}, r, θ) where {T}
+@inline function metric_uu(metric::Kerr{T}, r, θ) where {T}
     Δt = Δ(metric, r)
     Ξt = Ξ(metric, r, θ; Δ = Δt)
     Σt = Σ(metric, r, θ)
@@ -82,7 +82,7 @@ Inverse Kerr metric in Boyer Lindquist (BL) coordinates.
 - `metric` : Kerr metric
 - `coordinates` : Coordinates (t, r, θ, ϕ)
 """
-function metric_uu(metric::Kerr{T}, coordinates) where {T}
+@inline function metric_uu(metric::Kerr{T}, coordinates) where {T}
     _, r, θ, _ = coordinates
     metric_uu(metric, r, θ)
 end
@@ -90,7 +90,7 @@ end
 """
 Kerr metric in Boyer Lindquist (BL) coordinates.
 """
-function metric_dd(metric::Kerr{T}, r, θ) where {T}
+@inline function metric_dd(metric::Kerr{T}, r, θ) where {T}
     Δt = Δ(metric, r)
     Ξt = Ξ(metric, r, θ; Δ = Δt)
     Σt = Σ(metric, r, θ)
@@ -115,7 +115,7 @@ Kerr metric in Boyer Lindquist (BL) coordinates.
 - `metric` : Kerr metric
 - `coordinates` : Coordinates (t, r, θ, ϕ)
 """
-function metric_dd(metric::Kerr{T}, coordinates) where {T}
+@inline function metric_dd(metric::Kerr{T}, coordinates) where {T}
     _, r, θ, _ = coordinates
     return metric_dd(metric, r, θ)
 end

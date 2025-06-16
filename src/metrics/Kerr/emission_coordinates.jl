@@ -29,19 +29,19 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-function emission_radius(
+@inline function emission_radius(
     pix::Krang.AbstractPixel,
     θs::T,
     isindir,
     n,
-)::Tuple{T,Bool,Bool,Int,Bool} where {T}
+) where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
-    met = metric(pix)
+    met = @inline metric(pix)
     isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
     if !isincone
-        αmin = αboundary(met, θs)
-        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
+        αmin = @inline αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
         ((abs(β) + eps(T)) < βbound) && return zero(T), true, true, 0, false
     end
 
@@ -54,7 +54,7 @@ function emission_radius(
         νθ = (θo > θs) ⊻ (n % 2 == 1)
     end
 
-    ans, νr, numreals, issuccess = emission_radius(pix, τ)
+    ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
     return ans, νr, νθ, numreals, issuccess
 end
 
@@ -67,7 +67,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 -`pix` : Pixel information
 - `τ` : Mino time
 """
-function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T,Bool,Int,Bool} where {T}
+@inline function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T,Bool,Int,Bool} where {T}
     met = metric(pix)
     a = met.spin
     ans = zero(T)
@@ -96,7 +96,7 @@ Emission inclination for point originating at inclination rs whose nth order ima
 - `rs` : Emission radius
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 """
-function emission_inclination(pix::AbstractPixel, rs, νr)
+@inline function emission_inclination(pix::AbstractPixel, rs, νr)
     return emission_inclination(pix, Ir(pix, νr, rs))
 end
 
@@ -108,7 +108,7 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
 - `pix` : Pixel information
 - `τ` : Mino Time
 """
-function emission_inclination(pix::AbstractPixel, τ)
+@inline function emission_inclination(pix::AbstractPixel, τ)
     met = metric(pix)
     θo = inclination(pix)
     _, β = pix.screen_coordinate
@@ -127,7 +127,7 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
 - `τ` : Mino Time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 """
-function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) where {T}
+@inline function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) where {T}
     met = metric(pix)
     θo = inclination(pix)
 
@@ -136,7 +136,7 @@ function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) w
     Iϕ = Krang.Iϕ(pix, rs, τ, νr)
     (isnan(Iϕ) || !isfinite(Iϕ)) && return Iϕ
 
-    Gϕtemp, _, _, _ = Gϕ(pix, θs, isindir, n)
+    Gϕtemp, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return Iϕ
 
     return -(Iϕ + λtemp * Gϕtemp + T(π / 2))
@@ -153,7 +153,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where {T}
+@inline function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where {T}
     # NB: I do not return θs since it is already known, and returning it might encourage bad coding errors
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
@@ -165,7 +165,7 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
         ((abs(β) + eps(T)) < βbound) && return zero(T), zero(T), false, false, false
     end
 
-    τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
+    τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
     issuccess || return (zero(T), zero(T), false, false, false)
 
     # is θ̇s increasing or decreasing?
@@ -177,7 +177,7 @@ function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n)
     rs, νr, _, issuccess = emission_radius(pix, τ)
     issuccess || return (zero(T), zero(T), false, false, false)
 
-    ϕs = emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
+    ϕs = @inline emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
 
     return rs, ϕs, νr, νθ, issuccess
 end
@@ -190,17 +190,17 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 - `pix` : Pixel information
 - `τ` : Mino Time
 """
-function emission_coordinates_fast_light(pix::AbstractPixel, τ::T) where {T}
-    α, β = screen_coordinate(pix)
+@inline function emission_coordinates_fast_light(pix::AbstractPixel, τ::T) where {T}
+    α, β = @inline screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
 
-    θs, τs, _, _, n, isindir = emission_inclination(pix, τ)
+    θs, τs, _, _, n, isindir = @inline emission_inclination(pix, τ)
     νθ = τs > 0
 
     if cos(θs) > abs(cos(θo))
-        αmin = αboundary(met, θs)
-        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
+        αmin = @inline αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
             return zero(T), zero(T), zero(T), true, true, false
@@ -210,16 +210,16 @@ function emission_coordinates_fast_light(pix::AbstractPixel, τ::T) where {T}
     a = met.spin
 
     λtemp = λ(pix)
-    rs, νr, _, issuccess = emission_radius(pix, τ)
+    rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return zero(T), zero(T), zero(T), true, true, false
-    _, _, _, Ip, Im = radial_integrals(pix, rs, τ, νr)
+    _, _, _, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
 
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
+    Gϕtemp, _, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
 
     emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
 
@@ -239,25 +239,25 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
+@inline function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     α, β = pix.screen_coordinate
     met = metric(pix)
     θo = inclination(pix)
     cosθs = cos(θs)
     cosθo = cos(θo)
     if cos(θs) > abs(cosθo)
-        αmin = αboundary(met, θs)
-        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
+        αmin = @inline αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
             return zero(T), zero(T), zero(T), false, false, false
         end
     end
 
-    τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
+    τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
     issuccess || return zero(T), zero(T), zero(T), false, false, false
 
-    rs, νr, _, issuccess = emission_radius(pix, τ)
+    rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return zero(T), zero(T), zero(T), false, false, false
 
     a = met.spin
@@ -265,7 +265,6 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
     λtemp = λ(pix)
 
     νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    #isindir = !(((τ + sign(β)*τo - (νθ ? 1 : -1)*τs)/τhat) ≈ n) # TODO: Why is this here
     if (abs(cosθs) < abs(cosθo))
         isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
@@ -273,7 +272,7 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         return zero(T), zero(T), zero(T), false, false, false
     end
 
-    I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
+    I0, I1, I2, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
@@ -285,14 +284,14 @@ function emission_coordinates(pix::AbstractPixel, θs::T, isindir, n) where {T}
         I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
-    Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
+    Gϕtemp, _, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
+    Gttemp, _, _, _, _ = @inline Gt(pix, θs, isindir, n)
 
     emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
 
     # is θ̇s increasing or decreasing?
-    νθ = cosθs < abs(cosθo) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
 
     return emission_time_regularized, rs, emission_azimuth, νr, νθ, issuccess
 end
@@ -305,16 +304,16 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 - `pix` : Pixel information
 - `τ` : Mino Time
 """
-function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
+@inline function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
 
-    θs, _, _, _, n, isindir = emission_inclination(pix, τ)
+    θs, _, _, _, n, isindir = @inline emission_inclination(pix, τ)
 
     if cos(θs) > abs(cos(θo))
-        αmin = αboundary(met, θs)
-        βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
+        αmin = @inline αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
             return zero(T), zero(T), zero(T), zero(T), true, true, false
@@ -324,9 +323,9 @@ function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
     a = met.spin
 
     λtemp = λ(pix)
-    rs, νr, _, issuccess = emission_radius(pix, τ)
+    rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return zero(T), zero(T), zero(T), zero(T), true, true, false
-    I0, I1, I2, Ip, Im = radial_integrals(pix, rs, τ, νr)
+    I0, I1, I2, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
@@ -338,8 +337,8 @@ function emission_coordinates(pix::AbstractPixel, τ::T) where {T}
         I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _, _ = Gϕ(pix, θs, isindir, n)
-    Gttemp, _, _, _, _ = Gt(pix, θs, isindir, n)
+    Gϕtemp, _, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
+    Gttemp, _, _, _, _ = @inline Gt(pix, θs, isindir, n)
 
     emission_azimuth = -(Iϕ + λtemp * Gϕtemp + T(π / 2))
     emission_time_regularized = (It + a^2 * Gttemp)
@@ -352,7 +351,7 @@ function θs(metric::Kerr{T}, α, β, θo, τ) where {T}
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 
-function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
+@inline function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
     a = metric.spin
     Ghat_2, isvortical = zero(T), η < zero(T)
 

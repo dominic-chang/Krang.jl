@@ -7,6 +7,7 @@ using StaticArrays
 using FileIO
 import Downloads
 using Rotations
+import Downloads
 using GeometryBasics
 
 include("kerr_misc_tests.jl")
