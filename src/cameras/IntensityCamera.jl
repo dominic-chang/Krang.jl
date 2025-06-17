@@ -94,6 +94,32 @@ struct IntensityPixel{T} <: AbstractPixel{T}
             tempλ,
         )
     end
+
+    function IntensityPixel(met::Kerr{T}, p_local_u::Vector{T}, θo::T, ro::T) where {T}
+        p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
+        E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
+        tempλ = L/E
+        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+
+        roots = Krang.get_radial_roots(met, tempη, tempλ)
+        numreals = sum(_isreal2.(roots))
+        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+            roots = (roots[1], roots[4], roots[2], roots[3])
+        end
+        I0_o = Krang.Ir_s(met, ro, roots, true)
+        new{T}(
+            met,
+            (-p_local_u[3]/p_local_u[1], -p_local_u[4]/p_local_u[1]),
+            roots,
+            I0_o,
+            total_mino_time(met, roots),
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
+            θo,
+            ro,
+            tempη,
+            tempλ,
+        )
+    end
 end
 
 """
