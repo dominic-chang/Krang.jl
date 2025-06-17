@@ -14,7 +14,9 @@ Returns the screen polarization associated with a killing spinor κ as seen seen
     return fα, fβ
 end
 
-evpa(fα, fβ) = atan(-fα, fβ)
+function evpa(fα, fβ)
+     atan(-fα, fβ)
+end
 
 """
 Calculates the polarization of a photon emitted from a fluid particle with momentum f_u and observed by an asymptotic observer.
