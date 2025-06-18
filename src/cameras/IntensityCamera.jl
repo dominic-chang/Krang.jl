@@ -96,6 +96,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     end
 
     function IntensityPixel(met::Kerr{T}, p_local_u::Vector{T}, θo::T, ro::T) where {T}
+        a = met.spin
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
         tempλ = L/E
