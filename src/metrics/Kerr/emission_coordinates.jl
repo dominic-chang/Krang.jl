@@ -50,9 +50,6 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 
     # νθ is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    if isincone
-        νθ = (θo > θs) ⊻ (n % 2 == 1)
-    end
 
     ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
     return ans, νr, νθ, numreals, issuccess
