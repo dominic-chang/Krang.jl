@@ -76,6 +76,8 @@ Calculate the η value for a given pixel.
 - The η value of the pixel.
 """
 function η(pix::AbstractPixel)
+    @warn "η is not stored in pixel, calculating η under infinite observer assumption instead"
+
     met = metric(pix)
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
@@ -94,6 +96,7 @@ Calculate the λ value for a given pixel.
 - The λ value of the pixel.
 """
 function λ(pix::AbstractPixel)
+    @warn "λ is not stored in pixel, calculating λ under infinite observer assumption instead"
     met = metric(pix)
     α, _ = screen_coordinate(pix)
     θo = inclination(pix)
@@ -190,10 +193,12 @@ Calculate the I1 infinity minus I0 terms for a given pixel.
 - The I1 infinity minus I0 terms of the pixel.
 """
 function I1_inf_m_I0_terms(pix::AbstractPixel)
+    @warn "I1_inf_m_I0_terms are not stored in pixel, calculating I1_inf_integrals under infinite observer assumption instead"
     return radial_inf_integrals(metric(pix), roots(pix))[1]
 end
 
 function I1_o_m_I0_terms(pix::AbstractPixel)
+    @warn "I1_o_m_I0_terms are not stored in pixel, calculating I1_o_integrals under infinite observer assumption instead"
     return radial_o_integrals(metric(pix), roots(pix))[1]
 end
 
@@ -210,10 +215,12 @@ Calculate the I2 infinity minus I0 terms for a given pixel.
 - The I2 infinity minus I0 terms of the pixel.
 """
 function I2_inf_m_I0_terms(pix::AbstractPixel)
+    @warn "I2_inf_m_I0_terms are not stored in pixel, calculating I2_inf_integrals under infinite observer assumption instead"
     return radial_inf_integrals(metric(pix), roots(pix))[2]
 end
 
 function I2_o_m_I0_terms(pix::AbstractPixel)
+    @warn "I2_o_m_I0_terms are not stored in pixel, calculating I2_o_integrals under infinite observer assumption instead"
     return radial_o_integrals(metric(pix), roots(pix))[2]
 end
 

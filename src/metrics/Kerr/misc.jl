@@ -1666,7 +1666,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 """
 function Iϕ(pix::AbstractPixel, rs, τ, νr)
     metric = pix.metric
-    λtemp = λ(metric, pix.screen_coordinate[1], pix.θo)
+    λtemp = λ(pix)
     tempIϕ_inf = Iϕ_inf(pix)
     tempIϕ_s = Iϕ_w_I0_terms(metric, rs, τ, pix.roots, νr, λtemp)
 
@@ -1686,7 +1686,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 """
 function It(pix::AbstractPixel, rs, τ, νr)
     metric = pix.metric
-    λtemp = λ(metric, pix.screen_coordinate[1], pix.θo)
+    λtemp = λ(pix)
     tempIt_inf = It_inf(pix)
 
     return tempIt_inf - It_w_I0_terms(metric, rs, τ, pix.roots, λtemp, νr)
