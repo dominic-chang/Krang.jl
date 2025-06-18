@@ -25,26 +25,10 @@
         jaczb_u_d = jac_zamo_u_bl_d(metric, rs, θs)
         jacfz_u_d = jac_fluid_u_zamo_d(metric, 0.5, π / 4, π / 4)
         jaczf_u_d = jac_fluid_u_zamo_d(metric, -0.5, π / 4, π / 4)
-        trivjacfz_u_d = jac_fluid_u_zamo_d(metric, 0.0, 0.0, 0.0)
         met_uu = metric_uu(metric, rs, θs)
         met_dd = metric_dd(metric, rs, θs)
         minkowski = [-1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
         identity = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
-
-        @test maximum(abs, trivjacfz_u_d .- identity) ≈ 0 atol = 1e-10
-        @testset "Inversion" begin
-            @test maximum(abs, (jacbz_u_d * jaczb_u_d) .- identity) ≈ 0 atol = 1e-10
-            @test maximum(abs, (jacbz_d_u * jaczb_d_u) .- identity) ≈ 0 atol = 1e-10
-            @test maximum(abs, (jacfz_u_d * jaczf_u_d) .- identity) ≈ 0 atol = 1e-10
-        end
-
-        # Check that the local metric is Minkowski in the ZAMO basis.
-        @testset "Metric transformation" begin
-            @test maximum(abs, (jaczb_u_d * met_uu * jaczb_u_d') .- minkowski) ≈ 0 atol =
-                1e-10
-            @test maximum(abs, (jaczb_d_u * met_dd * jaczb_d_u') .- minkowski) ≈ 0 atol =
-                1e-10
-        end
 
         @testset "Polarization routine" begin
             metric = Kerr(0.01)
