@@ -66,11 +66,12 @@ end
                     Intersection(zero(rs), rs, θs, zero(rs), νr, νθ), issuccess
                 else
                     rs, ϕs, νr, νθ, issuccess =
-                    @inline emission_coordinates_fast_light(pix, θs, isindir, n)
+                        @inline emission_coordinates_fast_light(pix, θs, isindir, n)
                     Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
                 end
             else
-                ts, rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates(pix, θs, isindir, n)
+                ts, rs, ϕs, νr, νθ, issuccess =
+                    @inline emission_coordinates(pix, θs, isindir, n)
                 Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
             end
 

@@ -29,12 +29,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 - `isindir` : Is emission to observer direct or indirect
 - `n` : Image index
 """
-@inline function emission_radius(
-    pix::Krang.AbstractPixel,
-    θs::T,
-    isindir,
-    n,
-) where {T}
+@inline function emission_radius(pix::Krang.AbstractPixel, θs::T, isindir, n) where {T}
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = @inline metric(pix)
@@ -124,7 +119,15 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
 - `τ` : Mino Time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 """
-@inline function emission_azimuth(pix::AbstractPixel, θs, rs, τ::T, νr, isindir, n) where {T}
+@inline function emission_azimuth(
+    pix::AbstractPixel,
+    θs,
+    rs,
+    τ::T,
+    νr,
+    isindir,
+    n,
+) where {T}
     met = metric(pix)
     θo = inclination(pix)
 
@@ -150,7 +153,12 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 - `isindir` : Whether emission to observer is direct or indirect
 - `n` : Image index
 """
-@inline function emission_coordinates_fast_light(pix::AbstractPixel, θs::T, isindir, n) where {T}
+@inline function emission_coordinates_fast_light(
+    pix::AbstractPixel,
+    θs::T,
+    isindir,
+    n,
+) where {T}
     # NB: I do not return θs since it is already known, and returning it might encourage bad coding errors
     α, β = screen_coordinate(pix)
     θo = inclination(pix)
