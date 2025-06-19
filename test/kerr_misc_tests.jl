@@ -346,8 +346,7 @@
 
                         θturning = acos(√up) * (1 + 1e-10)
                         @testset "Gθ" begin
-                            @testset "θs:$θs" for θs in
-                                                  clamp.(
+                            @testset "θs:$θs" for θs in clamp.(
                                 (1, 3) .* (acos(-√up) - acos(√up)) ./ 4 .+ acos(√up),
                                 0.0,
                                 π,
@@ -393,8 +392,7 @@
                             end
                         end
                         @testset "Gϕ" begin
-                            @testset "θs:$θs" for θs in
-                                                  clamp.(
+                            @testset "θs:$θs" for θs in clamp.(
                                 (1, 3) .* (acos(-√up) - acos(√up)) ./ 4 .+ acos(√up),
                                 0.0,
                                 π,
@@ -441,8 +439,7 @@
                             end
                         end
                         @testset "Gt" begin
-                            @testset "θs:$θs" for θs in
-                                                  clamp.(
+                            @testset "θs:$θs" for θs in clamp.(
                                 (1, 3) .* (acos(-√up) - acos(√up)) ./ 4 .+ acos(√up),
                                 0.0,
                                 π,

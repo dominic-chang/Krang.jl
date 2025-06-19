@@ -966,7 +966,14 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
     return It_w_I0_terms_case4(metric, rs, τ, roots, λ)
 end
 
-@inline function It_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr) where {T}
+@inline function It_w_I0_terms_case2(
+    metric::Kerr{T},
+    rs,
+    τ,
+    roots::NTuple{4},
+    λ,
+    νr,
+) where {T}
     r1, r2, r3, r4 = roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r43 = r4 - r3
@@ -1306,7 +1313,13 @@ Returns the radial integrals for the case where there are no real roots in the r
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 end
 
-@inline function radial_w_I0_terms_integrals(met::Kerr{T}, rs, roots::NTuple{4}, τ, νr) where {T}
+@inline function radial_w_I0_terms_integrals(
+    met::Kerr{T},
+    rs,
+    roots::NTuple{4},
+    τ,
+    νr,
+) where {T}
     numreals = sum(_isreal2.(roots))
     if numreals == 4
         I1, I2, Ip, Im =
@@ -1702,7 +1715,12 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 - `isindir` : Is the path direct or indirect?
 - `n` : nth image ordered by minotime
 """
-@inline function Gθ(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,T,T,Bool,Bool} where {T}
+@inline function Gθ(
+    pix::AbstractPixel,
+    θs::T,
+    isindir,
+    n,
+)::Tuple{T,T,T,T,Bool,Bool} where {T}
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)

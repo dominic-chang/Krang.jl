@@ -82,7 +82,7 @@ recording =
                 colorrange = colorrange[i],
             )
             cb = GLMk.Colorbar(
-                fig[(i > 2 ? 2 : 1), (iszero(i % 2) ? 3 : 1)+1],
+                fig[(i > 2 ? 2 : 1), (iszero(i%2) ? 3 : 1)+1],
                 hm;
                 labelsize = 30,
                 ticklabelsize = 20,

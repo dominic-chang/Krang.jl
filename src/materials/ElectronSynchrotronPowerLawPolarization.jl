@@ -15,7 +15,7 @@ Returns the screen polarization associated with a killing spinor κ as seen seen
 end
 
 function evpa(fα, fβ)
-     atan(-fα, fβ)
+    atan(-fα, fβ)
 end
 
 """
