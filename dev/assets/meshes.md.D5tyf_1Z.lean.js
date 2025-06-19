@@ -1,0 +1,1 @@
+import{_ as a,c as t,o as s,a2 as i}from"./chunks/framework.DJXUo8ZD.js";const p=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"meshes.md","filePath":"meshes.md","lastUpdated":null}'),r={name:"meshes.md"};function o(n,e,c,d,h,l){return s(),t("div",null,e[0]||(e[0]=[i("",9)]))}const f=a(r,[["render",o]]);export{p as __pageData,f as default};
