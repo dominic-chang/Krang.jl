@@ -256,7 +256,7 @@
                     end
                 end
 
-                @test -(Iϕ + λtemp * Gϕ + π / 2) / ϕs ≈ 1.0 atol = 1e-3
+                @test (Iϕ + λtemp * Gϕ) / ϕs ≈ 1.0 atol = 1e-3
 
                 ft(r, p) = (
                     (r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λtemp)) *

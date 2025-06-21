@@ -11,7 +11,12 @@ export λ,
     get_radial_roots,
     Ir,
     Gθ,
-    total_mino_time
+    total_mino_time,
+    jac_zamo_d_bl_u,
+    jac_bl_d_zamo_u,
+    jac_zamo_u_bl_d,
+    jac_bl_u_zamo_d,
+    jac_fluid_u_zamo_d
 
 """
 Checks if a complex number is real to some tolerance
@@ -123,6 +128,110 @@ function S2(α, φ, j)
 end
 
 """
+    Returns the momentum form in the Boyer-Lindquist basis.
+"""
+function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr::Bool, νθ::Bool) where {T}
+    return @SVector[
+        -one(T),
+        (νr ? one(T) : -one(T)) * √max(zero(T), r_potential(metric, η, λ, r)) /
+        Δ(metric, r),
+        (νθ ? one(T) : -one(T)) * √max(zero(T), θ_potential(metric, η, λ, θ)),
+        λ,
+    ]
+end
+
+"""
+Returns the Jacobian which converts a Boyer-Lindquist covector to ZAMO basis.
+"""
+function jac_zamo_d_bl_u(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    # coords = {t, r, θ, ϕ}
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [# Eq 3.1 1972ApJ...178..347B
+        √(At / (Σt * Δt)) zero(T) zero(T) 2*a*r/√(At * Δt * Σt)
+        zero(T) √(Δt / Σt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) √(Σt / At)*csc(θ)
+        zero(T) zero(T) -inv(√Σt) zero(T)
+    ]
+end
+
+"""
+Jacobian which converts ZAMO covector to a Boyer-Lindquist basis
+"""
+function jac_bl_d_zamo_u(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [
+        # coords = {t, r, ϕ, θ}
+        √((Σt * Δt) / At) zero(T) -2*a*r*sin(θ)/√(At * Σt) zero(T)
+        zero(T) √(Σt / Δt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) -√Σt
+        zero(T) zero(T) √(At / Σt)*sin(θ) zero(T)
+    ]
+end
+
+"""
+Jacobian which converts Boyer-Lindquist vector to a ZAMO basis
+"""
+function jac_zamo_u_bl_d(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [#  Eq 3.2 1972ApJ...178..347B
+        # coords = {t, r, ϕ, θ}
+        √((Σt * Δt) / At) zero(T) zero(T) zero(T)
+        zero(T) √(Σt / Δt) zero(T) zero(T)
+        -(2a * r * sin(θ))/√(At * Σt) zero(T) zero(T) √(At / Σt)*sin(θ)
+        zero(T) zero(T) -√Σt zero(T)
+    ]
+end
+
+"""
+Jacobian which converts ZAMO vector to a Boyer-Lindquist basis
+"""
+function jac_bl_u_zamo_d(metric::Kerr{T}, r, θ) where {T}
+    a = metric.spin
+    Σt = Σ(metric, r, θ)
+    Δt = Δ(metric, r)
+    At = A(metric, r, θ)
+
+    return @SMatrix [
+        # coords = {t, r, ϕ, θ}
+        √(At / (Σt * Δt)) zero(T) zero(T) zero(T)
+        zero(T) √(Δt / Σt) zero(T) zero(T)
+        zero(T) zero(T) zero(T) -inv(√Σt)
+        2a*r/√(Σt * Δt * At) zero(T) √(Σt / At)*csc(θ) zero(T)
+    ]
+end
+
+"""
+Jacobian which expreases ZAMO vector in the fluid frame
+"""
+function jac_fluid_u_zamo_d(::Kerr{T}, β, θ, φ) where {T}
+    γ = inv(√(1 - β^2))
+    sinφ = sin(φ)
+    cosφ = cos(φ)
+    sinθ = sin(θ)
+    cosθ = cos(θ)
+
+    return @SMatrix [
+        γ -β*γ*cosφ*sinθ -β*γ*sinφ*sinθ -β*γ*cosθ
+        -β*γ*cosφ*sinθ cosθ^2*cosφ^2+γ*cosφ^2*sinθ^2+sinφ^2 (γ-1)*cosφ*sinθ^2*sinφ (γ-1)*cosθ*cosφ*sinθ
+        -β*γ*sinθ*sinφ (γ-1)*cosφ*sinθ^2*sinφ cosφ^2+(cosθ^2+γ*sinθ^2)*sinφ^2 (γ-1)*cosθ*sinθ*sinφ
+        -β*γ*cosθ (γ-1)*cosθ*cosφ*sinθ (γ-1)*cosθ*sinθ*sinφ γ*cosθ^2+sinθ^2
+    ]
+end
+
+
+"""
 Energy reduced azimuthal angular momentum
 
 # Arguments
@@ -184,7 +293,7 @@ Defines a horizontal boundary on the assymptotic observer's screen that emission
 - `metric`: Kerr metric
 - `θs`  : Emission Inclination
 """
-@inline function αboundary(metric::Kerr, θs)
+function αboundary(metric::Kerr, θs)
     return metric.spin * sin(θs)
 end
 
@@ -198,7 +307,7 @@ Defines a vertical boundary on the assymptotic observer's screen that emission t
 - `θo`  : Observer inclination
 - `θs`  : Emission Inclination
 """
-@inline function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
+function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
     a = metric.spin
     cosθs2 = cos(θs)^2
     return √max(
@@ -251,7 +360,7 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
 - `η`  : Reduced Carter constant
 - `λ`  : Reduced azimuthal angular momentum
 """
-@inline function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
+function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     a = metric.spin
 
     a2 = a * a
@@ -293,7 +402,7 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
     return roots
 end
 
-@inline function _get_root_diffs(r1::T, r2::T, r3::T, r4::T) where {T}
+function _get_root_diffs(r1::T, r2::T, r3::T, r4::T) where {T}
     return r2 - r1, r3 - r1, r3 - r2, r4 - r1, r4 - r2, r4 - r3
 end
 
@@ -321,10 +430,10 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 """
 function Ir_inf(metric::Kerr{T}, roots) where {T}
     #root_diffs = _get_root_diffs(roots...)
-    numreals = sum(map(_isreal2, roots))
+    numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
-        return Ir_inf_case1_and_2(metric, map(real, roots))
+        return Ir_inf_case1_and_2(metric, real.(roots))
     elseif numreals == 2 #case3
         return Ir_inf_case3(metric, roots)
     else #case 4
@@ -394,6 +503,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
+    isinf(rs) && return Ir_inf(metric, roots)
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
@@ -748,6 +858,11 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     return -2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
 end
 
+function Iϕ_o_m_I0_terms(metric::Kerr{T}, rs, roots::NTuple{4}, λ, νr) where {T}
+    isinf(rs) && return Iϕ_inf(metric, roots, λ)
+    return Iϕ_w_I0_terms(metric, rs, 0, roots, νr, λ)
+end
+
 """
 Returns the antiderivative \$I_t=\\int\\frac{r^2\\Delta+2Mr(r^2+a^2-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$ 
 evaluated at infinity without I0 terms.
@@ -954,7 +1069,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `λ`  : Reduced azimuthal angular momentum
 - `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
-@inline function It_w_I0_terms(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr) where {T}
+function It_w_I0_terms(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ, νr) where {T}
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
@@ -1010,10 +1125,10 @@ end
     )
 
     #equation B37
-    I1_total = r3 * I0_total + r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
+    I1_total = r3 * I0_total + r43 * (-1)^νr * Π1_s
     #equation B38
     I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = -(r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s# asymptotic Divergent piece is not included
+    I2_total = -(r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1037,7 +1152,7 @@ end
     )
 end
 
-@inline function It_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
+function It_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
     r1, r2, _, _ = roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r21 = real(r21)
@@ -1097,7 +1212,7 @@ end
     )
 end
 
-@inline function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
+function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
     a = metric.spin
     r1, _, _, r4 = roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
@@ -1153,7 +1268,17 @@ end
     )# + (logdiv + lineardiv)
 end
 
-@inline function radial_inf_integrals(met::Kerr{T}, roots::NTuple{4}) where {T}
+function It_o_m_I0_terms(metric::Kerr{T}, ro, roots::NTuple{4}, λ, νr) where {T}
+    isinf(ro) && return It_inf(metric, roots, λ)
+    return It_w_I0_terms(metric, ro, 0, roots, λ, νr)
+end
+
+function radial_o_m_I0_terms_integrals(met::Kerr{T}, ro::T, roots::NTuple{4}, νr) where {T}
+    isinf(ro) && return radial_inf_integrals(met, roots)
+    return radial_w_I0_terms_integrals(met, ro, roots, zero(T), νr)
+end
+
+function radial_inf_integrals(met::Kerr{T}, roots::NTuple{4}) where {T}
     numreals = sum(_isreal2.(roots))
     if numreals == 4
         I1, I2, Ip, Im = Krang.radial_inf_integrals_case2(met, roots)
@@ -1168,7 +1293,7 @@ end
 """
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 """
-@inline function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
+function radial_inf_integrals_case2(metric::Kerr{T}, roots::NTuple{4}) where {T}
     roots = real.(roots)
     _, _, r3, r4 = roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
@@ -1217,7 +1342,7 @@ end
 """
 Returns the radial integrals for the case where there are two real roots in the radial potential
 """
-@inline function radial_inf_integrals_case3(metric::Kerr{T}, roots::NTuple{4}) where {T}
+function radial_inf_integrals_case3(metric::Kerr{T}, roots::NTuple{4}) where {T}
     r1, r2, _, _ = roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
@@ -1260,7 +1385,7 @@ end
 """
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
-@inline function radial_inf_integrals_case4(metric::Kerr{T}, roots::NTuple{4}) where {T}
+function radial_inf_integrals_case4(metric::Kerr{T}, roots::NTuple{4}) where {T}
     r1, _, _, r4 = roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     a2 = metric.spin^2
@@ -1335,7 +1460,7 @@ end
 """
 Returns the radial integrals for the case where there are four real roots in the radial potential, with roots outside the horizon.
 """
-@inline function radial_w_I0_terms_integrals_case2(
+function radial_w_I0_terms_integrals_case2(
     metric::Kerr{T},
     rs,
     roots::NTuple{4},
@@ -1378,10 +1503,10 @@ Returns the radial integrals for the case where there are four real roots in the
     )
 
     #equation B37
-    I1_total = -r3 * I0_total - r43 * (-1)^νr * Π1_s# Removed the logarithmic divergence
+    I1_total = -r3 * I0_total - r43 * (-1)^νr * Π1_s
     #equation B38
     I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s# asymptotic Divergent piece is not included
+    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s
 
     coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
     coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
@@ -1403,7 +1528,7 @@ end
 """
 Returns the radial integrals for the case where there are two real roots in the radial potential
 """
-@inline function radial_w_I0_terms_integrals_case3(
+function radial_w_I0_terms_integrals_case3(
     metric::Kerr{T},
     rs,
     roots::NTuple{4},
@@ -1441,9 +1566,7 @@ Returns the radial integrals for the case where there are two real roots in the 
     Π2_s = (coef^2) * R2(αo, φ_s, k3)
 
     I0_total = τ
-    # Removed logarithmic divergence
     I1_total = -(B * r2 + A * r1) / (B + A) * I0_total + Π1_s
-    # Removed linear divergence
     I2_total = -(
         (((B * r2 + A * r1) / (B + A))^2) * I0_total -
         2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * (-Π2_s)
@@ -1461,7 +1584,7 @@ end
 """
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
-@inline function radial_w_I0_terms_integrals_case4(
+function radial_w_I0_terms_integrals_case4(
     metric::Kerr{T},
     rs,
     roots::NTuple{4},
@@ -1491,14 +1614,11 @@ Returns the radial integrals for the case where there are no real roots in the r
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
     S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-    #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
     Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
     Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
 
-    # Removed logarithmic divergence
     I1_total = -(a2 / go - b1) * τ + (-Π1_s)
 
-    # Removed linear divergence
     I2_total = -((a2 / go - b1)^2) * τ + 2(a2 / go - b1) * (-Π1_s) - (-Π2_s)
     Ip_total =
         -go / (a2 * (1 - go * x4_p)) *
@@ -1532,6 +1652,22 @@ function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where {T}
     return τf
 end
 
+function total_mino_time(metric::Kerr{T}, ro, roots::NTuple{4}) where {T}
+    isinf(ro) && return total_mino_time(metric, roots)
+
+    numreals = unsafe_trunc(Int, sum((Krang._isreal2.(roots))))
+    Io = Krang.Ir_s(metric, ro, roots, true)
+
+    if numreals == 4
+        τf = Io + Ir_inf(metric, roots) 
+    else
+        rh = Krang.horizon(metric)
+        τf = Io - Krang.Ir_s(metric, rh, roots, true)
+    end
+    return τf
+end
+
+
 ##----------------------------------------------------------------------------------------------------------------------
 # Pixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1547,7 +1683,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `rs` : Emission radius
 """
 function Ir(pix::AbstractPixel, νr::Bool, rs)
-    return I0_inf(pix) - Ir_s(metric(pix), rs, roots(pix), νr)
+    return I0_o(pix) - Ir_s(metric(pix), rs, roots(pix), νr)
 end
 
 """
@@ -1563,7 +1699,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 """
 function Iϕ(pix::AbstractPixel, rs, τ, νr)
     metric = pix.metric
-    λtemp = λ(metric, pix.screen_coordinate[1], pix.θo)
+    λtemp = λ(pix)
     tempIϕ_inf = Iϕ_inf(pix)
     tempIϕ_s = Iϕ_w_I0_terms(metric, rs, τ, pix.roots, νr, λtemp)
 
@@ -1583,7 +1719,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 """
 function It(pix::AbstractPixel, rs, τ, νr)
     metric = pix.metric
-    λtemp = λ(metric, pix.screen_coordinate[1], pix.θo)
+    λtemp = λ(pix)
     tempIt_inf = It_inf(pix)
 
     return tempIt_inf - It_w_I0_terms(metric, rs, τ, pix.roots, λtemp, νr)
@@ -1597,14 +1733,23 @@ Return the radial integrals
 - `τ` : Mino time
 - `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
 """
-@inline function radial_integrals(pix::AbstractPixel, rs, τ, νr)
+function radial_integrals(pix::AbstractPixel, rs, τ, νr)
     met = metric(pix)
-    I1_o, I2_o, Ip_o, Im_o = radial_inf_integrals_m_I0_terms(pix)
+    I1_o, I2_o, Ip_o, Im_o = radial_o_integrals_m_I0_terms(pix)
     I1_s, I2_s, Ip_s, Im_s = radial_w_I0_terms_integrals(met, rs, pix.roots, τ, νr)
     return τ, I1_o - I1_s, I2_o - I2_s, Ip_o - Ip_s, Im_o - Im_s
 end
 
-@inline function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
+function radial_o_integrals_m_I0_terms(pix::AbstractPixel)
+    if isinf(pix.ro)
+        return radial_inf_integrals(metric(pix), pix.roots)
+    else
+        return radial_w_I0_terms_integrals(metric(pix), pix.ro, pix.roots, 0, true)
+    end
+end
+
+
+function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     radial_roots = real.(roots(pix))
     _, _, r3, r4 = radial_roots
     _, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
@@ -1617,26 +1762,26 @@ end
     coef = 2 / √real(r31 * r42)
     Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
 
     r4 < rh && τ > (fo - Ir_s) && return zero(T), false, false# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
-    if τ > 2fo
+    if τ > (fo + I0_inf(pix))
         return zero(T), false, false
     end
     sn = r41 * JacobiElliptic.sn(X2, k)^2
     return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
 end
 
-@inline function _rs_case3(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
+function _rs_case3(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     radial_roots = roots(pix)
     r1, r2, _, _ = radial_roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
     r1, r2, r21 = real.((r1, r2, r21))
 
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
     A = √abs(r32 * r42)
     B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
@@ -1657,7 +1802,7 @@ end
     return real(num / den), X3 > zero(T), true
 end
 
-@inline function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
+function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     radial_roots = roots(pix)
     r1, _, _, r4 = radial_roots
     root_diffs = _get_root_diffs(radial_roots...)
@@ -1676,7 +1821,7 @@ end
     coef = 2 / (C + D)
     Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
-    fo = I0_inf(pix)
+    fo = I0_o(pix)
     τ > (fo - Ir_s) && return zero(T), false, false
 
     X4 = (C + D) / T(2) * (fo - τ)
@@ -1786,11 +1931,11 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
 end
 
 function Gs(pix::AbstractPixel, τ::T) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     θo = inclination(pix)
     met = metric(pix)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
     signβ = sign(β)
 
     τ == T(NaN) && return T(NaN)
@@ -1837,14 +1982,14 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     return Δτ
 end
 
-@inline function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
 
     signβ = sign(β)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
 
     a = met.spin
     Go, Ghat = absGϕo_Gϕhat(pix)
@@ -1900,14 +2045,14 @@ end
     return ans, Gs, Go, Ghat, isvortical, true
 end
 
-@inline function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
     signβ = sign(β)
 
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
     a = met.spin
     Go, Ghat = absGto_Gthat(pix)
     Gs, ans, isvortical = zero(T), zero(T), ηtemp < zero(T)
@@ -1969,7 +2114,7 @@ end
 # SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
-@inline function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
+function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
     a2 = a^2
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
@@ -2009,7 +2154,7 @@ end
     return Go, Ghat
 end
 
-@inline function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
+function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
 
     a = metric.spin
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
@@ -2049,7 +2194,7 @@ end
     return Go, Ghat
 end
 
-@inline function _absGto_Gthat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
+function _absGto_Gthat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
