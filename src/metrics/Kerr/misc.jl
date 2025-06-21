@@ -1656,7 +1656,7 @@ function total_mino_time(metric::Kerr{T}, ro, roots::NTuple{4}) where {T}
         τf = Io + Ir_inf(metric, roots) 
     else
         rh = Krang.horizon(metric)
-        τf = Io_inf - Krang.Ir_s(metric, rh, roots, true)
+        τf = Io - Krang.Ir_s(metric, rh, roots, true)
     end
     return τf
 end
