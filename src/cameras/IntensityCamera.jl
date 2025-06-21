@@ -3,7 +3,8 @@ export IntensityCamera
     $TYPEDEF
 
 Intensity Pixel Type. 
-Each Pixel is associated with a single ray, and caches some information about the ray.
+Each Pixel is associated with a single ray. 
+Pixels cache some information about the ray.
 """
 struct IntensityPixel{T} <: AbstractPixel{T}
     metric::Kerr{T}
@@ -11,14 +12,17 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     screen_coordinate::NTuple{2,T}
     "Radial roots"
     roots::NTuple{4,Complex{T}}
-    "Radial antiderivative"
+    "Radial anti-derivative at observer"
     I0_o::T
+    "Radial anti-derivative at infinity"
+    I0_inf::T
     "Total possible Mino time"
     total_mino_time::T
     "Angular antiderivative"
     absGθo_Gθhat::NTuple{2,T}
     "Inclination"
     θo::T
+    "radius"
     ro::T
     η::T
     λ::T
@@ -55,6 +59,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
             (α, β),
             roots,
             I0_inf,
+            I0_inf,
             total_mino_time(met, roots),
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
             θo,
@@ -73,7 +78,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
         tempλ = L/E
-        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+        tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
         roots = Krang.get_radial_roots(met, tempη, tempλ)
         numreals = sum(_isreal2.(roots))
@@ -81,12 +86,14 @@ struct IntensityPixel{T} <: AbstractPixel{T}
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
         I0_o = Krang.Ir_s(met, ro, roots, true)
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
             (longitude, latitude),
             roots,
             I0_o,
-            total_mino_time(met, roots),
+            I0_inf,
+            total_mino_time(met, ro, roots),
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
             θo,
             ro,
@@ -99,8 +106,8 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         a = met.spin
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
-        tempλ = L/E
-        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+        tempλ = -L/E
+        tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
         roots = Krang.get_radial_roots(met, tempη, tempλ)
         numreals = sum(_isreal2.(roots))
@@ -108,12 +115,14 @@ struct IntensityPixel{T} <: AbstractPixel{T}
             roots = (roots[1], roots[4], roots[2], roots[3])
         end
         I0_o = Krang.Ir_s(met, ro, roots, true)
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
-            (-p_local_u[3]/p_local_u[1], -p_local_u[4]/p_local_u[1]),
+            (p_local_u[3]/p_local_u[1], p_local_u[4]/p_local_u[1]),
             roots,
             I0_o,
-            total_mino_time(met, roots),
+            I0_inf,
+            total_mino_time(met, ro, roots),
             Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
             θo,
             ro,

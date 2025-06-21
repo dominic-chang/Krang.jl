@@ -1648,6 +1648,20 @@ function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where {T}
     return τf
 end
 
+function total_mino_time(metric::Kerr{T}, ro, roots::NTuple{4}) where {T}
+    numreals = unsafe_trunc(Int, sum((Krang._isreal2.(roots))))
+    Io = Krang.Ir_s(metric, ro, roots, true)
+
+    if numreals == 4
+        τf = Io + Ir_inf(metric, roots) 
+    else
+        rh = Krang.horizon(metric)
+        τf = Io_inf - Krang.Ir_s(metric, rh, roots, true)
+    end
+    return τf
+end
+
+
 ##----------------------------------------------------------------------------------------------------------------------
 # Pixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1747,7 +1761,7 @@ function _rs_case1_and_2(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} wher
     r4 < rh && τ > (fo - Ir_s) && return zero(T), false, false# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
-    if τ > 2fo
+    if τ > (fo + I0_inf(pix))
         return zero(T), false, false
     end
     sn = r41 * JacobiElliptic.sn(X2, k)^2

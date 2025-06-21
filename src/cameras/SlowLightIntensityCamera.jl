@@ -11,25 +11,27 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     screen_coordinate::NTuple{2,T}
     "Radial roots"
     roots::NTuple{4,Complex{T}}
-    "Radial antiderivative"
+    "Radial anti-derivative at observer"
+    I0_o::T
+    "Radial anti-derivative at infinity"
     I0_inf::T
     "Total possible Mino time"
     total_mino_time::T
-    "Radial phi antiderivative"
+    "Radial phi anti-derivative"
     Iϕ_inf::T
-    "Radial time antiderivative"
+    "Radial time anti-derivative"
     It_inf::T
     I1_o_m_I0_terms::T
     I2_o_m_I0_terms::T
     Ip_o_m_I0_terms::T
     Im_o_m_I0_terms::T
-    "Angular antiderivative"
+    "Angular anti-derivative"
     absGθo_Gθhat::NTuple{2,T}
-    "Angular ϕ antiderivative"
+    "Angular ϕ anti-derivative"
     absGϕo_Gϕhat::NTuple{2,T}
-    "Angular t antiderivative"
+    "Angular t anti-derivative"
     absGto_Gthat::NTuple{2,T}
-    "Half orbit of angular t antiderivative"
+    "Half orbit of angular t anti-derivative"
     θo::T
     ro::T
     η::T
@@ -51,7 +53,7 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
     # Details
     This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
     It then computes the radial roots and adjusts them if necessary. 
-    It also calculates the radial and angular antiderivatives. 
+    It also calculates the radial and angular anti-derivatives. 
     Finally, it initializes a `SlowLightIntensityPixel` object with the calculated values and the provided parameters.
     """
     function SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo) where {T}
@@ -69,6 +71,7 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
             met,
             (α, β),
             roots,
+            I0_inf,
             I0_inf,
             total_mino_time(met, roots),
             Krang.Iϕ_inf(met, roots, tempλ),
@@ -106,11 +109,13 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
         I1, I2, Ip, Im = radial_o_m_I0_terms_integrals(met, ro, roots, true)
 
         I0_o = Krang.Ir_s(met, ro, roots, true)
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
             (longitude, latitude),
             roots,
             I0_o,
+            I0_inf,
             total_mino_time(met, roots),
             Krang.Iϕ_o_m_I0_terms(met, ro, roots, tempλ, true),
             Krang.It_o_m_I0_terms(met, ro, roots, tempλ, true),
@@ -132,8 +137,8 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
         a = met.spin
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
-        tempλ = L/E
-        tempη = (Σ(met,ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
+        tempλ = -L/E
+        tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
         roots = Krang.get_radial_roots(met, tempη, tempλ)
         numreals = sum(_isreal2.(roots))
@@ -143,11 +148,13 @@ struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
         I1, I2, Ip, Im = radial_o_m_I0_terms_integrals(met, ro, roots, true)
 
         I0_o = Krang.Ir_s(met, ro, roots, true)
+        I0_inf = Krang.Ir_inf(met, roots)
         new{T}(
             met,
-            (-p_local_u[3]/p_local_u[1], -p_local_u[4]/p_local_u[1]),
+            (p_local_u[3]/p_local_u[1], p_local_u[4]/p_local_u[1]),
             roots,
             I0_o,
+            I0_inf,
             total_mino_time(met, roots),
             Krang.Iϕ_o_m_I0_terms(met, ro, roots, tempλ, true),
             Krang.It_o_m_I0_terms(met, ro, roots, tempλ, true),
