@@ -26,6 +26,31 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     ro::T
     η::T
     λ::T
+    function _IntensityPixel(met::Kerr{T}, tempη, tempλ, θo::T, ro::T, x, y) where {T}
+        roots = Krang.get_radial_roots(met, tempη, tempλ)
+        numreals = sum(_isreal2.(roots))
+        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+            roots = (roots[1], roots[4], roots[2], roots[3])
+        end
+        I0_o = Krang.Ir_s(met, ro, roots, true)
+        I0_inf = Krang.Ir_inf(met, roots)
+        total_mino_time = numreals == 4 ? I0_o + I0_inf : I0_o - Krang.Ir_s(met, Krang.horizon(met), roots, true)
+
+        new{T}(
+            met,
+            (x, y),
+            roots,
+            I0_o,
+            I0_inf,
+            total_mino_time,
+            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
+            θo,
+            ro,
+            tempη,
+            tempλ,
+        )
+    end
+
     @doc """
         IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
 
@@ -48,88 +73,28 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
         tempη = Krang.η(met, α, β, θo)
         tempλ = Krang.λ(met, α, θo)
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
-        end
-        I0_inf = Krang.Ir_inf(met, roots)
-        new{T}(
-            met,
-            (α, β),
-            roots,
-            I0_inf,
-            I0_inf,
-            total_mino_time(met, roots),
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            θo,
-            T(Inf),
-            tempη,
-            tempλ,
-        )
+        _IntensityPixel(met, tempη, tempλ, θo, T(Inf), α, β)
     end
 
-    function IntensityPixel(met::Kerr{T}, longitude::T, latitude::T, θo::T, ro::T) where {T}
-        @assert latitude >= -π/2 && latitude <= π/2 "latitude must be in [-π/2, π/2]"
-        a = met.spin
-        red_α = sin(longitude)
-        red_β = sin(latitude)
-        p_local_u = [1, √abs(1-(red_α^2+red_β^2)), red_α, -red_β]
-        p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
-        E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
-        tempλ = L/E
-        tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
-
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
-        end
-        I0_o = Krang.Ir_s(met, ro, roots, true)
-        I0_inf = Krang.Ir_inf(met, roots)
-        new{T}(
-            met,
-            (longitude, latitude),
-            roots,
-            I0_o,
-            I0_inf,
-            total_mino_time(met, ro, roots),
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            θo,
-            ro,
-            tempη,
-            tempλ,
-        )
-    end
-
-    function IntensityPixel(met::Kerr{T}, p_local_u::Vector{T}, θo::T, ro::T) where {T}
+    function IntensityPixel(met::Kerr{T}, p_local_u::Vector{T}, θo::T, ro::T; x=p_local_u[3], y=p_local_u[4]) where {T}
         a = met.spin
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
         tempλ = -L/E
         tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
-        end
-        I0_o = Krang.Ir_s(met, ro, roots, true)
-        I0_inf = Krang.Ir_inf(met, roots)
-        new{T}(
-            met,
-            (p_local_u[3]/p_local_u[1], p_local_u[4]/p_local_u[1]),
-            roots,
-            I0_o,
-            I0_inf,
-            total_mino_time(met, ro, roots),
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            θo,
-            ro,
-            tempη,
-            tempλ,
-        )
+        _IntensityPixel(met, tempη, tempλ, θo, ro, x, y)
     end
+
+    function IntensityPixel(met::Kerr{T}, longitude::T, latitude::T, θo::T, ro::T) where {T}
+        @assert latitude >= -π/2 && latitude <= π/2 "latitude must be in [-π/2, π/2]"
+        red_α = sin(longitude)
+        red_β = sin(latitude)
+        p_local_u = [1, √abs(1-(red_α^2+red_β^2)), -red_α, -red_β]
+        IntensityPixel(met, p_local_u, θo, ro; x=red_α, y=red_β)
+    end
+
+
 end
 
 """

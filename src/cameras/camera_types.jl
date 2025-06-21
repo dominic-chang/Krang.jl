@@ -197,6 +197,17 @@ function I1_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[1]
 end
 
+"""
+    I1_o_m_I0_terms(pix::AbstractPixel)
+
+Calculate the I1 anti-derivative minus I0 terms for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The I1 anti-derivative minus I0 terms of the pixel.
+"""
 function I1_o_m_I0_terms(pix::AbstractPixel)
     @warn "I1_o_m_I0_terms are not stored in pixel, calculating I1_o_integrals under infinite observer assumption instead"
     return radial_o_integrals(metric(pix), roots(pix))[1]
@@ -219,6 +230,17 @@ function I2_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[2]
 end
 
+"""
+    I2_o_m_I0_terms(pix::AbstractPixel)
+
+Calculate the I2 anti-derivative minus I0 terms for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The I2 anti-derivative minus I0 terms of the pixel.
+"""
 function I2_o_m_I0_terms(pix::AbstractPixel)
     @warn "I2_o_m_I0_terms are not stored in pixel, calculating I2_o_integrals under infinite observer assumption instead"
     return radial_o_integrals(metric(pix), roots(pix))[2]
@@ -240,6 +262,17 @@ function Ip_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[3]
 end
 
+"""
+    Ip_o_m_I0_terms(pix::AbstractPixel)
+
+Calculate the Ip anti-derivative minus I0 terms for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The Ip anti-derivative minus I0 terms of the pixel.
+"""
 function Ip_o_m_I0_terms(pix::AbstractPixel)
     return radial_o_integrals(metric(pix), roots(pix))[3]
 end
@@ -260,6 +293,17 @@ function Im_inf_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))[4]
 end
 
+"""
+    Im_o_m_I0_terms(pix::AbstractPixel)
+
+Calculate the Im anti-derivative minus I0 terms for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The Im anti-derivative minus I0 terms of the pixel.
+"""
 function Im_o_m_I0_terms(pix::AbstractPixel)
     return radial_o_integrals(metric(pix), roots(pix))[4]
 end
@@ -280,6 +324,17 @@ function radial_inf_integrals_m_I0_terms(pix::AbstractPixel)
     return radial_inf_integrals(metric(pix), roots(pix))
 end
 
+"""
+    radial_o_integrals(pix::AbstractPixel)
+
+Calculate the radial anti-derivative minus I0 terms for a given pixel at radius ro.
+
+# Arguments
+- `pix::AbstractPixel`: The pixel of a screen.
+
+# Returns
+- The radial anti-derivative minus I0 terms of the pixel.
+"""
 function radial_o_integrals(pix::AbstractPixel)
     return radial_o_integrals_m_I0_terms(metric(pix), roots(pix))
 end

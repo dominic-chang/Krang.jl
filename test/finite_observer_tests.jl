@@ -12,7 +12,7 @@
     finite_coordinates = [zeros(sze, sze) for _ = 1:3]
     infinite_camera =
         Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
-    finite_camera = Krang.SlowLightIntensityCamera(
+    finite_camera = Krang.IntensityCamera(
         metric,
         θo,
         ro,
@@ -98,8 +98,8 @@
         infinite_draw!(infinite_camera, infinite_coordinates, rmin, rmax, θs, n)
 
         @testset "$coord" for (i, coord) in enumerate(["radius", "azimuth"])
-            @test maximum(abs.(finite_coordinates[i+1] .- infinite_coordinates[i+1])) .≈ 0.0 atol =
-                1e-4
+            residual = maximum(abs.(finite_coordinates[i+1] .- infinite_coordinates[i+1]))
+            @test residual ≈ 0.0 atol = 1e-4
         end
     end
 

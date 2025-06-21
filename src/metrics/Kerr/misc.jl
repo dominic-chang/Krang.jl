@@ -503,6 +503,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
 function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
+    isinf(rs) && return Ir_inf(metric, roots)
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
@@ -858,6 +859,7 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
 end
 
 function Iϕ_o_m_I0_terms(metric::Kerr{T}, rs, roots::NTuple{4}, λ, νr) where {T}
+    isinf(rs) && return Iϕ_inf(metric, roots, λ)
     return Iϕ_w_I0_terms(metric, rs, 0, roots, νr, λ)
 end
 
@@ -1267,10 +1269,12 @@ function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) wher
 end
 
 function It_o_m_I0_terms(metric::Kerr{T}, ro, roots::NTuple{4}, λ, νr) where {T}
+    isinf(ro) && return It_inf(metric, roots, λ)
     return It_w_I0_terms(metric, ro, 0, roots, λ, νr)
 end
 
 function radial_o_m_I0_terms_integrals(met::Kerr{T}, ro::T, roots::NTuple{4}, νr) where {T}
+    isinf(ro) && return radial_inf_integrals(met, roots)
     return radial_w_I0_terms_integrals(met, ro, roots, zero(T), νr)
 end
 
@@ -1649,6 +1653,8 @@ function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where {T}
 end
 
 function total_mino_time(metric::Kerr{T}, ro, roots::NTuple{4}) where {T}
+    isinf(ro) && return total_mino_time(metric, roots)
+
     numreals = unsafe_trunc(Int, sum((Krang._isreal2.(roots))))
     Io = Krang.Ir_s(metric, ro, roots, true)
 
@@ -1677,7 +1683,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `rs` : Emission radius
 """
 function Ir(pix::AbstractPixel, νr::Bool, rs)
-    return I0_inf(pix) - Ir_s(metric(pix), rs, roots(pix), νr)
+    return I0_o(pix) - Ir_s(metric(pix), rs, roots(pix), νr)
 end
 
 """
