@@ -80,7 +80,7 @@ struct IntensityPixel{T} <: AbstractPixel{T}
         a = met.spin
         p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
         E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
-        tempλ = -L/E
+        tempλ = L/E
         tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
         _IntensityPixel(met, tempη, tempλ, θo, ro, x, y)
