@@ -85,90 +85,69 @@
         end
     end
     @testset "Emission inclination" begin
-        a = 0.99
-        met = Krang.Kerr(a)
+        # Make sure Emission inclination is the inverse of Gθ
+        function coordinate_point(
+            pix::Krang.AbstractPixel,
+            geometry::Krang.ConeGeometry{T,A},
+        ) where {T,A}
+            n, rmin, rmax = geometry.attributes
+            θs = geometry.opening_angle
 
-        @test !emission_radius(
-            Krang.SlowLightIntensityPixel(met, 10.0, 1.0, π / 2),
-            π / 2,
-            true,
-            2,
-        )[5]
-        @testset "Ordinary Geodesics" begin
-            α = √27 * cos(π / 4)
-            β = √27 * sin(π / 4)
-            θo = π / 4
-            @testset "$pixtype" for (pixtype, pix) in [
-                ("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)),
-                (
-                    "Cached Slow Light Intensity Pixel",
-                    Krang.SlowLightIntensityPixel(met, α, β, θo),
-                ),
-            ]
+            coords = ntuple(j -> zero(T), Val(4))
 
-                @testset "n:$n" for n = 0:2
-                    @testset "θs:$θs" for θs in [
-                        π / 5,
-                        π / 4,
-                        π / 3,
-                        π / 2,
-                        2π / 3,
-                        3π / 4,
-                        4π / 5,
-                    ]
-                        @testset "isindir:$isindir" for isindir in [true, false]
-                            ηcase1 = η(met, α, β, θo)
-                            λcase1 = λ(met, α, θo)
-                            roots = get_radial_roots(met, ηcase1, λcase1)
-                            _, _, _, root = roots
-                            τ1, _, _, _, _, issuccess = Krang.Gθ(pix, θs, isindir, n)
-                            if issuccess
-                                testθs = Krang.emission_inclination(pix, τ1)[1]
-                                if !isnan(testθs)
-                                    @test testθs / θs ≈ 1 atol = 1e-5
-                                end
-                            end
-                        end
-                    end
+            isindir = false
+            for _ = 1:2
+                isindir ⊻= true
+                ts, rs, ϕs = emission_coordinates(pix, geometry.opening_angle, isindir, n)
+                if rs ≤ rmin || rs ≥ rmax
+                    continue
                 end
+                coords = isnan(rs) ? observation : (ts, rs, θs, ϕs)
             end
+            return coords
         end
 
-        @testset "Vortical Geodesics" begin
-            α = 0.1
-            β = 0.1
-            θo = π / 4
-            @testset "$pixtype" for (pixtype, pix) in [
-                ("Intensity Pixel", Krang.IntensityPixel(met, α, β, θo)),
-                (
-                    "Cached Slow Light Intensity Pixel",
-                    Krang.SlowLightIntensityPixel(met, α, β, θo),
-                ),
+        @testset "a=$a" for a in [0.99, 0.5, 0.01, -0.01, -0.5, -0.99]
+            met = Krang.Kerr(a)
+            @testset "$pixtype" for (pixtype, fcam) in [
+                ("Intensity Pixel", Krang.IntensityCamera),
+                ("Slow Light Intensity Pixel", Krang.SlowLightIntensityCamera),
             ]
+                @testset "θs:$θs" for θs in
+                                      [π / 5, π / 4, π / 3, π / 2, 2π / 3, 3π / 4, 4π / 5]
+                    θo = π/4.1;
+                    ρmax = 7.0;
+                    sze = 400;
+                    rmax = 1000.0; # maximum radius to be ray traced
 
-                @testset "n:$n" for n = 0:2
-                    @testset "θs:$θs" for θs in [
-                        π / 5,
-                        π / 4,
-                        π / 3,
-                        π / 2,
-                        2π / 3,
-                        3π / 4,
-                        4π / 5,
-                    ]
-                        @testset "isindir:$isindir" for isindir in [true, false]
-                            ηcase1 = η(met, α, β, θo)
-                            λcase1 = λ(met, α, θo)
-                            roots = get_radial_roots(met, ηcase1, λcase1)
-                            _, _, _, root = roots
-                            τ1, _, _, _, _, issuccess = Krang.Gθ(pix, θs, isindir, n)
-                            if issuccess
-                                testθs = Krang.emission_inclination(pix, τ1)[1]
-                                if !isnan(testθs)
-                                    @test testθs / θs ≈ 1 atol = 1e-5
-                                end
-                            end
+                    pixels = Vector{Krang.AbstractPixel}(undef, 3)
+
+                    cam = fcam(met, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+                    geometries =
+                        (Krang.ConeGeometry(θs, (i, Krang.horizon(met), rmax)) for i = 0:2)
+
+                    for (i, geometry) in enumerate(geometries)
+                        temp = false
+                        pix = nothing
+                        while !temp
+                            pix = rand(cam.screen.pixels)
+                            temp = coordinate_point(pix, geometry)[2] != 0
                         end
+                        pixels[i] = pix
+                    end
+
+                    for n = 0:2
+                        pix = pixels[n+1]
+                        isindir = pix.screen_coordinate[2] > 0
+
+                        ηcase1 = η(pix)
+                        λcase1 = λ(pix)
+                        roots = get_radial_roots(met, ηcase1, λcase1)
+                        _, _, _, root = roots
+                        τ1, _, _, _, _, issuccess = Krang.Gθ(pix, θs, isindir, n)
+                        testθs, _, _, _, testn, _ = Krang.emission_inclination(pix, τ1)
+                        @test testθs / θs ≈ 1 atol = 1e-5
+                        @test testn == n
                     end
                 end
             end
