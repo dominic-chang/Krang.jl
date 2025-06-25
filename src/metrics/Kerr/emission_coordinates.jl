@@ -378,7 +378,7 @@ end
         Ghat_2 = tempfac * JacobiElliptic.K(k)
         τhat = 2Ghat_2
         Δτtemp = (τ % τhat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * τo)
-        n = floor(τ / τhat)
+        n = unsafe_trunc(Int, τ / τhat)
         absτs = abs(argmin(abs, (τhat - Δτtemp, Δτtemp)))
         τs = (θo > T(π / 2) ? -one(T) : one(T)) * absτs
 
@@ -394,7 +394,7 @@ end
         Ghat_2 = tempfac * JacobiElliptic.K(k)
         τhat = Ghat_2 + Ghat_2
         Δτtemp = (τ % τhat + signβ * τo)
-        n = floor(τ / τhat)
+        n = unsafe_trunc(Int, τ / τhat)
         sign = (n % 2 == 1) ? -one(T) : one(T)
         τs = argmin(abs, (sign * signβ * (τhat - Δτtemp), sign * signβ * Δτtemp))
         newargs = JacobiElliptic.sn(τs / tempfac, k)
