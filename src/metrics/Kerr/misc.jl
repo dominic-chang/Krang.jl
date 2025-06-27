@@ -361,16 +361,16 @@ function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
 end
 
 function Ir_inf_case4(::Kerr{T}, roots::NTuple{4}) where {T}
-    _, r1, _, _ = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
+    b1 = real(r4)
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
     k4 = 4C * D / (C + D)^2
-    a2 = abs(imag(r1))
+
 
     k4 = T(4) * C * D / (C + D)^2
 
@@ -438,17 +438,16 @@ function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
 end
 
 function Ir_s_case4(::Kerr{T}, rs, roots::NTuple{4}) where {T}
-    _, r1, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = 4C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
+
 
     k4 = T(4) * C * D / (C + D)^2
 
@@ -560,24 +559,19 @@ function Iϕ_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 end
 
 function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_p = (rp + b1) / a2
     x4_m = (rm + b1) / a2
@@ -707,24 +701,19 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
 end
 
 function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_s = (rs + b1) / a2
     x4_p = (rp + b1) / a2
@@ -878,22 +867,18 @@ end
 
 function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     a = metric.spin
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
+
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_p = (rp + b1) / a2
     x4_m = (rm + b1) / a2
@@ -1099,22 +1084,17 @@ end
 
 @inline function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
     a = metric.spin
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
     rp = one(T) + √(one(T) - a^2)
     rm = one(T) - √(one(T) - a^2)
 
-    if real(r32 * r41) < zero(T) || real(r31 * r42) < zero(T)
-        return T(Inf)
-    end
-
-    C = √real(r31 * r42)
-    D = √real(r32 * r41)
-    k4 = T(4) * C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_s = (rs + b1) / a2
     x4_p = (rp + b1) / a2
@@ -1261,17 +1241,18 @@ end
 Returns the radial integrals for the case where there are no real roots in the radial potential
 """
 @inline function radial_inf_integrals_case4(metric::Kerr{T}, roots::NTuple{4}) where {T}
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
     a2 = metric.spin^2
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    C = √abs(r31 * r42)
-    D = √abs(r32 * r41)
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_p = (rp + b1) / a2
     x4_m = (rm + b1) / a2
@@ -1467,18 +1448,19 @@ Returns the radial integrals for the case where there are no real roots in the r
     roots::NTuple{4},
     τ,
 ) where {T}
-    r1, _, _, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
+    _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
     rp = one(T) + √(one(T) - a2)
     rm = one(T) - √(one(T) - a2)
 
-    C = √abs(r31 * r42)
-    D = √abs(r32 * r41)
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
-    k4 = 4 * C * D / (C + D)^2
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
 
     x4_s = (rs + b1) / a2
     x4_p = (rp + b1) / a2
@@ -1659,15 +1641,16 @@ end
 
 @inline function _rs_case4(pix::AbstractPixel, rh, τ::T)::Tuple{T,Bool,Bool} where {T}
     radial_roots = roots(pix)
-    r1, _, _, r4 = radial_roots
-    root_diffs = _get_root_diffs(radial_roots...)
-    _, r31, r32, r41, r42, _ = root_diffs
+    _, r2, _, r4 = radial_roots
 
-    C = √abs(r31 * r42)
-    D = √abs(r32 * r41)
-    k4 = 4C * D / (C + D)^2
-    a2 = abs(imag(r1))
+    a1 = abs(imag(r4))
+    a2 = abs(imag(r2))
     b1 = real(r4)
+    b2 = real(r2)
+    C = sqrt((a1-a2)^2 + (b1-b2)^2)
+    D = sqrt((a1+a2)^2 + (b1-b2)^2)
+    k4 = 4C * D / (C + D)^2
+
 
     k4 = T(4) * C * D / (C + D)^2
 
