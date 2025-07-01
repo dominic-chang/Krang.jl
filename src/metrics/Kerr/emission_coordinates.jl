@@ -34,14 +34,15 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
     θo = inclination(pix)
     met = @inline metric(pix)
     isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
+    err_return = (T(Inf), true, true, 0, false)
     if !isincone
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
-        ((abs(β) + eps(T)) < βbound) && return zero(T), true, true, 0, false
+        ((abs(β) + eps(T)) < βbound) && return err_return
     end
 
     τ, _, _, _, _, issuccess = Gθ(pix, θs, isindir, n)
-    issuccess || return zero(T), true, true, 0, false
+    issuccess || return err_return
 
     # νθ is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
@@ -164,14 +165,15 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     θo = inclination(pix)
     met = metric(pix)
     isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
+    err_return = (T(Inf), T(Inf), false, false, false)
     if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
-        ((abs(β) + eps(T)) < βbound) && return zero(T), zero(T), false, false, false
+        ((abs(β) + eps(T)) < βbound) && return err_return
     end
 
     τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
-    issuccess || return (zero(T), zero(T), false, false, false)
+    issuccess || return err_return
 
     # is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
@@ -180,7 +182,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     end
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
-    issuccess || return (zero(T), zero(T), false, false, false)
+    issuccess || return err_return
 
     ϕs = @inline emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
 
@@ -203,12 +205,13 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     θs, τs, _, _, n, isindir = @inline emission_inclination(pix, τ)
     νθ = τs > 0
 
+    err_return = (T(Inf), T(Inf), T(Inf), true, true, false)
     if cos(θs) > abs(cos(θo))
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return zero(T), zero(T), zero(T), true, true, false
+            return err_return
         end
     end
 
@@ -216,7 +219,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 
     λtemp = λ(pix)
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
-    issuccess || return zero(T), zero(T), zero(T), true, true, false
+    issuccess || return err_return
     _, _, _, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
@@ -250,20 +253,21 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     θo = inclination(pix)
     cosθs = cos(θs)
     cosθo = cos(θo)
+    err_return = (T(Inf), T(Inf), T(Inf), false, false, false)
     if cos(θs) > abs(cosθo)
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return zero(T), zero(T), zero(T), false, false, false
+            return err_return
         end
     end
 
     τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
-    issuccess || return zero(T), zero(T), zero(T), false, false, false
+    issuccess || return err_return  
 
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
-    issuccess || return zero(T), zero(T), zero(T), false, false, false
+    issuccess || return err_return
 
     a = met.spin
 
@@ -274,7 +278,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
         isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
     if isnan(τ)
-        return zero(T), zero(T), zero(T), false, false, false
+        return err_return
     end
 
     I0, I1, I2, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
@@ -315,13 +319,13 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     θo = inclination(pix)
 
     θs, _, _, _, n, isindir = @inline emission_inclination(pix, τ)
-
+    err_return = (T(Inf), T(Inf), T(Inf), T(Inf), true, true, false)
     if cos(θs) > abs(cos(θo))
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
         if (abs(β) + eps(T)) < βbound
-            return zero(T), zero(T), zero(T), zero(T), true, true, false
+            return err_return
         end
     end
 
@@ -329,7 +333,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 
     λtemp = λ(pix)
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
-    issuccess || return zero(T), zero(T), zero(T), zero(T), true, true, false
+    issuccess || return err_return
     I0, I1, I2, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
     rp = one(T) + √(one(T) - a^2)
