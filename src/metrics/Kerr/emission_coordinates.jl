@@ -264,7 +264,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     end
 
     τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
-    issuccess || return err_return  
+    issuccess || return err_return
 
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return err_return

@@ -19,7 +19,7 @@ function _raytrace(
     z = zero(A)
     for i = res:-1:2
         (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
-        if rs <= Krang.horizon(pixel.metric)
+        if rs <= Krang.horizon(pixel.metric) || isinf(rs)
             continue
         end
         line_point_2 = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
