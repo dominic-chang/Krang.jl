@@ -1595,17 +1595,18 @@ end
     if (rh == r3)
         rh += eps(T)
     end
+    err_return = (T(Inf), false, false)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
     Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     fo = I0_inf(pix)
 
-    r4 < rh && τ > (fo - Ir_s) && return zero(T), false, false# invalid case2
+    r4 < rh && τ > (fo - Ir_s) && return err_return# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
     if τ > 2fo
-        return zero(T), false, false
+        return err_return
     end
     sn = r41 * JacobiElliptic.sn(X2, k)^2
     return (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
@@ -1617,7 +1618,7 @@ end
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
     r1, r2, r21 = real.((r1, r2, r21))
 
-
+    err_return = (T(Inf), false, false)
     fo = I0_inf(pix)
     A = √abs(r32 * r42)
     B = √abs(r31 * r41)
@@ -1626,11 +1627,11 @@ end
     x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
     coef = one(T) * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > (fo - Ir_s) && return zero(T), false, false
+    τ > (fo - Ir_s) && return err_return
 
     X3 = √(A * B) * real(fo - τ)
     if X3 < zero(T)
-        return zero(T), false, false
+        return err_return
     end
     cn = JacobiElliptic.cn(X3, k)
     num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
@@ -1651,16 +1652,13 @@ end
     D = sqrt((a1+a2)^2 + (b1-b2)^2)
     k4 = 4C * D / (C + D)^2
 
-
-    k4 = T(4) * C * D / (C + D)^2
-
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
     x4_s = (rh + b1) / a2
     coef = 2 / (C + D)
     Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
     fo = I0_inf(pix)
-    τ > (fo - Ir_s) && return zero(T), false, false
+    τ > (fo - Ir_s) && return (T(Inf), false, false)
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
