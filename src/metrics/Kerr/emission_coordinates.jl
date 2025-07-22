@@ -34,7 +34,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
     θo = inclination(pix)
     met = @inline metric(pix)
     isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
-    err_return = (T(Inf), true, true, 0, false)
+    err_return = (zero(T), true, true, 0, false)
     if !isincone
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
@@ -165,7 +165,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     θo = inclination(pix)
     met = metric(pix)
     isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
-    err_return = (T(Inf), T(Inf), false, false, false)
+    err_return = (zero(T), zero(T), false, false, false)
     if !isincone
         αmin = αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? βboundary(met, α, θo, θs) : zero(T))
@@ -205,7 +205,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     θs, τs, _, _, n, isindir = @inline emission_inclination(pix, τ)
     νθ = τs > 0
 
-    err_return = (T(Inf), T(Inf), T(Inf), true, true, false)
+    err_return = (zero(T), zero(T), zero(T), true, true, false)
     if cos(θs) > abs(cos(θo))
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
@@ -253,7 +253,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     θo = inclination(pix)
     cosθs = cos(θs)
     cosθo = cos(θo)
-    err_return = (T(Inf), T(Inf), T(Inf), false, false, false)
+    err_return = (zero(T), zero(T), zero(T), false, false, false)
     if cos(θs) > abs(cosθo)
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
@@ -319,7 +319,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     θo = inclination(pix)
 
     θs, _, _, _, n, isindir = @inline emission_inclination(pix, τ)
-    err_return = (T(Inf), T(Inf), T(Inf), T(Inf), true, true, false)
+    err_return = (zero(T), zero(T), zero(T), zero(T), true, true, false)
     if cos(θs) > abs(cos(θo))
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))

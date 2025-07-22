@@ -63,7 +63,7 @@ function raytrace(
 
     for i = 2:res
         (; rs, θs, ϕs) = ray[i]
-        if rs <= Krang.horizon(pixel.metric) || isinf(rs)
+        if rs <= Krang.horizon(pixel.metric) || iszero(rs)
             continue
         end
         line_point_2 =
