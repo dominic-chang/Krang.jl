@@ -12,25 +12,31 @@ sze = 100 # Resolution of the screen is sze x sze
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
 
 # Import external mesh
-bunny_mesh = translate(
-    rotate(
-        scale(
-            load(
-                download(
-                    "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
-                    "bunny.obj",
+bunny_mesh = rotate(
+    translate(
+        rotate(
+            scale(
+                load(
+                    download(
+                        "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
+                        "bunny.obj",
+                    ),
                 ),
+                100,
             ),
-            100,
+            π / 2,
+            0.0,
+            0.0,
+            1.0,
         ),
-        π / 2,
-        1.0,
-        0.0,
-        0.0,
+        10.0,
+        2.0,
+        -8.0,
     ),
-    2.0,
-    10.0,
-    -10.0,
+    π / 2,
+    0.0,
+    1.0,
+    0.0,
 );
 
 # Ray trace the mesh embedded in the Kerr space time. The emission picked up by a ray will be the sum of all the intersections of the ray with the mesh
@@ -39,13 +45,14 @@ bunny_mesh = translate(
 
 # Let us now ray trace the image to see what the mesh looks like from the observer's perspective.
 
-intersections = raytrace(camera, bunny_mesh);
+intersections = raytrace(camera, bunny_mesh; res=10);
 
 # And plot the image with GLMakie, 
 
-fig = GLMk.Figure()
-ax = GLMk.Axis(fig[1, 1], aspect = 1)
-GLMk.heatmap!(ax, intersections, colormap = :afmhot);
+fig = GLMk.Figure();
+ax = GLMk.Axis(fig[1, 1], aspect=1)
+GLMk.heatmap!(ax, intersections, colormap=:afmhot);
+display(fig)
 
 save("mesh_geometry_example.png", fig);
 
@@ -56,21 +63,21 @@ save("mesh_geometry_example.png", fig);
 fig = GLMk.Figure()
 ax1 = GLMk.Axis3(
     fig[1, 1],
-    aspect = (1, 1, 1),
-    title = "Top view of scene",
-    elevation = π / 2,
-    azimuth = π,
+    aspect=(1, 1, 1),
+    title="Top view of scene",
+    elevation=π / 2,
+    azimuth=π,
 )
 ax2 = GLMk.Axis3(
     fig[1, 2],
-    aspect = (1, 1, 1),
-    title = "Side view of scene",
-    elevation = 0.0,
-    azimuth = 3π / 2,
+    aspect=(1, 1, 1),
+    title="Side view of scene",
+    elevation=0.0,
+    azimuth=3π / 2,
 )
-ax3 = GLMk.Axis3(fig[2, 1], aspect = (1, 1, 1), title = "Isometric view of scene")
+ax3 = GLMk.Axis3(fig[2, 1], aspect=(1, 1, 1), title="Isometric view of scene")
 
-ax = GLMk.Axis(fig[2, 2], aspect = 1, title = "Heatmap of ray intersections with mesh")
+ax = GLMk.Axis(fig[2, 2], aspect=1, title="Heatmap of ray intersections with mesh")
 
 for a in [ax1, ax2, ax3]
     GLMk.xlims!(a, (-20, 20))
@@ -81,10 +88,16 @@ end
 
 GLMk.hidedecorations!(ax)
 sphere = GLMk.Sphere(GLMk.Point(0.0, 0.0, 0.0), horizon(metric)) # Sphere to represent black hole
-lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 100) # 100 is the number of steps to take along the ray
+#lines_to_plot = 
+function temp()
+    for _ in 1:1_000
+        Krang.generate_ray(rand(camera.screen.pixels), 1000) # 100 is the number of steps to take along the ray
+    end
+end
+@profview temp()
 
 img = zeros(sze, sze)
-recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate = 120) do i
+recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate=120) do i
     line = lines_to_plot[i]
 
     img[i] = intersections[i]
@@ -98,14 +111,14 @@ recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate = 120) do i
         GLMk.mesh!(
             a,
             bunny_mesh,
-            color = [
+            color=[
                 parse(GLMk.Colorant, "rgba(0%, 50%, 70%,1.0)") for
                 tri in bunny_mesh.position
             ],
-            colormap = :blues,
-            transparency = true,
+            colormap=:blues,
+            transparency=true,
         )
-        GLMk.mesh!(a, sphere, color = :black)
+        GLMk.mesh!(a, sphere, color=:black)
     end
 
     cart_line = map(
@@ -117,8 +130,8 @@ recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate = 120) do i
         ),
         line,
     )
-    GLMk.lines!(ax3, cart_line, color = :red)
-    GLMk.heatmap!(ax, img, colormap = :afmhot, colorrange = (0, 8))
+    GLMk.lines!(ax3, cart_line, color=:red)
+    GLMk.heatmap!(ax, img, colormap=:afmhot, colorrange=(0, 8))
 end
 # ```@raw html 
 # <video loop muted playsinline controls src="./mesh.mp4" />
