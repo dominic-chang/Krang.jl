@@ -1,4 +1,4 @@
-# # Raytracing a polygon mesh
+# # Raytracing a triangular mesh
 using Krang
 import GLMakie as GLMk
 using GeometryBasics
@@ -52,7 +52,6 @@ intersections = raytrace(camera, bunny_mesh; res=10);
 fig = GLMk.Figure();
 ax = GLMk.Axis(fig[1, 1], aspect=1)
 GLMk.heatmap!(ax, intersections, colormap=:afmhot);
-display(fig)
 
 save("mesh_geometry_example.png", fig);
 
@@ -88,13 +87,7 @@ end
 
 GLMk.hidedecorations!(ax)
 sphere = GLMk.Sphere(GLMk.Point(0.0, 0.0, 0.0), horizon(metric)) # Sphere to represent black hole
-#lines_to_plot = 
-function temp()
-    for _ in 1:1_000
-        Krang.generate_ray(rand(camera.screen.pixels), 1000) # 100 is the number of steps to take along the ray
-    end
-end
-@profview temp()
+lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 100) # 100 is the number of steps to take along the ray
 
 img = zeros(sze, sze)
 recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate=120) do i
