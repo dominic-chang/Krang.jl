@@ -8,7 +8,7 @@ There are three basic geometries currently available in `Krang`.
 
 * `ConeGeometry` : A spin axis centered cone with its apex placed at the coordinate origin.
 
-* `MeshGeometry` : A geometry made from a [triangle mesh](https://en.wikipedia.org/wiki/Triangle_mesh). The mesh is embedded by placing vertices at points in the Cartesian Kerr-Schild coordinate system. Check out the [ray tracing mesh example](@ref)
+* `MeshGeometry` : A geometry made from a [triangle mesh](https://en.wikipedia.org/wiki/Triangle_mesh). The mesh is embedded by placing vertices at points in the Cartesian Kerr-Schild coordinate system. Check out the [Raytracing a Triangular Mesh](@ref)
 There are convenience functions defines to `translate`, `rotate` and `scale` these geometries.
 
 * `LevelSetGeometry` : A geometry defined by a level set function expressed in the Cartesian Kerr-Schild coordinate system.

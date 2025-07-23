@@ -1,4 +1,4 @@
-# # Raytracing a triangular mesh
+# # Raytracing a Triangular Mesh
 using Krang
 import GLMakie as GLMk
 using GeometryBasics
