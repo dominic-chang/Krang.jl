@@ -202,6 +202,24 @@ function ϕ_kerr_schild(metric::Kerr{T}, rBL, ϕBL) where {T}
     return ans
 end
 
+function ϕ_BL(metric::Kerr{T}, rKS, ϕKS) where {T}
+    a = metric.spin
+    temp = sqrt(1 - a^2)
+    rp = 1 + temp
+    rm = 1 - temp
+    num = rKS - rp + eps()
+    den = rKS - rm + eps()
+
+    term1 = -a / (2temp) * log(abs(num / den))
+    term2 = atan(a, rKS)
+    ans = ϕKS + term1 + term2
+    if isinf(ans)
+        @warn "ϕ_BL is inf at rs=$rKS. This usually happens if the ray intersects the horizon."
+        return ϕKS + term2
+    end
+    return ans
+end
+
 
 """    
     Transforms from Boyer-Lindquist to Kerr-Schild coordinates

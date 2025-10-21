@@ -119,3 +119,8 @@ Kerr metric in Boyer Lindquist (BL) coordinates.
     _, r, θ, _ = coordinates
     return metric_dd(metric, r, θ)
 end
+
+
+function met_det(metric::Kerr{T}, r, θ) where {T}
+    return -sin(θ)^2 * (r^2 + metric.spin^2 * cos(θ)^2)^2
+end
