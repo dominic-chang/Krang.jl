@@ -13,11 +13,11 @@ function _raytrace(
     material = mesh.material
     ray = Vector{Intersection{T}}(undef, res)
     generate_ray!(ray, pixel, res)
-    (; rs, θs, ϕs, νr, νθ) = ray[1]
+    (; rs, θs, ϕs, νr, νθ) = ray[end]
     origin =
         boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs)
     z = zero(A)
-    for i = 2:res
+    for i = res:-1:1
         (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
         if rs <= Krang.horizon(pixel.metric) || iszero(rs)
             continue
@@ -52,7 +52,7 @@ end
     line_point_2,
     geometry::AbstractLevelSetGeometry{T},
 ) where {T}
-    didintersect = geometry(origin...) * geometry(line_point_2...) < zero(T)
+    didintersect = geometry(origin...) * geometry(line_point_2...) <= zero(T)
     if didintersect
         direction = (
             line_point_2[1] - origin[1],
