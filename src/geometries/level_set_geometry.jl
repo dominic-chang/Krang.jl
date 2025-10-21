@@ -17,7 +17,7 @@ function _raytrace(
     origin =
         boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs)
     z = zero(A)
-    for i = res:-1:2
+    for i = 2:res
         (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
         if rs <= Krang.horizon(pixel.metric) || iszero(rs)
             continue
@@ -34,7 +34,7 @@ function _raytrace(
         didintersect, point = line_intersection(origin, line_point_2, geometry)
         rs = sqrt(sum(point .^ 2))
         θs = acos(point[3] / rs)
-        ϕs = atan(point[2], point[1])
+        ϕs = ϕ_BL(pixel.metric, rs, atan(point[2], point[1]))
 
         if rs < Krang.horizon(pixel.metric)
             continue
