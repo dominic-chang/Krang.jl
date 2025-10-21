@@ -209,19 +209,19 @@ struct SlowLightIntensityCamera{T,A} <: AbstractCamera
     end
 end
 
-function η(pix::SlowLightIntensityPixel)
+@inline function η(pix::SlowLightIntensityPixel)
     return pix.η
 end
-function λ(pix::SlowLightIntensityPixel)
+@inline function λ(pix::SlowLightIntensityPixel)
     return pix.λ
 end
-function roots(pix::SlowLightIntensityPixel)
+@inline function roots(pix::SlowLightIntensityPixel)
     return pix.roots
 end
-function screen_coordinate(pix::SlowLightIntensityPixel)
+@inline function screen_coordinate(pix::SlowLightIntensityPixel)
     return pix.screen_coordinate
 end
-function inclination(pix::SlowLightIntensityPixel)
+@inline function inclination(pix::SlowLightIntensityPixel)
     return pix.θo
 end
 function I0_inf(pix::SlowLightIntensityPixel)
