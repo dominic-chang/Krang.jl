@@ -13,11 +13,11 @@ function _raytrace(
     material = mesh.material
     ray = Vector{Intersection{T}}(undef, res)
     generate_ray!(ray, pixel, res)
-    (; rs, θs, ϕs, νr, νθ) = ray[end]
+    (; rs, θs, ϕs, νr, νθ) = ray[1]
     origin =
         boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs)
     z = zero(A)
-    for i = res:-1:1
+    for i = 1:res
         (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
         if rs <= Krang.horizon(pixel.metric) || iszero(rs)
             continue

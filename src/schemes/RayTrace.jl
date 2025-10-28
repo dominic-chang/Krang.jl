@@ -7,8 +7,7 @@ function generate_ray!(
     pixel::Krang.AbstractPixel,
     res::Int,
 ) where {T}
-    actual_res =
-        unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res + 1 : res
+    actual_res = res
     τf = total_mino_time(pixel)
 
     Δτ = τf / actual_res

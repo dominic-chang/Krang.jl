@@ -17,9 +17,9 @@ export p_bl_d,
 function p_bl_d(metric::Kerr{T}, r, θ, η, λ, νr::Bool, νθ::Bool) where {T}
     return @SVector[
         -one(T),
-        (νr ? one(T) : -one(T)) * √max(zero(T), r_potential(metric, η, λ, r)) /
+        (νr ? one(T) : -one(T)) * √abs(r_potential(metric, η, λ, r)) /
         Δ(metric, r),
-        (νθ ? one(T) : -one(T)) * √max(zero(T), θ_potential(metric, η, λ, θ)),
+        (νθ ? one(T) : -one(T)) * √abs(θ_potential(metric, η, λ, θ)),
         λ,
     ]
 end
