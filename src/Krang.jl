@@ -7,6 +7,7 @@ import GeometryBasics
 using Rotations
 using Roots
 using KernelAbstractions
+using Reactant
 @template (FUNCTIONS, METHODS, MACROS) = """
                                          $(TYPEDSIGNATURES)
                                          $(DOCSTRING)

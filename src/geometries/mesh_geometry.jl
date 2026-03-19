@@ -73,7 +73,7 @@ function raytrace(
             v1 = @view vertices[:, f1]
             v2 = @view vertices[:, f2]
             v3 = @view vertices[:, f3]
-            didintersect, point = line_intersection(origin, line_point_2, v1, v2, v3)
+            didintersect, point = @inline line_intersection(origin, line_point_2, v1, v2, v3)
             intersections += didintersect ? 1 : 0
         end
         origin = line_point_2

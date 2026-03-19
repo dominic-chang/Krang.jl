@@ -6,50 +6,55 @@ Intensity Pixel Type.
 Each Pixel is associated with a single ray. 
 Pixels cache some information about the ray.
 """
-struct IntensityPixel{T} <: AbstractPixel{T}
-    metric::Kerr{T}
-    "Bardeen coordiantes if ro is \`Inf`, otherwise longitude and latitude"
-    screen_coordinate::NTuple{2,T}
-    "Radial roots"
-    roots::NTuple{4,Complex{T}}
-    "Radial anti-derivative at observer"
-    I0_o::T
-    "Radial anti-derivative at infinity"
-    I0_inf::T
-    "Total possible Mino time"
-    total_mino_time::T
-    "Angular antiderivative"
-    absGθo_Gθhat::NTuple{2,T}
-    "Inclination"
-    θo::T
-    "radius"
-    ro::T
-    η::T
-    λ::T
-    function _IntensityPixel(met::Kerr{T}, tempη, tempλ, θo::T, ro::T, x, y) where {T}
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
+struct IntensityPixel{T, SCREEN_TYPE, ROOTS_TYPE, G0_TYPE} <: AbstractPixel{T}
+	metric::Kerr{T}
+	"Bardeen coordiantes if ro is \`Inf`, otherwise longitude and latitude"
+	screen_coordinate::SCREEN_TYPE#AbstractArray{T}
+	"Radial roots"
+	roots::ROOTS_TYPE#SCREEN_TYPEAbstractArray{Complex{T}}
+	"Radial anti-derivative at observer"
+	I0_o::T
+	"Radial anti-derivative at infinity"
+	I0_inf::T
+	"Total possible Mino time"
+	total_mino_time::T
+	"Angular antiderivative"
+	absGθo_Gθhat::G0_TYPE
+	"Inclination"
+	θo::T
+	"radius"
+	ro::T
+	η::T
+	λ::T
+	function _IntensityPixel(met::Kerr{T}, tempη, tempλ, θo, ro, x, y)  where T
+		roots = Krang.get_radial_roots(met, tempη, tempλ)
+		numreals = sum(_isreal2, roots)
+		cond = (numreals == 2) & (abs(imag(roots[4]) / real(roots[4])) < eps(met.spin))
+		roots = Base.ifelse(cond, (roots[1], roots[4], roots[2], roots[3]), roots)
+		_I0_o = Krang.Ir_s(met, ro, roots, true)
+		I0_inf = Krang.Ir_inf(met, roots)
+		total_mino_time = _I0_o + I0_inf
+        
+        if numreals != 4 
+            total_mino_time = _I0_o - Krang.Ir_s(met, Krang.horizon(met), roots, true)
         end
-        I0_o = Krang.Ir_s(met, ro, roots, true)
-        I0_inf = Krang.Ir_inf(met, roots)
-        total_mino_time = numreals == 4 ? I0_o + I0_inf : I0_o - Krang.Ir_s(met, Krang.horizon(met), roots, true)
 
-        new{T}(
-            met,
-            (x, y),
-            roots,
-            I0_o,
-            I0_inf,
-            total_mino_time,
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            θo,
-            ro,
-            tempη,
-            tempλ,
-        )
-    end
+		screen_coords = [x, y]
+		Go = collect(Krang._absGθo_Gθhat(met, θo, tempη, tempλ))
+		new{T, typeof(screen_coords), typeof(roots), typeof(Go)}(
+			met,
+			screen_coords,
+			roots,
+			_I0_o,
+			I0_inf,
+			total_mino_time,
+			Go,
+			θo,
+			ro,
+			tempη,
+			tempλ,
+		)
+	end
 
     @doc """
         IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
@@ -65,34 +70,18 @@ struct IntensityPixel{T} <: AbstractPixel{T}
     # Returns
     - An `IntensityPixel` object initialized with the given parameters.
 
-    # Details
-    This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
-    It then computes the radial roots and adjusts them if necessary. 
-    Finally, it initializes an `IntensityPixel` object with the calculated values and the provided parameters.
-    """
-    function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
-        tempη = Krang.η(met, α, β, θo)
-        tempλ = Krang.λ(met, α, θo)
-        _IntensityPixel(met, tempη, tempλ, θo, T(Inf), α, β)
-    end
+	# Details
+	This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
+	It then computes the radial roots and adjusts them if necessary. 
+	Finally, it initializes an `IntensityPixel` object with the calculated values and the provided parameters.
+	"""
+	function IntensityPixel(met::Kerr{A}, α, β, θo) where A
+		tempη = Krang.η(met, α, β, θo)
+		tempλ = Krang.λ(met, α, θo)
+		_IntensityPixel(met, tempη, tempλ, θo, Inf, α, β)
+	end
 
-    function IntensityPixel(met::Kerr{T}, p_local_u::Vector{T}, θo::T, ro::T; x=p_local_u[3], y=p_local_u[4]) where {T}
-        a = met.spin
-        p_bl_u = jac_bl_u_zamo_d(met, ro, θo) * p_local_u
-        E, _, _, L = metric_dd(met, ro, θo) * p_bl_u
-        tempλ = L/E
-        tempη = (Σ(met, ro, θo)/E*p_bl_u[3])^2 - (a*cos(θo))^2 + (tempλ*cot(θo))^2
 
-        _IntensityPixel(met, tempη, tempλ, θo, ro, x, y)
-    end
-
-    function IntensityPixel(met::Kerr{T}, longitude::T, latitude::T, θo::T, ro::T) where {T}
-        @assert latitude >= -π/2 && latitude <= π/2 "latitude must be in [-π/2, π/2]"
-        red_α = sin(longitude)
-        red_β = sin(latitude)
-        p_local_u = [1, √abs(1-(red_α^2+red_β^2)), -red_α, -red_β]
-        IntensityPixel(met, p_local_u, θo, ro; x=red_α, y=red_β)
-    end
 
 
 end

@@ -187,7 +187,7 @@ end
     α, β = screen_coordinate(pix)
 
     eα, eβ, redshift, lp = synchrotronPolarization(
-        met,
+        spin,
         α,
         β,
         rs,

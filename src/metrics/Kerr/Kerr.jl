@@ -33,8 +33,8 @@ end
 Outer Horizon for the Kerr metric.
 """
 function horizon(metric::Kerr{T}) where {T}
-    m = metric.mass
-    return m + √(m - metric.spin^2)
+    spin = metric.spin
+    return 1 + √(1 - spin^2)
 end
 
 function Δ(metric::Kerr{T}, r) where {T}

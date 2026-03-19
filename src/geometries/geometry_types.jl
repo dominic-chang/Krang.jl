@@ -24,8 +24,8 @@ struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
     material::M
 end
 
-const Scene = NTuple{N,Mesh} where {N}
-Scene() = NTuple{0,Mesh}()
+const Scene = Array{Mesh} 
+Scene() = []
 
 function add(scene::Scene, mesh::Mesh)
     return (scene..., mesh)
