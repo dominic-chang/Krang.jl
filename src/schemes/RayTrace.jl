@@ -24,40 +24,6 @@ function generate_ray(pixel::AbstractPixel{T}, res::Int) where {T}
     generate_ray!(ray, pixel, res)
     return ray
 end
-
-#TODO: debug this
-@kernel function _generate_rays!(
-    rays::AbstractArray{Intersection{T}},
-    pixels::AbstractMatrix{P},
-    res::Int,
-) where {T,P<:AbstractPixel}
-    (I, J, K) = @index(Global, NTuple)
-    k = Int(K)
-    pixel = pixels[I, J]
-    actual_res =
-        unsafe_trunc(Int, sum((Krang._isreal2.(Krang.roots(pixel))))) == 4 ? res + 1 : res
-    τf = total_mino_time(pixel)
-
-    Δτ = τf / actual_res
-
-    ts, rs, θs, ϕs, νr, νθ = (2.0f0, 0.0f0, 0.0f0, 0.0f0, true, true)
-    rays[I, J, K] = Intersection(ts, rs, θs, ϕs, νr, νθ)
-    emission_coordinates(pixel, Δτ * k)
-
-
-end
-function generate_rays(
-    pixels::AbstractMatrix{P},
-    res::Int;
-    A = Array,
-) where {P<:AbstractPixel{T}} where {T}
-    dims = (size(pixels)..., res)
-    rays = A{Intersection{T}}(undef, dims...)
-    backend = get_backend(rays)
-    _generate_rays!(backend)(rays, pixels, res, ndrange = dims)
-    return rays
-end
-
 function line_intersection(origin::NTuple{3,T}, line_point_2, t_a, t_b, t_c) where {T}
     e1 = (t_b[1] - t_a[1], t_b[2] - t_a[2], t_b[3] - t_a[3])
     e2 = (t_c[1] - t_a[1], t_c[2] - t_a[2], t_c[3] - t_a[3])

@@ -77,68 +77,16 @@ struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
     "Data type that stores screen pixel information"
     pixels::A
 
-    @kernel function _generate_screen!(
-        screen,
-        met::Kerr{T},
-        αmin,
-        αmax,
-        βmin,
-        βmax,
-        θo,
-        res,
-    ) where {T}
-        I, J = @index(Global, NTuple)
-        α = αmin + (αmax - αmin) * (T(I) - 1) / (res - 1)
-        β = βmin + (βmax - βmin) * (T(J) - 1) / (res - 1)
-        screen[I, J] = IntensityPixel(met, α, β, θo)
-    end
-
-    @doc """
-        IntensityScreen(met::Kerr{T}, αmin::T, αmax::T, βmin::T, βmax::T, θo::T, res::Int; A=Matrix) where {T}
-
-    Creates an intensity screen for the given Kerr metric. 
-    This camera caches information for fast light computations.
-
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric.
-    - `αmin::T`: Minimum value of α.
-    - `αmax::T`: Maximum value of α.
-    - `βmin::T`: Minimum value of β.
-    - `βmax::T`: Maximum value of β.
-    - `θo::T`: Observer's inclination angle. θo ∈ (0, π).
-    - `res::Int`: Resolution of the screen.
-    - `A=Matrix`: Optional argument to specify the type of matrix to use. A GPUMatrix can be used for GPU computations.
-
-    # Returns
-    - `IntensityScreen{T, A}`: An intensity screen object.
-    """
-    function IntensityScreen(
-        met::Kerr{T},
-        αmin::T,
-        αmax::T,
-        βmin::T,
-        βmax::T,
-        θo::T,
-        res;
-        A = Matrix,
-    ) where {T}
-        screen = A(Matrix{IntensityPixel{T}}(undef, res, res))
-
-        backend = get_backend(screen)
-
-        _generate_screen!(backend)(
-            screen,
-            met,
-            αmin,
-            αmax,
-            βmin,
-            βmax,
-            θo,
-            res,
-            ndrange = (res, res),
-        )
-
-        new{T,A}((αmin, αmax), (βmin, βmax), screen)
+    function IntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+        screen = Matrix{IntensityPixel}(undef, res, res)
+        αvals = range(αmin, αmax, length=res)
+        βvals = range(βmin, βmax, length=res)
+        for (iα, α) in enumerate(αvals)
+            for (iβ, β) in enumerate(βvals)
+                screen[iα, iβ] = IntensityPixel(met, α, β, θo)
+            end
+        end
+        new{T, typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -180,12 +128,12 @@ struct IntensityCamera{T,A} <: AbstractCamera
         αmax,
         βmin,
         βmax,
-        res::Int;
-        A = Matrix,
+        res::Int
     ) where {T}
-        new{T,A}(
+        screen = IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res)
+        new{T,typeof(screen.pixels)}(
             met,
-            IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A = A),
+            screen,
             (T(Inf), θo),
         )
     end
