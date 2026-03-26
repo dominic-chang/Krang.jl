@@ -31,25 +31,6 @@ function _render(observation, pixel::AbstractPixel{T}, scene::Scene) where {T}
     return observation
 end
 
-@kernel function _render!(store, pixels, mesh::Mesh)
-    I = @index(Global)
-    @inbounds store[I] = mesh.material(pixels[I], mesh.geometry)
-end
-
-function render!(store, camera::AbstractCamera, scene::Scene)
-    backend = get_backend(store)
-    @assert backend == get_backend(camera.screen.pixels)
-    @assert size(store) == size(camera.screen.pixels)
-    mapreduce(
-        mesh -> begin
-            _render!(backend)(store, camera.screen.pixels, mesh, ndrange = size(store))
-            store
-        end,
-        +,
-        scene,
-    )
-end
-
 function render_cpu_threaded!(store, camera::AbstractCamera, scene::Scene)
     @assert size(store) == size(camera.screen.pixels)
     mapreduce(

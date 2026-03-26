@@ -100,67 +100,16 @@ struct SlowLightIntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
 
     "Data type that stores screen pixel information"
     pixels::A
-
-    @kernel function _generate_screen!(
-        screen,
-        met::Kerr{T},
-        αmin,
-        αmax,
-        βmin,
-        βmax,
-        θo,
-        res,
-    ) where {T}
-        I, J = @index(Global, NTuple)
-        α = αmin + (αmax - αmin) * (T(I) - 1) / (res - 1)
-        β = βmin + (βmax - βmin) * (T(J) - 1) / (res - 1)
-        screen[I, J] = SlowLightIntensityPixel(met, α, β, θo)
-    end
-    @doc """
-        SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res; A=Matrix) where {T}
-
-    Construct a `SlowLightIntensityScreen` object.
-
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric object.
-    - `αmin`: Minimum Bardeen α value.
-    - `αmax`: Maximum Bardeen α value.
-    - `βmin`: Minimum Bardeen β value.
-    - `βmax`: Maximum Bardeen β value.
-    - `θo`: Observer's inclination angle. θo ∈ (0, π).
-    - `res`: Resolution of the screen (number of pixels along one dimension).
-    - `A=Matrix`: Data type that stores screen pixel information (default is `Matrix`). A GPUMatrix can be used for GPU computations.
-
-    # Returns
-    A `SlowLightIntensityScreen` object.
-    """
-    function SlowLightIntensityScreen(
-        met::Kerr{T},
-        αmin,
-        αmax,
-        βmin,
-        βmax,
-        θo,
-        res;
-        A = Matrix,
-    ) where {T}
-        screen = A(Matrix{SlowLightIntensityPixel{T}}(undef, res, res))
-
-        backend = get_backend(screen)
-
-        _generate_screen!(backend)(
-            screen,
-            met,
-            αmin,
-            αmax,
-            βmin,
-            βmax,
-            θo,
-            res,
-            ndrange = (res, res),
-        )
-
-        new{T,typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
+    function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+        screen = Matrix{SlowLightIntensityPixel}(undef, res, res)
+        αvals = range(αmin, αmax, length=res)
+        βvals = range(βmin, βmax, length=res)
+        for (iα, α) in collect(enumerate(αvals))
+            for (iβ, β) in enumerate(βvals)
+                screen[iα, iβ] = SlowLightIntensityPixel(met, α, β, θo)
+            end
+        end
+        new{T, typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -201,10 +150,9 @@ struct SlowLightIntensityCamera{T,A} <: AbstractCamera
         αmax,
         βmin,
         βmax,
-        res;
-        A = Matrix,
+        res
     ) where {T}
-        screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A)
+        screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res)
         new{T,typeof(screen.pixels)}(met, screen, (T(Inf), θo))
     end
 end

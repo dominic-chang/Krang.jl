@@ -6,7 +6,6 @@ using PolarizedTypes
 import GeometryBasics
 using Rotations
 using Roots
-using KernelAbstractions
 @template (FUNCTIONS, METHODS, MACROS) = """
                                          $(TYPEDSIGNATURES)
                                          $(DOCSTRING)
