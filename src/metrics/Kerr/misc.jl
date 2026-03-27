@@ -22,7 +22,7 @@ function _isreal2(num)
     ren, imn = reim(num)
     ren2 = ren^2
     imn2 = imn^2
-    return sqrt(imn2 / (imn2 + ren2)) < sqrt(eps(T))
+    return imn2 / (imn2 + ren2) < sqrt(eps(T))
 end
 
 """
@@ -332,10 +332,9 @@ function Ir_inf(metric::Kerr{T}, roots) where T
         return Ir_inf_case1_and_2(metric, map(real, roots))
     elseif numreals == 2 #case3
         return Ir_inf_case3(metric, roots)
-    elseif numreals == 0 #case 4
+    else #case 4
         return Ir_inf_case4(metric, roots)
     end
-    return T(NaN)
 end
 
 function Ir_inf_case1_and_2(::Kerr, roots::NTuple{4}) 
@@ -401,10 +400,9 @@ function Ir_s(metric::Kerr{T}, rs, roots, νr) where T
         return Ir_s_case1_and_2(metric, rs, real.(roots), νr)
     elseif numreals == 2 #case3
         return Ir_s_case3(metric, rs, roots)
-    else numreals == 0#case 4
+    else #case 4
         return Ir_s_case4(metric, rs, roots)
     end
-    return T(NaN)
 end
 
 function Ir_s_case1_and_2(::Kerr{T}, rs, roots::NTuple{4}, νr) where {T}
@@ -478,10 +476,9 @@ function Iϕ_inf(metric::Kerr{T}, roots, λ) where {T}
         return Iϕ_inf_case2(metric, real.(roots), λ)
     elseif numreals == 2 #case3
         return Iϕ_inf_case3(metric, roots, λ)
-    elseif numreals == 0#case4
+    else #case4
         return Iϕ_inf_case4(metric, roots, λ)
     end
-    return T(NaN)
 end
 
 function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
@@ -617,10 +614,9 @@ function Iϕ_w_I0_terms(metric::Kerr{T}, rs, τ, roots, νr, λ) where {T}
         return Iϕ_w_I0_terms_case2(metric, rs, τ, real.(roots), νr, λ)
     elseif numreals == 2 #case3
         return Iϕ_w_I0_terms_case3(metric, rs, τ, roots, λ)
-    elseif numreals == 0  #case4
+    else #case4
         return Iϕ_w_I0_terms_case4(metric, rs, τ, roots, λ)
     end
-    return T(NaN)
 end
 
 function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ) where {T}
@@ -761,10 +757,9 @@ function It_inf(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
         return It_inf_case2(metric, real.(roots), λ)
     elseif numreals == 2 #case3
         return It_inf_case3(metric, roots, λ)
-    elseif numreals == 0 #case4
+    else #case4
         return It_inf_case4(metric, roots, λ)
     end
-    return T(NaN)
 end
 
 function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
@@ -872,11 +867,12 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 end
 
 function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
+    oneT = one(T)
     a = metric.spin
     _, r2, _, r4 = roots
 
-    rp = 1 + √(1 - a^2)
-    rm = 1 - √(1 - a^2)
+    rp = one(T) + √(oneT - a^2)
+    rm = one(T) - √(oneT - a^2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -903,10 +899,10 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     I1_total =
         -(Π1_o) +
-        1 / 2 * log(
-            (16 * (1 + go^2 - sqrt((1 + go^2) * (1 + go^2 - k4))) * (1 + go^2 - k4)) /
-            ((C + D)^2 * ((1 + go^2)^2 - k4) * k4 * (1 + sqrt(1 - k4 / (1 + go^2)))),
-        )
+        log(
+            (T(16) * (oneT + go^2 - sqrt((oneT + go^2) * (oneT + go^2 - k4))) * (oneT + go^2 - k4)) /
+            ((C + D)^2 * ((oneT + go^2)^2 - k4) * k4 * (oneT + sqrt(oneT - k4 / (oneT + go^2)))),
+        ) / T(2)
 
     # Removed linear divergence
     I2_total =
@@ -925,11 +921,11 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
         (-2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1m_o))
 
     return -(
-        4 / (rp - rm) *
+        T(4) / (rp - rm) *
         (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) +
         2 * I1_total +
         I2_total
-    )# + (logdiv + lineardiv)
+    )
 end
 
 """
@@ -952,10 +948,9 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
         return It_w_I0_terms_case2(metric, rs, τ, real.(roots), λ, νr)
     elseif numreals == 2 #case3
         return It_w_I0_terms_case3(metric, rs, τ, roots, λ)
-    elseif numreals == 0 #case4
+    else #case4
         return It_w_I0_terms_case4(metric, rs, τ, roots, λ)
     end
-    return T(NaN)
 end
 
 @inline function It_w_I0_terms_case2(
@@ -1146,10 +1141,8 @@ end
         I1, I2, Ip, Im = Krang.radial_inf_integrals_case2(met, roots)
     elseif numreals == 2
         I1, I2, Ip, Im = Krang.radial_inf_integrals_case3(met, roots)
-    elseif numreals == 2
-        I1, I2, Ip, Im = Krang.radial_inf_integrals_case4(met, roots)
     else
-        I1, I2, Ip, Im = (T(NaN) for _ in 1:4)
+        I1, I2, Ip, Im = Krang.radial_inf_integrals_case4(met, roots)
     end
     return I1, I2, Ip, Im
 end
@@ -1316,10 +1309,8 @@ end
             Krang.radial_w_I0_terms_integrals_case2(met, rs, real.(roots), τ, νr)
     elseif numreals == 2
         I1, I2, Ip, Im = Krang.radial_w_I0_terms_integrals_case3(met, rs, roots, τ)
-    elseif numreals == 0
-        I1, I2, Ip, Im = Krang.radial_w_I0_terms_integrals_case4(met, rs, roots, τ)
     else
-        I1, I2, Ip, Im = (T(NaN) for _ in 1:4)
+        I1, I2, Ip, Im = Krang.radial_w_I0_terms_integrals_case4(met, rs, roots, τ)
     end
     return I1, I2, Ip, Im
 end

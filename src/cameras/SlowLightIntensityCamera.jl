@@ -37,56 +37,65 @@ struct SlowLightIntensityPixel{T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
 end
 
 @doc """
-        SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
+    SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
 
-    Construct a `SlowLightIntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
+Construct a `SlowLightIntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
 
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric.
-    - `α::T`: The Bardeen α value (screen coordinate).
-    - `β::T`: The Bardeen β value (screen coordinate).
-    - `θo::T`: The inclination angle.
+# Arguments
+- `met::Kerr{T}`: The Kerr metric.
+- `α::T`: The Bardeen α value (screen coordinate).
+- `β::T`: The Bardeen β value (screen coordinate).
+- `θo::T`: The inclination angle.
 
-    # Returns
-    - A `SlowLightIntensityPixel` object initialized with the given parameters.
+# Returns
+- A `SlowLightIntensityPixel` object initialized with the given parameters.
 
-    # Details
-    This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
-    It then computes the radial roots and adjusts them if necessary. 
-    It also calculates the radial and angular antiderivatives. 
-    Finally, it initializes a `SlowLightIntensityPixel` object with the calculated values and the provided parameters.
-    """
-    function SlowLightIntensityPixel(met::Kerr{T}, α, β, θo) where {T}
-        tempη = Krang.η(met, α, β, θo)
-        tempλ = Krang.λ(met, α, θo)
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
-        end
-        I1, I2, Ip, Im = radial_inf_integrals(met, roots)
-
-        I0_inf = Krang.Ir_inf(met, roots)
-        SlowLightIntensityPixel(
-            met,
-            (α, β),
-            roots,
-            I0_inf,
-            total_mino_time(met, roots),
-            Krang.Iϕ_inf(met, roots, tempλ),
-            Krang.It_inf(met, roots, tempλ),
-            I1,
-            I2,
-            Ip,
-            Im,
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ),
-            Krang._absGto_Gthat(met, θo, tempη, tempλ),
-            θo,
-            tempη,
-            tempλ,
-        )
+# Details
+This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
+It then computes the radial roots and adjusts them if necessary. 
+It also calculates the radial and angular antiderivatives. 
+Finally, it initializes a `SlowLightIntensityPixel` object with the calculated values and the provided parameters.
+"""
+function SlowLightIntensityPixel(met::Kerr{T}, α, β, θo) where {T}
+    α = T(α)
+    β = T(β)
+    θo = T(θo)
+    tempη = Krang.η(met, α, β, θo)
+    tempλ = Krang.λ(met, α, θo)
+    roots = Krang.get_radial_roots(met, tempη, tempλ)
+    numreals = sum(_isreal2.(roots))
+    if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+        roots = (roots[1], roots[4], roots[2], roots[3])
     end
+    I1, I2, Ip, Im = radial_inf_integrals(met, roots)
+    I0_inf = Krang.Ir_inf(met, roots)
+    τ_total = total_mino_time(met, roots)
+    Iϕ_inf_temp = Krang.Iϕ_inf(met, roots, tempλ)
+    It_inf_temp = Krang.It_inf(met, roots, tempλ)
+    Gθ_Gθhat_temp = Krang._absGθo_Gθhat(met, θo, tempη, tempλ)
+    Gϕ_Gϕhat_temp = Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ)
+    Gt_Gthat_temp = Krang._absGto_Gthat(met, θo, tempη, tempλ)
+
+    SlowLightIntensityPixel(
+        met,
+        (α, β),
+        roots,
+        I0_inf,
+        τ_total,
+        Iϕ_inf_temp,
+        It_inf_temp,
+        I1,
+        I2,
+        Ip,
+        Im,
+        Gθ_Gθhat_temp,
+        Gϕ_Gϕhat_temp,
+        Gt_Gthat_temp,
+        θo,
+        tempη,
+        tempλ,
+    )
+end
 
 """
     $TYPEDEF

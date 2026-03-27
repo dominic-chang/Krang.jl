@@ -50,6 +50,24 @@ Gθo_Gθhat_mtl = Krang._absGθo_Gθhat.(Ref(met), θo_mtl, η_mtl, λ_mtl)
 pix_s = Krang.IntensityPixel.(Ref(met), α_s, β_s, θo_s)
 pix_mtl = Krang.IntensityPixel.(Ref(met), α_mtl, β_mtl, θo_mtl)
 
+Ivals_s = Krang.radial_inf_integrals.(Ref(met), radial_roots_s)
+Ivals_mtl = Krang.radial_inf_integrals.(Ref(met), radial_roots_mtl)
+#@test maximum(abs.(sum.(collect.(Array(Ivals_mtl)) .- collect.(Ivals_s)))) ≈ 0f0 atol=1e-5
+
+Iϕ_s =  Krang.Iϕ_inf.(Ref(met), radial_roots_s, λ_s)
+Iϕ_mtl =  Krang.Iϕ_inf.(Ref(met), radial_roots_mtl, λ_mtl)
+#@test maximum(abs.((Array(Iϕ_mtl) ./ Iϕ_s) .- 1f0)) ≈ 0f0 atol=1e-2
+
+It_s =  Krang.It_inf.(Ref(met), radial_roots_s, λ_s)
+It_mtl =  Krang.It_inf.(Ref(met), radial_roots_mtl, λ_mtl)
+#@test maximum(abs.((Array(It_mtl) ./ It_s) .- 1f0)) ≈ 0f0 atol=1e-2
+
+Gϕo_Gϕhat_s = Krang._absGϕo_Gϕhat.(Ref(met), θo_s, η_s, λ_s)
+Gϕo_Gϕhat_mtl = Krang._absGϕo_Gϕhat.(Ref(met), θo_mtl, η_mtl, λ_mtl)
+
+Gto_Gthat_s = Krang._absGto_Gthat.(Ref(met), θo_s, η_s, λ_s)
+Gto_Gthat_mtl = Krang._absGto_Gthat.(Ref(met), θo_mtl, η_mtl, λ_mtl)
+
 pix_s = Krang.SlowLightIntensityPixel.(Ref(met), α_s, β_s, θo_s)
 pix_mtl = Krang.SlowLightIntensityPixel.(Ref(met), α_mtl, β_mtl, θo_mtl)
 
