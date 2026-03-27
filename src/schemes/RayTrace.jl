@@ -87,8 +87,8 @@ function raytrace(
     pix::AbstractPixel,
     mesh::Mesh;
     res = 100,
-) where {T}
-    observation = zero(T)
+)
+    observation = zero(typeof(metric(pix).spin))
     return _raytrace(observation, pix, mesh; res = res)
 end
 
@@ -97,7 +97,8 @@ function raytrace(
     pix::AbstractPixel,
     mesh::Mesh;
     res = 100,
-) where {T}
+)
+    T = typeof(metric(pix).spin)
     observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
     return _raytrace(observation, pix, mesh; res = res)
 end

@@ -7,6 +7,13 @@ function _custom_pow(x::ComplexF32, y::Float32)
     return (abs(x)^y)*(c-s*one(x)im)
 end
 
+@inline function _argmax_real3(x1, x2, x3)
+    if real(x1) >= real(x2)
+        return real(x1) >= real(x3) ? x1 : x3
+    end
+    return real(x2) >= real(x3) ? x2 : x3
+end
+
 function Krang.get_radial_roots(metric::Krang.Kerr{T}, η::T, λ::T) where {T<:Float32}
     a = metric.spin
 
@@ -27,7 +34,7 @@ function Krang.get_radial_roots(metric::Krang.Kerr{T}, η::T, λ::T) where {T<:F
 
     v = -P .* _custom_pow.(T(3) .* C, -one(T))
 
-    ξ0 = argmax(real, (C .+ v)) - A / T(3)
+    ξ0 = _argmax_real3(C[1] + v[1], C[2] + v[2], C[3] + v[3]) - A / T(3)
     ξ02 = 2ξ0
 
     predet1 = A2 + ξ02
