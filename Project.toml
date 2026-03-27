@@ -14,15 +14,18 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [weakdeps]
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 
 [extensions]
 KrangKernelAbstractionsExt = "KernelAbstractions"
+KrangReactantExt = "Reactant"
+KrangMetalExt = "Metal"
 
 [compat]
 DocStringExtensions = "0.9"
 GeometryBasics = "0.5"
 JacobiElliptic = "0.3"
-KernelAbstractions = "0.9"
 PolarizedTypes = "0.1"
 Roots = "2"
 Rotations = "1"
