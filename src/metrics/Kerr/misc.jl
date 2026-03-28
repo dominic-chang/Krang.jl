@@ -18,11 +18,10 @@ export λ,
 Checks if a complex number is real to some tolerance
 """
 function _isreal2(num) 
-    T = typeof(real(num))
     ren, imn = reim(num)
     ren2 = ren^2
     imn2 = imn^2
-    return imn2 / (imn2 + ren2) < sqrt(eps(T))
+    return Base.:&(1, (imn2 / (imn2 + ren2))  < sqrt(eps(real(num))))
 end
 
 """

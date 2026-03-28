@@ -5,7 +5,6 @@ using JacobiElliptic
 using PolarizedTypes
 import GeometryBasics
 using Rotations
-using Roots
 @template (FUNCTIONS, METHODS, MACROS) = """
                                          $(TYPEDSIGNATURES)
                                          $(DOCSTRING)
