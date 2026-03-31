@@ -19,8 +19,9 @@ struct Parabaloid{T} <: Krang.AbstractLevelSetGeometry{T}
     rh::T
     index::T
 end
-function (geometry::Parabaloid)(x, y, z)
-    r = sqrt(x^2 + y^2 + z^2)
+function(geometry::Parabaloid)(x, y, z)
+    r = sqrt(((x)^2 + (y)^2)*(1-0.5*sin(z)) + z^2)
+    #r = sqrt(x^2 + y^2 + z^2)
     return 1 - (r / geometry.rh)^geometry.index * (1 - z / r)
 end
 
@@ -32,6 +33,28 @@ function (mat::XMaterial)(pix, intersection)
     return 1.0
 end
 
+χ = π;
+ι = 0.0;
+βv = 0.5;
+σ = 1.0;
+η1 = π/2;#2.64;
+η2 = π - η1;
+magfield1 = Krang.SVector(sin(ι) * cos(η1), sin(ι) * sin(η1), cos(ι));
+vel = Krang.SVector(βv, (π / 2), χ);
+R = 4.0;
+p1 = 1.0;
+p2 = 1.0;
+material1 = Krang.ElectronSynchrotronPowerLawIntensity(
+    magfield1...,
+    vel...,
+    σ,
+    R,
+    p1,
+    p2,
+    (0, 1),
+);
+material1 = XMaterial();
+
 # We will ray trace the geometry and plot the image.
 parabaloid = Parabaloid(Krang.horizon(metric), 1.0)
 
@@ -39,7 +62,7 @@ fig = GLMk.Figure();
 ax = GLMk.Axis(fig[1, 1], aspect = 1)
 
 
-intersections = raytrace(camera, Krang.Mesh(parabaloid, XMaterial()), res = 1_00);
+@time intersections = raytrace(camera, Krang.Mesh(parabaloid, material1), res = 400);
 
 # And plot the image with GLMakie, 
 

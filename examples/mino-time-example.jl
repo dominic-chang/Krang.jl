@@ -29,7 +29,7 @@ GLMk.set_theme!(GLMk.merge(curr_theme, GLMk.theme_latexfonts()))
 
 # We will use a 0.99 spin Kerr black hole viewed by an asymptotic observer at an inclination angle of θo=π/4. 
 
-metric = Krang.Kerr(0.99); # Kerr spacetime with 0.99 spin
+metric = Krang.Kerr(-0.99); # Kerr spacetime with 0.99 spin
 θo = 85 * π / 180; # Observer inclination angle with respect to spin axis
 sze = 200; # Number of pixels along each axis of the screen
 ρmax = 5; # Size of the screen
@@ -102,13 +102,13 @@ recording =
 # Rays can be generated using the `generate_ray` function.
 
 # We will plot a ray for each pixel in the camera.
-camera = Krang.SlowLightIntensityCamera(metric, θo, -3, 3, -3, 3, 4);
+camera = Krang.SlowLightIntensityCamera(metric, θo, -15, 15, -15, 15, 10);
 
 fig = GLMk.Figure()
 ax = GLMk.Axis3(fig[1, 1], aspect = (1, 1, 1))
-GLMk.xlims!(ax, (-3, 3))
-GLMk.ylims!(ax, (-3, 3))
-GLMk.zlims!(ax, (-3, 3))
+GLMk.xlims!(ax, (-15, 15))
+GLMk.ylims!(ax, (-15, 15))
+GLMk.zlims!(ax, (-15, 15))
 lines_to_plot = []
 lines_to_plot = Krang.generate_ray.(camera.screen.pixels, 5_000)
 
@@ -118,7 +118,8 @@ GLMk.mesh!(ax, sphere, color = :black) # Sphere to represent black hole
 for i in lines_to_plot
     ray = map(x -> begin
         (; rs, θs, ϕs) = x
-        [rs * sin(θs) * cos(ϕs), rs * sin(θs) * sin(ϕs), rs * cos(θs)]
+        #[rs * sin(θs) * cos(ϕs), rs * sin(θs) * sin(ϕs), rs * cos(θs)]
+        collect(Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(metric, rs, θs, ϕs))
     end, i)
     ray = hcat(ray...)
     GLMk.lines!(ax, ray)

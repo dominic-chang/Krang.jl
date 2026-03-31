@@ -40,7 +40,7 @@ axes_list = [
 
 # Initialize Camera and Pre-Allocate Memory for data to be plotted
 coordinates = (zeros(sze, sze) for _ = 1:3)
-camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+camera = Krang.IntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
 
@@ -65,9 +65,40 @@ function coordinate_point(
     return coords
 end
 
-θs = (75 * π / 180) # opening angle of the cone
-geometry = Krang.ConeGeometry(θs, (0, rmin, rmax))
-coordinate_point.(MtlArray(camera.screen.pixels), Ref(geometry))
+θs = Float32(75 * π / 180) # opening angle of the cone
+geometry = Krang.ConeGeometry(θs, (Int32(0), rmin, rmax))
+#Metal.@device_override Base.promote_rule(::Type{Float64}, ::Type{Float32}) = Float64
+coordinate_point.(MtlArray([camera.screen.pixels[1],]), Ref(geometry))
+
+struct TempPixel{T} <: Krang.AbstractPixel{T} 
+    metric::Krang.Kerr{T}
+    screen_coordinate::NTuple{2,T}
+    "Radial roots"
+    θo::T
+    roots::NTuple{4,Complex{T}}
+    function TempPixel(metric::Krang.Kerr{T}, α::T, β::T) where {T}
+        θo = 17f0/180f0*T(π)
+        tempη = Krang.η(metric, α, β, θo)
+        tempλ = Krang.λ(metric, α, θo)
+        roots = Krang.get_radial_roots(metric, tempη, tempλ)
+        return new{T}(metric, (α, β), θo, roots)
+    end
+end
+pix = TempPixel(Krang.Kerr(0.99f0), 10f0, 10f0)
+
+function temp(a)
+    i = thread_position_in_grid_1d()
+
+    emission_coordinates(a[i], 0f1)
+
+    return 
+end
+@metal threads=2 temp(MtlArray([pix,pix]))
+emission_coordinates(pix, 0f1)
+
+
+    
+
 
 # Draw Function
 # This function draws the coordinates associated with the n=0,1,2 subimages of a cone with opening angle θs.

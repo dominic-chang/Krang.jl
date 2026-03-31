@@ -53,7 +53,7 @@ function raytrace(camera::AbstractCamera, mesh::Krang.Mesh{<:MeshGeometry, <:Abs
 end
 
 function _raytrace(
-    pixel::AbstractPixel{T},
+    pixel::AbstractPixel,
     faces::Matrix{GeometryBasics.OffsetInteger{-1,UInt32}},
     vertices::Matrix{T},
     material::AbstractMaterial;
