@@ -9,19 +9,19 @@ function render(pixel::AbstractPixel, scene::Scene)
     render(returnTrait(scene[1].material), pixel, scene)
 end
 
-function render(::AbstractReturnTrait, pixel::AbstractPixel{T}, scene::Scene) where {T}
-    return _render(zero(T), pixel, scene)
+function _render_init(pixel::AbstractPixel, scene::Scene)
+    return zero(raytrace(pixel, scene[1]))
 end
 
-function render(
-    ::AbstractPolarizationTrait,
-    pixel::AbstractPixel{T},
-    scene::Scene,
-) where {T}
-    return _render(StokesParams(zero(T), zero(T), zero(T), zero(T)), pixel, scene)
+function render(::AbstractReturnTrait, pixel::AbstractPixel, scene::Scene)
+    return _render(_render_init(pixel, scene), pixel, scene)
 end
 
-function _render(observation, pixel::AbstractPixel{T}, scene::Scene) where {T}
+function render(::AbstractPolarizationTrait, pixel::AbstractPixel, scene::Scene)
+    return _render(_render_init(pixel, scene), pixel, scene)
+end
+
+function _render(observation, pixel::AbstractPixel, scene::Scene) where {T}
     mesh = scene[1]
 
     for itr = 1:length(scene)

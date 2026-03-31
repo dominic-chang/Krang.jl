@@ -17,7 +17,7 @@ abstract type AbstractScreen end
 
 Abstract Pixel Type
 """
-abstract type AbstractPixel{T} end
+abstract type AbstractPixel end
 
 """
     screen_coordinate(pix::AbstractPixel)

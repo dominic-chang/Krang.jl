@@ -13,14 +13,15 @@ export λ,
     Gθ,
     total_mino_time
 
+
 """
 Checks if a complex number is real to some tolerance
 """
-function _isreal2(num::Complex{T}) where {T}
+function _isreal2(num) 
     ren, imn = reim(num)
     ren2 = ren^2
     imn2 = imn^2
-    return imn2 / (imn2 + ren2) < eps(T)
+    return Base.:&(1, (imn2 / (imn2 + ren2))  < sqrt(eps(real(num))))
 end
 
 """
@@ -37,19 +38,19 @@ function regularized_Pi(n, ϕ, k)
     return JacobiElliptic.F(ϕ, k) - JacobiElliptic.Pi(ω, ϕ, k)
 end
 
-function regularized_R1(α::T, φ::T, j) where {T}
-    n = α^2 / (α^2 - one(T))
-    return one(T) / (one(T) - α^2) * (regularized_Pi(n, φ, j))
+function regularized_R1(α, φ, j) 
+    n = α^2 / (α^2 - 1)
+    return 1 / (1 - α^2) * (regularized_Pi(n, φ, j))
 end
 
-function regularized_R2(α::T, φ::T, j) where {T}
+function regularized_R2(α, φ, j) 
 
-    return one(T) / (one(T) - α^2) * (
-        JacobiElliptic.F(φ, j) - α^2 / (j + (one(T) - j) * α^2) * (JacobiElliptic.E(φ, j)
-        #-α*sin(φ)*sqrt(one(T)-j*sin(φ)^2)/(one(T)+α*cos(φ)) #Linear Divergent term
+    return 1 / (1 - α^2) * (
+        JacobiElliptic.F(φ, j) - α^2 / (j + (1 - j) * α^2) * (JacobiElliptic.E(φ, j)
+        #-α*sin(φ)*sqrt(1-j*sin(φ)^2)/(1+α*cos(φ)) #Linear Divergent term
         )
     ) #+ 
-    #inv(j+(one(T)-j)*α^2)*(2*j-α^2/(α^2-one(T)))*regularized_R1(α, φ, j)
+    #inv(j+(1-j)*α^2)*(2*j-α^2/(α^2-1))*regularized_R1(α, φ, j)
 end
 
 function regularizedS1(α, φ, j)
@@ -64,13 +65,13 @@ function regularizedS2(α, φ, j)
            (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * regularizedS1(α, φ, j)
 end
 
-function p1(α::T, j::T) where {T}
-    √abs((α^2 - one(T)) / (j + (one(T) - j) * α^2))
+function p1(α, j) 
+    √abs((α^2 - 1) / (j + (1 - j) * α^2))
 end
 
-function f1(α::T, sinφ::T, j) where {T}
+function f1(α, sinφ, j) 
     p1temp = p1(α, j)
-    tempsinφ = √(one(T) - j * sinφ^2)
+    tempsinφ = √(1 - j * sinφ^2)
     return p1temp / 2 * log(abs((p1temp * tempsinφ + sinφ) / (p1temp * tempsinφ - sinφ)))
 end
 
@@ -84,25 +85,26 @@ function f2(α, sinφ, j)
     )
 end
 
-function R1(α::T, φ::T, j) where {T}
+function R1(α, φ, j) 
     #FIXME: This function is undefined when n=1 in Pi(n, ϕ, m) and when α^2 =1
-    denom = ((one(T) - α^2) + eps(T))
-    return one(T) / denom *
-           (JacobiElliptic.Pi(-α^2 / denom + eps(T), φ, j) - α * f1(α, sin(φ), j))
+    epsT = eps(α)
+    denom = ((1 - α^2) + epsT)
+    return (JacobiElliptic.Pi(-α^2 / denom + epsT, φ, j) - α * f1(α, sin(φ), j)) / denom
 end
 
-function R2(α::T, φ::T, j) where {T}
+function R2(α, φ, j) 
     #FIXME: This function is undefined when α*cos(φ) = 1
-    denom = ((one(T) - α^2) + eps(T))
-    return one(T) / denom * (
+    epsT = eps(α)
+    denom = ((1 - α^2) + epsT)
+    return (
         JacobiElliptic.F(φ, j) -
-        α^2 / (j + (one(T) - j) * α^2) * (
+        α^2 / (j + (1 - j) * α^2) * (
             JacobiElliptic.E(φ, j) -
-            α * sin(φ) * √(one(T) - j * sin(φ)^2) / ((one(T) + α * cos(φ)) + eps(T))
+            α * sin(φ) * √(1 - j * sin(φ)^2) / ((1 + α * cos(φ)) + epsT)
         )
-    ) +
-           inv(j + (one(T) - j) * α^2) *
-           (2 * j + α^2 / ((one(T) - α^2) + eps(T))) *
+    )/denom +
+           inv(j + (1 - j) * α^2) *
+           (2 * j + α^2 / ((1 - α^2) + epsT)) *
            R1(α, φ, j)
 end
 
@@ -173,7 +175,8 @@ Vertical Bardeen Screen Coordinate
 - `θo`: Observer inclination
 """
 function β(metric::Kerr, λ, η, θo)
-    return sqrt(max(η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2, 0))
+    temp = η - (α(metric, λ, θo)^2 - metric.spin^2) * cos(θo)^2
+    return sqrt(max(temp, zero(temp)))
 end
 
 """
@@ -198,12 +201,13 @@ Defines a vertical boundary on the assymptotic observer's screen that emission t
 - `θo`  : Observer inclination
 - `θs`  : Emission Inclination
 """
-@inline function βboundary(metric::Kerr{T}, α, θo, θs) where {T}
+@inline function βboundary(metric::Kerr, α, θo, θs)
     a = metric.spin
     cosθs2 = cos(θs)^2
+    temp = (cos(θo)^2 - cosθs2) * (α^2 - a^2 * (1 - cosθs2)) / (cosθs2 - 1)
     return √max(
-        (cos(θo)^2 - cosθs2) * (α^2 - a^2 * (one(T) - cosθs2)) / (cosθs2 - one(T)),
-        zero(T),
+        temp,
+        zero(temp),
     ) #eq 15 DOI 10.3847/1538-4357/acafe3 
 end
 
@@ -217,7 +221,7 @@ Radial potential of spacetime
 - `λ`  : Reduced azimuthal angular momentum
 - `r`  : Boyer Lindquist radius
 """
-function r_potential(metric::Kerr{T}, η, λ, r) where {T}
+function r_potential(metric::Kerr, η, λ, r) 
     a = metric.spin
     λ2 = λ^2
     return a * (a * (r * (r + 2) - η) - 4 * λ * r) +
@@ -234,7 +238,7 @@ Theta potential of a Kerr black hole
 - `λ`  : Reduced azimuthal angular momentum
 - `θ`  : Boyer Lindquist inclination
 """
-function θ_potential(metric::Kerr{T}, η, λ, θ) where {T}
+function θ_potential(metric::Kerr, η, λ, θ) 
     a = metric.spin
     return η + a^2 * cos(θ)^2 - λ^2 * cot(θ)^2
 end
@@ -251,20 +255,20 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
 - `η`  : Reduced Carter constant
 - `λ`  : Reduced azimuthal angular momentum
 """
-@inline function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
+function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     a = metric.spin
 
-    a2 = a * a
+    a2 = a^2
     A = a2 - η - λ * λ
     A2 = A + A
     B = T(2) * (η + (λ - a)^2)
     C = -a2 * η
 
-    P = -A * A / T(12) - C
-    Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B * B / T(8)
+    P = -A^2 / T(12) - C
+    Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B^2 / T(8)
 
-    Δ3 = -T(4) * P * P * P - T(27) * Q * Q
-    ωp = ^(-Q / T(2) + sqrt(-Δ3 / T(108)) + zero(T)im, T(1 / 3))
+    negΔ3 = T(4) * P * P * P + T(27) * (Q^2)
+    ωp =  ^(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im,  T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1 / 2) + T(√3 / 2)im, -T(1 / 2) - T(√3 / 2)im, one(T) + zero(T)im) .* ωp
@@ -272,7 +276,7 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
     v = -P .* inv.(T(3) .* C)
 
     ξ0 = argmax(real, (C .+ v)) - A / T(3)
-    ξ02 = ξ0 + ξ0
+    ξ02 = 2ξ0
 
     predet1 = A2 + ξ02
     predet2 = (√T(2) * B) * inv(sqrt(ξ0))
@@ -287,13 +291,13 @@ Returns roots of \$r^4 + (a^2-η-λ^2)r^2 + 2(η+(a-λ)^2)r - a^2η\$
     r4 = (sqrtξ02 + det2) / 2
 
     roots = (r1, r2, r3, r4)
-    if (sum(_isreal2.(roots)) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
+    if (sum(_isreal2, roots) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
         roots = (roots[1], roots[4], roots[2], roots[3])
     end
     return roots
 end
 
-@inline function _get_root_diffs(r1::T, r2::T, r3::T, r4::T) where {T}
+@inline function _get_root_diffs(r1, r2, r3, r4)
     return r2 - r1, r3 - r1, r3 - r2, r4 - r1, r4 - r2, r4 - r3
 end
 
@@ -306,7 +310,7 @@ Mino time of trajectory between an observer at infinity and point at radius rs
 - `rs` : Emission radius
 - `isindir` : Is the path direct or indirect?
 """
-function mino_time(pix, rs::T, isindir) where {T}
+function mino_time(pix, rs, isindir) 
     return Ir(pix, isindir, rs)[1]
 end
 
@@ -319,7 +323,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `metric`: Kerr{T} metric
 - `roots`  : Roots of the radial potential
 """
-function Ir_inf(metric::Kerr{T}, roots) where {T}
+function Ir_inf(metric::Kerr{T}, roots) where T
     #root_diffs = _get_root_diffs(roots...)
     numreals = sum(map(_isreal2, roots))
 
@@ -330,10 +334,9 @@ function Ir_inf(metric::Kerr{T}, roots) where {T}
     else #case 4
         return Ir_inf_case4(metric, roots)
     end
-    return T(Inf)
 end
 
-function Ir_inf_case1_and_2(::Kerr{T}, roots::NTuple{4}) where {T}
+function Ir_inf_case1_and_2(::Kerr, roots::NTuple{4}) 
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
     k = r32 * r41 / (r31 * r42)
@@ -343,7 +346,7 @@ function Ir_inf_case1_and_2(::Kerr{T}, roots::NTuple{4}) where {T}
     return Ir_inf
 end
 
-function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
+function Ir_inf_case3(::Kerr, roots::NTuple{4}) 
     r1, r2, _, _ = roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
@@ -354,10 +357,9 @@ function Ir_inf_case3(::Kerr{T}, roots::NTuple{4}) where {T}
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    coef = one(T) * √inv(A * B)
-    Ir_inf = coef * JacobiElliptic.F((acos(clamp((A - B) / (A + B), -one(T), one(T)))), k3)
+    coef = 1 * √inv(A * B)
+    return coef * JacobiElliptic.F((acos(clamp((A - B) / (A + B), -1, 1))), k3)
 
-    return Ir_inf
 end
 
 function Ir_inf_case4(::Kerr{T}, roots::NTuple{4}) where {T}
@@ -375,11 +377,8 @@ function Ir_inf_case4(::Kerr{T}, roots::NTuple{4}) where {T}
     k4 = T(4) * C * D / (C + D)^2
 
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
-    coef = 2 / (C + D)
 
-    Ir_inf = coef * JacobiElliptic.F(T(π / 2) + atan(go), k4)
-    #return (C+D), coef
-    return Ir_inf
+    return 2 / (C + D) * JacobiElliptic.F(T(π / 2) + atan(go), k4)
 end
 
 """
@@ -393,7 +392,7 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 - `roots`  : Roots of the radial potential
 - `νr` : Radial emission direction (Only necessary for case 1&2 geodesics)
 """
-function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
+function Ir_s(metric::Kerr{T}, rs, roots, νr) where T
     numreals = sum(_isreal2.(roots))
 
     if numreals == 4 #case 2
@@ -403,7 +402,6 @@ function Ir_s(metric::Kerr{T}, rs, roots, νr) where {T}
     else #case 4
         return Ir_s_case4(metric, rs, roots)
     end
-    return T(Inf)
 end
 
 function Ir_s_case1_and_2(::Kerr{T}, rs, roots::NTuple{4}, νr) where {T}
@@ -413,12 +411,12 @@ function Ir_s_case1_and_2(::Kerr{T}, rs, roots::NTuple{4}, νr) where {T}
     k = r32 * r41 / (r31 * r42)
     x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = (x2_s > one(T)) ? T(Inf) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_s = (x2_s > 1) ? T(Inf) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     return -(-1)^νr * Ir_s
 end
 
-function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
+function Ir_s_case3(::Kerr, rs, roots::NTuple{4}) 
     r1, r2, _, _ = roots
     r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
 
@@ -430,8 +428,8 @@ function Ir_s_case3(::Kerr{T}, rs, roots::NTuple{4}) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) / (A * (rs - r1))
-    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
-    coef = one(T) * √inv(A * B)
+    x3_s = clamp(((1 - temprat) / (1 + temprat)), -1, 1)
+    coef = 1 * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k3)
 
     return Ir_s
@@ -477,8 +475,9 @@ function Iϕ_inf(metric::Kerr{T}, roots, λ) where {T}
         return Iϕ_inf_case2(metric, real.(roots), λ)
     elseif numreals == 2 #case3
         return Iϕ_inf_case3(metric, roots, λ)
-    end #case4
-    return Iϕ_inf_case4(metric, roots, λ)
+    else #case4
+        return Iϕ_inf_case4(metric, roots, λ)
+    end
 end
 
 function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
@@ -486,8 +485,8 @@ function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     _, r31, r32, r41, r42, r43 = _get_root_diffs(roots...)
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -525,8 +524,8 @@ function Iϕ_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp1 = real(rp - r1)
     rp2 = real(rp - r2)
     rm1 = real(rm - r1)
@@ -541,7 +540,7 @@ function Iϕ_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
-    x3_o = clamp((A - B) / (A + B), -one(T), one(T))
+    x3_o = clamp((A - B) / (A + B), -1, 1)
     φ_o = acos(x3_o)
 
     (isnan(φ_o)) && return T(NaN)
@@ -562,8 +561,8 @@ function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -577,8 +576,8 @@ function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_p) || isnan(x4_m)) && return T(NaN)
     S1p_o = S1(gp, T(π / 2) + atan(go), k4)
@@ -614,8 +613,9 @@ function Iϕ_w_I0_terms(metric::Kerr{T}, rs, τ, roots, νr, λ) where {T}
         return Iϕ_w_I0_terms_case2(metric, rs, τ, real.(roots), νr, λ)
     elseif numreals == 2 #case3
         return Iϕ_w_I0_terms_case3(metric, rs, τ, roots, λ)
-    end #case4
-    return Iϕ_w_I0_terms_case4(metric, rs, τ, roots, λ)
+    else #case4
+        return Iϕ_w_I0_terms_case4(metric, rs, τ, roots, λ)
+    end
 end
 
 function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ) where {T}
@@ -623,8 +623,8 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     _, r31, r32, r41, r42, r43 = _get_root_diffs(roots...)
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -662,8 +662,8 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
 
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp1 = real(rp - r1)
     rp2 = real(rp - r2)
     rm1 = real(rm - r1)
@@ -679,7 +679,7 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
     temprat = B * (rs - r2) * real(inv(A * (rs - r1)))
-    x3_s = clamp(((one(T) - temprat) * real(inv(one(T) + temprat))), -one(T), one(T))
+    x3_s = clamp(((1 - temprat) * real(inv(1 + temprat))), -1, 1)
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -704,8 +704,8 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -720,8 +720,8 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(Inf)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
@@ -756,9 +756,9 @@ function It_inf(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
         return It_inf_case2(metric, real.(roots), λ)
     elseif numreals == 2 #case3
         return It_inf_case3(metric, roots, λ)
-    end #case4
-
-    return It_inf_case4(metric, roots, λ)
+    else #case4
+        return It_inf_case4(metric, roots, λ)
+    end
 end
 
 function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
@@ -766,8 +766,8 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r43 = r4 - r3
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -818,8 +818,8 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     r2 = real(r2)
     r1 = real(r1)
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp1 = real(rp - r1)
     rp2 = real(rp - r2)
     rm1 = real(rm - r1)
@@ -834,7 +834,7 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
 
-    x3_o = min((A - B) / (A + B), one(T))
+    x3_o = min((A - B) / (A + B), 1)
     φ_o = acos(x3_o)
 
     (isnan(φ_o)) && return T(NaN)
@@ -866,11 +866,12 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 end
 
 function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
+    oneT = one(T)
     a = metric.spin
     _, r2, _, r4 = roots
 
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = one(T) + √(oneT - a^2)
+    rm = one(T) - √(oneT - a^2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -884,8 +885,8 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_p) || isnan(x4_m)) && return T(NaN)
     S1p_o = S1(gp, T(π / 2) + atan(go), k4)
@@ -897,10 +898,10 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     I1_total =
         -(Π1_o) +
-        1 / 2 * log(
-            (16 * (1 + go^2 - sqrt((1 + go^2) * (1 + go^2 - k4))) * (1 + go^2 - k4)) /
-            ((C + D)^2 * ((1 + go^2)^2 - k4) * k4 * (1 + sqrt(1 - k4 / (1 + go^2)))),
-        )
+        log(
+            (T(16) * (oneT + go^2 - sqrt((oneT + go^2) * (oneT + go^2 - k4))) * (oneT + go^2 - k4)) /
+            ((C + D)^2 * ((oneT + go^2)^2 - k4) * k4 * (oneT + sqrt(oneT - k4 / (oneT + go^2)))),
+        ) / T(2)
 
     # Removed linear divergence
     I2_total =
@@ -919,11 +920,11 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
         (-2 / (C + D) * ((1 + go^2) / (go * (go + x4_p))) * (S1m_o))
 
     return -(
-        4 / (rp - rm) *
+        T(4) / (rp - rm) *
         (rp * (rp - a * λ / 2) * Ip_total - rm * (rm - a * λ / 2) * Im_total) +
         2 * I1_total +
         I2_total
-    )# + (logdiv + lineardiv)
+    )
 end
 
 """
@@ -946,9 +947,9 @@ See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
         return It_w_I0_terms_case2(metric, rs, τ, real.(roots), λ, νr)
     elseif numreals == 2 #case3
         return It_w_I0_terms_case3(metric, rs, τ, roots, λ)
-    end #case4
-
-    return It_w_I0_terms_case4(metric, rs, τ, roots, λ)
+    else #case4
+        return It_w_I0_terms_case4(metric, rs, τ, roots, λ)
+    end
 end
 
 @inline function It_w_I0_terms_case2(
@@ -963,8 +964,8 @@ end
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r43 = r4 - r3
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -991,7 +992,7 @@ end
         -r2 * r3 * r4 + r1 * (r2 * (-r3 - r4) - r3 * r4),
         r3 * r4 + r2 * (r3 + r4) + r1 * (r2 + r3 + r4),
         -r1 - r2 - r3 - r4,
-        one(T),
+        1,
     )
 
     #equation B37
@@ -1029,8 +1030,8 @@ end
     r2 = real(r2)
     r1 = real(r1)
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp1 = real(rp - r1)
     rp2 = real(rp - r2)
     rm1 = real(rm - r1)
@@ -1046,7 +1047,7 @@ end
     k3 = real(((A + B)^2 - r21^2) / (4 * A * B))
 
     temprat = B * (rs - r2) * inv(A * (rs - r1))
-    x3_s = clamp(real(((one(T) - temprat) * inv(one(T) + temprat))), -one(T), one(T))
+    x3_s = clamp(real(((1 - temprat) * inv(1 + temprat))), -1, 1)
     φ_s = acos(x3_s)
 
     (isnan(φ_s)) && return T(NaN)
@@ -1085,8 +1086,8 @@ end
 @inline function It_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) where {T}
     a = metric.spin
     _, r2, _, r4 = roots
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -1101,8 +1102,8 @@ end
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
@@ -1154,8 +1155,8 @@ Returns the radial integrals for the case where there are four real roots in the
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r43 = r4 - r3
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -1204,8 +1205,8 @@ Returns the radial integrals for the case where there are two real roots in the 
     r1, r2, r21 = real.((r1, r2, r21))
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp1 = rp - r1
     rp2 = rp - r2
     rm1 = rm - r1
@@ -1243,8 +1244,8 @@ Returns the radial integrals for the case where there are no real roots in the r
 @inline function radial_inf_integrals_case4(metric::Kerr{T}, roots::NTuple{4}) where {T}
     _, r2, _, r4 = roots
     a2 = metric.spin^2
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -1258,8 +1259,8 @@ Returns the radial integrals for the case where there are no real roots in the r
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     S1p_o = S1(gp, T(π / 2) + atan(go), k4)
     S1m_o = S1(gm, T(π / 2) + atan(go), k4)
@@ -1268,12 +1269,9 @@ Returns the radial integrals for the case where there are no real roots in the r
         2 / (C + D) * (a2 / go * (1 + go^2))^2 * regularizedS2(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
 
     # Removed logarithmic divergence
-    I1o_m_I0_terms =
-        -Π1_o +
-        1 / 2 * log(
-            (16 * (1 + go^2 - sqrt((1 + go^2) * (1 + go^2 - k4))) * (1 + go^2 - k4)) /
-            ((C + D)^2 * ((1 + go^2)^2 - k4) * k4 * (1 + sqrt(1 - k4 / (1 + go^2)))),
-        )
+    I1o_num = (16 * (1 + go^2 - sqrt((1 + go^2) * (1 + go^2 - k4))) * (1 + go^2 - k4))
+    I1o_den = ((C + D)^2 * ((1 + go^2)^2 - k4) * k4 * (1 + sqrt(1 - k4 / (1 + go^2))))
+    I1o_m_I0_terms = -Π1_o + log(I1o_num/I1o_den) / 2
 
     # Removed linear divergence
     I2o_m_I0_terms =
@@ -1327,8 +1325,8 @@ Returns the radial integrals for the case where there are four real roots in the
     _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
     r43 = r4 - r3
     a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rp = 1 + √(1 - a^2)
+    rm = 1 - √(1 - a^2)
     rp3 = rp - r3
     rp4 = rp - r4
     rm3 = rm - r3
@@ -1355,7 +1353,7 @@ Returns the radial integrals for the case where there are four real roots in the
         -r2 * r3 * r4 + r1 * (r2 * (-r3 - r4) - r3 * r4),
         r3 * r4 + r2 * (r3 + r4) + r1 * (r2 + r3 + r4),
         -r1 - r2 - r3 - r4,
-        one(T),
+        1,
     )
 
     #equation B37
@@ -1396,8 +1394,8 @@ Returns the radial integrals for the case where there are two real roots in the 
     r1, r2, r21 = real.((r1, r2, r21))
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
     rp1 = rp - r1
     rp2 = rp - r2
     rm1 = rm - r1
@@ -1408,9 +1406,9 @@ Returns the radial integrals for the case where there are two real roots in the 
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) * inv(A * (rs - r1))
-    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
+    x3_s = real((1 - temprat) * inv(1 + temprat))
 
-    abs(x3_s) > one(T) && return zero(T), zero(T), zero(T), zero(T)
+    abs(x3_s) > 1 && return zero(T), zero(T), zero(T), zero(T)
 
     φ_s = acos(x3_s)
     αo = (B + A) / (B - A)
@@ -1451,8 +1449,8 @@ Returns the radial integrals for the case where there are no real roots in the r
     _, r2, _, r4 = roots
     a = metric.spin
     a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
+    rp = 1 + √(1 - a2)
+    rm = 1 - √(1 - a2)
 
     a1 = abs(imag(r4))
     a2 = abs(imag(r2))
@@ -1467,8 +1465,8 @@ Returns the radial integrals for the case where there are no real roots in the r
     x4_m = (rm + b1) / a2
 
     go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
+    gp = (go * x4_p - 1) / (go + x4_p)
+    gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
     S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
@@ -1502,7 +1500,7 @@ Returns the maximum mino time that can be accrued along a ray.
 - `I0_inf` : Mino time at infinity
 """
 function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where {T}
-    numreals = unsafe_trunc(Int, sum((Krang._isreal2.(roots))))
+    numreals = unsafe_trunc(Int, sum(Krang._isreal2, roots))
     I0_inf = Ir_inf(metric, roots)
 
     if numreals == 4
@@ -1598,7 +1596,7 @@ end
     err_return = (T(Inf), false, false)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = !(x2_s < one(T)) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
+    Ir_s = !(x2_s < 1) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
 
     fo = I0_inf(pix)
 
@@ -1624,8 +1622,8 @@ end
     B = √abs(r31 * r41)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
     temprat = B * (rh - r2) / (A * (rh - r1))
-    x3_s = clamp(((one(T) - temprat) / (one(T) + temprat)), -one(T), one(T))
-    coef = one(T) * √inv(A * B)
+    x3_s = clamp(((1 - temprat) / (1 + temprat)), -1, 1)
+    coef = 1 * √inv(A * B)
     Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
     τ > (fo - Ir_s) && return err_return
 
@@ -1725,10 +1723,10 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
         return minotime, Gs, Go, Ghat, isvortical, false
     end
 
-    Δθ = (one(T) - (ηtemp + λtemp^2) / a2) / 2
+    Δθ = (1 - (ηtemp + λtemp^2) / a2) / 2
     Δθ2 = Δθ^2
     desc = √(Δθ2 + ηtemp / a2)
-    up = min(Δθ + desc, one(T) - eps(T))
+    up = min(Δθ + desc, 1 - eps(T))
     um = Δθ - desc
     m = up / um
     k = m
@@ -1740,21 +1738,21 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
     if isvortical
         args = (cosθs^2 - um) / (up - um)
         argo = (cosθo^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
             return minotime, Gs, Go, Ghat, isvortical, false
         end
-        tempfac = one(T) / √abs(um * a2)
-        Go *= (θs > T(π / 2) ? -one(T) : one(T))
-        Gs = (θs > T(π / 2) ? -one(T) : one(T)) * tempfac * JacobiElliptic.F(asin(√args), k)
+        tempfac = 1 / √abs(um * a2)
+        Go *= (θs > T(π / 2) ? -1 : 1)
+        Gs = (θs > T(π / 2) ? -1 : 1) * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
         argo = cosθo / √(up)
         k = m
-        if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
+        if !(-1 < args < 1) || !(-1 < argo < 1)
             return zero(T), zero(T), zero(T), zero(T), isvortical, false
         end
-        tempfac = one(T) / √abs(um * a^2)
+        tempfac = 1 / √abs(um * a^2)
         Gs = tempfac * JacobiElliptic.F(asin(args), k)
     end
 
@@ -1780,27 +1778,27 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     Go, Ghat = absGθo_Gθhat(pix)
     Gs, isvortical = zero(T), ηtemp < zero(T)
 
-    Δθ = T(0.5) * (one(T) - (ηtemp + λtemp^2) / a^2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
+    Δθ = T(0.5) * (1 - (ηtemp + λtemp^2) / a^2)
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), 1 - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
 
     argo = zero(T)
     k = zero(T)
-    tempfac = one(T) / √abs(um * a^2)
+    tempfac = 1 / √abs(um * a^2)
 
     if isvortical
         argo = (cos(θo)^2 - um) / (up - um)
-        k = one(T) - m
-        tempfac = one(T) / √abs(um * a^2)
-        Δτtemp = (τ % Ghat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * Go)
+        k = 1 - m
+        tempfac = 1 / √abs(um * a^2)
+        Δτtemp = (τ % Ghat + (θo > T(π / 2) ? -1 : 1) * signβ * Go)
         n = floor(τ / Ghat)
         Δτ =
-            (θo > T(π / 2) ? -one(T) : one(T)) * abs(
+            (θo > T(π / 2) ? -1 : 1) * abs(
                 argmin(
                     abs,
-                    [(-one(T))^n * signβ * (Ghat - Δτtemp), (-one(T))^n * signβ * Δτtemp],
+                    [(-1)^n * signβ * (Ghat - Δτtemp), (-1)^n * signβ * Δτtemp],
                 ),
             )
     else
@@ -1811,7 +1809,7 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
         n = floor(τ / Ghat)
         Δτ = argmin(
             abs,
-            [(-one(T))^n * signβ * (Ghat - Δτtemp), (-one(T))^n * signβ * Δτtemp],
+            [(-1)^n * signβ * (Ghat - Δτtemp), (-1)^n * signβ * Δτtemp],
         )
     end
 
@@ -1842,7 +1840,7 @@ end
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), 1 - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
@@ -1854,8 +1852,8 @@ end
     if isvortical
         args = (cos(θs)^2 - um) / (up - um)
         argo = (cos(θo)^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
@@ -1866,7 +1864,7 @@ end
         args = cos(θs) / √(up)
         argo = cos(θo) / √(up)
         #k = abs(m)
-        if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
+        if !(-1 < args < 1) || !(-1 < argo < 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = inv(√abs(um * a^2))
@@ -1904,7 +1902,7 @@ end
     end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(T) - eps(T))
+    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), 1 - eps(T))
     um = Δθ - √(Δθ^2 + ηtemp / a^2)
     m = up / um
     k = m
@@ -1917,8 +1915,8 @@ end
     if isvortical
         args = (cos(θs)^2 - um) / (up - um)
         argo = (cosθo^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)) || !(zero(T) < args < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = √abs(um / a^2)
@@ -1929,7 +1927,7 @@ end
         args = cos(θs) / √(up)
         argo = cosθo / √(up)
         #k = abs(m)
-        if !(-one(T) < args < one(T)) || !(-one(T) < argo < one(T))
+        if !(-1 < args < 1) || !(-1 < argo < 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = -2 * up * inv(√abs(um * a^2))
@@ -1955,10 +1953,10 @@ end
     a2 = a^2
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
-    Δθ = (one(T) - (η + λ^2) / a2) / 2
+    Δθ = (1 - (η + λ^2) / a2) / 2
     Δθ2 = Δθ^2
-    desc = √max(Δθ2 + η / a2, 0)
-    up = min(Δθ + desc, one(T) - eps(T))
+    desc = √max(Δθ2 + η / a2, zero(T))
+    up = min(Δθ + desc, 1 - eps(T))
     um = Δθ - desc
     m = up / um
     k = m
@@ -1969,20 +1967,20 @@ end
     cosθo = cos(θo)
     if isvortical
         argo = (cosθo^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1))
             return Go, Ghat
         end
-        tempfac = one(T) / √abs(um * a2)
+        tempfac = 1 / √abs(um * a2)
         Go = tempfac * JacobiElliptic.F(asin(√argo), k)
         Ghat = 2 * tempfac * JacobiElliptic.K(k)
     else
         argo = cosθo / √(up)
         k = m
-        if !(-one(T) < argo < one(T))
+        if !(-1 < argo < 1)
             return Go, Ghat
         end
-        tempfac = one(T) / √abs(um * a^2)
+        tempfac = 1 / √abs(um * a^2)
         Go = tempfac * JacobiElliptic.F(asin(argo), k)
         Ghat = 2 * tempfac * JacobiElliptic.K(k)
     end
@@ -1996,7 +1994,7 @@ end
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + η / a^2), one(T) - eps(T))
+    up = min(Δθ + √(Δθ^2 + η / a^2), 1 - eps(T))
     um = Δθ - √(Δθ^2 + η / a^2)
     m = up / um
     k = m
@@ -2007,8 +2005,8 @@ end
     cosθo = cos(θo)
     if isvortical
         argo = (cosθo^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1))
             return Go, Ghat
         end
         tempfac = inv((1 - um) * √abs(um * a^2))
@@ -2018,7 +2016,7 @@ end
     else
         argo = cosθo / √(up)
         #k = abs(m)
-        if !(-one(T) < argo < one(T))
+        if !(-1 < argo < 1)
             return Go, Ghat
         end
         tempfac = inv(√abs(um * a^2))
@@ -2035,7 +2033,7 @@ end
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + η / a^2), one(T) - eps(T))
+    up = min(Δθ + √(Δθ^2 + η / a^2), 1 - eps(T))
     um = Δθ - √(Δθ^2 + η / a^2)
     m = up / um
     k = m
@@ -2046,8 +2044,8 @@ end
     cosθo = cos(θo)
     if isvortical
         argo = (cosθo^2 - um) / (up - um)
-        k = one(T) - m
-        if (!(zero(T) < argo < one(T)))
+        k = 1 - m
+        if (!(zero(T) < argo < 1))
             return Go, Ghat
         end
         tempfac = √abs(um / a^2)
@@ -2057,7 +2055,7 @@ end
     else
         argo = cosθo / √(up)
         #k = abs(m)
-        if !(-one(T) < argo < one(T))
+        if !(-1 < argo < 1)
             return Go, Ghat
         end
         tempfac = -2 * up * inv(√abs(um * a^2))

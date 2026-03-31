@@ -5,47 +5,50 @@ export SlowLightIntensityCamera
 
 Intensity Pixel Type.
 """
-struct SlowLightIntensityPixel{T} <: AbstractPixel{T}
-    metric::Kerr{T}
+struct SlowLightIntensityPixel{T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17} <: AbstractPixel
+    metric::Kerr{T1}
     "Pixel screen_coordinate"
-    screen_coordinate::NTuple{2,T}
+    screen_coordinate::NTuple{2,T2}
     "Radial roots"
-    roots::NTuple{4,Complex{T}}
+    roots::NTuple{4,T3}
     "Radial antiderivative"
-    I0_inf::T
+    I0_inf::T4
     "Total possible Mino time"
-    total_mino_time::T
+    total_mino_time::T5
     "Radial phi antiderivative"
-    Iϕ_inf::T
+    Iϕ_inf::T6
     "Radial time antiderivative"
-    It_inf::T
-    I1_inf_m_I0_terms::T
-    I2_inf_m_I0_terms::T
-    Ip_inf_m_I0_terms::T
-    Im_inf_m_I0_terms::T
+    It_inf::T7
+    I1_inf_m_I0_terms::T8
+    I2_inf_m_I0_terms::T9
+    Ip_inf_m_I0_terms::T10
+    Im_inf_m_I0_terms::T11
     "Angular antiderivative"
-    absGθo_Gθhat::NTuple{2,T}
+    absGθo_Gθhat::NTuple{2,T12}
     "Angular ϕ antiderivative"
-    absGϕo_Gϕhat::NTuple{2,T}
+    absGϕo_Gϕhat::NTuple{2,T13}
     "Angular t antiderivative"
-    absGto_Gthat::NTuple{2,T}
+    absGto_Gthat::NTuple{2,T14}
     "Half orbit of angular t antiderivative"
-    θo::T
-    η::T
-    λ::T
-    @doc """
-        SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
+    θo::T15
+    η::T16
+    λ::T17
+    
+end
 
-    Construct a `SlowLightIntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
+@doc """
+    SlowLightIntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
 
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric.
-    - `α::T`: The Bardeen α value (screen coordinate).
-    - `β::T`: The Bardeen β value (screen coordinate).
-    - `θo::T`: The inclination angle.
+Construct a `SlowLightIntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
 
-    # Returns
-    - A `SlowLightIntensityPixel` object initialized with the given parameters.
+# Arguments
+- `met::Kerr{T}`: The Kerr metric.
+- `α::T`: The Bardeen α value (screen coordinate).
+- `β::T`: The Bardeen β value (screen coordinate).
+- `θo::T`: The inclination angle.
+
+# Returns
+- A `SlowLightIntensityPixel` object initialized with the given parameters.
 
 # Details
 This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
@@ -96,16 +99,20 @@ end
 
 Screen made of `SlowLightIntensityPixel`s.
 """
-struct SlowLightIntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
+struct SlowLightIntensityScreen{A<:AbstractMatrix} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
-    αrange::NTuple{2,T}
+    αrange::NTuple{2}
 
     "Minimum and Maximum Bardeen β values"
-    βrange::NTuple{2,T}
+    βrange::NTuple{2}
 
     "Data type that stores screen pixel information"
     pixels::A
-    function SlowLightIntensityScreen(met::Kerr{T}, αmin, αmax, βmin, βmax, θo, res) where {T}
+
+    SlowLightIntensityScreen{A}(αrange::NTuple{2}, βrange::NTuple{2}, pixels::A) where {A<:AbstractMatrix} =
+        new{A}(αrange, βrange, pixels)
+
+    function SlowLightIntensityScreen(met::Kerr, αmin, αmax, βmin, βmax, θo, res) 
         screen = Matrix{SlowLightIntensityPixel}(undef, res, res)
         αvals = range(αmin, αmax, length=res)
         βvals = range(βmin, βmax, length=res)
@@ -114,7 +121,7 @@ struct SlowLightIntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
                 screen[iα, iβ] = SlowLightIntensityPixel(met, α, β, θo)
             end
         end
-        new{T, typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
+        new{typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -124,12 +131,12 @@ end
 Camera that caches slow light raytracing information for an observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct SlowLightIntensityCamera{T,A} <: AbstractCamera
-    metric::Kerr{T}
+struct SlowLightIntensityCamera{A} <: AbstractCamera
+    metric::Kerr
     "Data type that stores screen pixel information"
-    screen::SlowLightIntensityScreen{T,A}
+    screen::SlowLightIntensityScreen{A}
     "Observer screen_coordinate"
-    screen_coordinate::NTuple{2,T}
+    screen_coordinate::NTuple{2}
     @doc """
         SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
 
@@ -158,7 +165,7 @@ struct SlowLightIntensityCamera{T,A} <: AbstractCamera
         res
     ) where {T}
         screen = SlowLightIntensityScreen(met, αmin, αmax, βmin, βmax, θo, res)
-        new{T,typeof(screen.pixels)}(met, screen, (T(Inf), θo))
+        new{typeof(screen.pixels)}(met, screen, (T(Inf), θo))
     end
 end
 

@@ -19,7 +19,7 @@ function generate_ray!(
     end
 end
 
-function generate_ray(pixel::AbstractPixel{T}, res::Int) where {T}
+function generate_ray(pixel::AbstractPixel, res::Int) where {T}
     ray = Vector{Intersection{T}}(undef, res)#zeros(T, 3, res)
     generate_ray!(ray, pixel, res)
     return ray
@@ -84,20 +84,21 @@ end
 
 function raytrace(
     ::AbstractReturnTrait,
-    pix::AbstractPixel{T},
+    pix::AbstractPixel,
     mesh::Mesh;
     res = 100,
-) where {T}
-    observation = zero(T)
+)
+    observation = zero(typeof(metric(pix).spin))
     return _raytrace(observation, pix, mesh; res = res)
 end
 
 function raytrace(
     ::SimplePolarizationTrait,
-    pix::AbstractPixel{T},
+    pix::AbstractPixel,
     mesh::Mesh;
     res = 100,
-) where {T}
+)
+    T = typeof(metric(pix).spin)
     observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
     return _raytrace(observation, pix, mesh; res = res)
 end
