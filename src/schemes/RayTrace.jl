@@ -19,8 +19,8 @@ function generate_ray!(
     end
 end
 
-function generate_ray(pixel::AbstractPixel, res::Int) where {T}
-    ray = Vector{Intersection{T}}(undef, res)#zeros(T, 3, res)
+function generate_ray(pixel::AbstractPixel, res::Int) 
+    ray = Vector{Intersection}(undef, res)#zeros(T, 3, res)
     generate_ray!(ray, pixel, res)
     return ray
 end

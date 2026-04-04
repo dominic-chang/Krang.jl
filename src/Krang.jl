@@ -3,6 +3,7 @@ using DocStringExtensions
 using StaticArrays
 using JacobiElliptic
 using PolarizedTypes
+using Roots # For Level set geometry
 import GeometryBasics
 using Rotations
 @template (FUNCTIONS, METHODS, MACROS) = """

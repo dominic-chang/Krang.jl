@@ -21,7 +21,7 @@ function render(::AbstractPolarizationTrait, pixel::AbstractPixel, scene::Scene)
     return _render(_render_init(pixel, scene), pixel, scene)
 end
 
-function _render(observation, pixel::AbstractPixel, scene::Scene) where {T}
+function _render(observation, pixel::AbstractPixel, scene::Scene)
     mesh = scene[1]
 
     for itr = 1:length(scene)
