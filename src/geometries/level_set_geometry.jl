@@ -1,5 +1,8 @@
 """
-    Level Sets should be a functor
+    AbstractLevelSetGeometry{T}
+
+Abstract geometry represented by a functor `geometry(x, y, z)` whose zero set defines a
+surface in quasi-Cartesian Kerr-Schild coordinates.
 """
 abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
 
@@ -11,38 +14,20 @@ abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
 ) where {A}
     geometry = mesh.geometry
     material = mesh.material
-    T = typeof(pixel.metric.spin)
-    ray = Vector{Intersection{T}}(undef, res)
-    generate_ray!(ray, pixel, res)
-    (; rs, θs, ϕs, νr, νθ) = ray[1]
-    origin =
-        boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs)
-    z = zero(A)
-    for i = 1:res
-        (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
-        if rs <= Krang.horizon(pixel.metric) || iszero(rs)
-            continue
-        end
-        line_point_2 = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
-            pixel.metric,
-            rs,
-            θs,
-            ϕs,
-        )
-        if isinf(line_point_2[1]) || isinf(line_point_2[2]) || isinf(line_point_2[3])
-            continue
-        end
-        didintersect, point = line_intersection(origin, line_point_2, geometry)
-        rs = sqrt(sum(point .^ 2))
-        θs = acos(point[3] / rs)
-        ϕs = ϕ_BL(pixel.metric, rs, atan(point[2], point[1]))
+    τf = Krang.total_mino_time(pixel)
+    Δτ = τf / res - eps()
+    origin_bl = 1e100,pixel.θo, 0.0, true, true
+    for i in 1:res
+        τref = Δτ*i
+        τ = Krang.line_intersection(pixel, origin_bl, Δτ*(i-1), τref, geometry)
+        rs, θs, ϕs, νr, νθ = Krang.emission_coordinates_fast_light(pixel, τ)
 
         if rs < Krang.horizon(pixel.metric)
             continue
         end
 
         intersection = Krang.Intersection(0.0, rs, θs, ϕs, νr, νθ)
-        observation += τ == 0 ? T(0) : material(pixel, intersection)#didintersect ? 1 : 0
+        observation += τ == 0 ? zero(A) : material(pixel, intersection)#didintersect ? 1 : 0
         origin_bl = Krang.emission_coordinates_fast_light(pixel, τref)
 
     end

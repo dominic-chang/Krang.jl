@@ -21,7 +21,7 @@ function _isreal2(num)
     ren, imn = reim(num)
     ren2 = ren^2
     imn2 = imn^2
-    return Base.:&(1, (imn2 / (imn2 + ren2))  < sqrt(eps(real(num))))
+    return Base.:&(1, (imn2 / (imn2 + ren2))  < eps(real(num)))
 end
 
 """
