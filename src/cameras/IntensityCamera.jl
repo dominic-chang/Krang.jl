@@ -5,61 +5,64 @@ export IntensityCamera
 Intensity Pixel Type. 
 Each Pixel is associated with a single ray, and caches some information about the ray.
 """
-struct IntensityPixel{T} <: AbstractPixel{T}
-    metric::Kerr{T}
-    screen_coordinate::NTuple{2,T}
+struct IntensityPixel{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractPixel
+    metric::Kerr{T1}
+    screen_coordinate::NTuple{2,T2}
     "Radial roots"
-    roots::NTuple{4,Complex{T}}
+    roots::NTuple{4,T3}
     "Radial antiderivative"
-    I0_inf::T
+    I0_inf::T4
     "Total possible Mino time"
-    total_mino_time::T
+    total_mino_time::T5
     "Angular antiderivative"
-    absGθo_Gθhat::NTuple{2,T}
+    absGθo_Gθhat::NTuple{2,T6}
     "Inclination"
-    θo::T
-    η::T
-    λ::T
-    @doc """
-        IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
+    θo::T7
+    η::T8
+    λ::T9
+end
 
-    Construct an `IntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
+@doc """
+    IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
 
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric.
-    - `α::T`: The Bardeen α value (screen coordinate).
-    - `β::T`: The Bardeen β value (screen coordinate).
-    - `θo::T`: The inclination angle.
+Construct an `IntensityPixel` object with the given Kerr metric, screen coordinates, and inclination.
 
-    # Returns
-    - An `IntensityPixel` object initialized with the given parameters.
+# Arguments
+- `met::Kerr{T}`: The Kerr metric.
+- `α`: The Bardeen α value (screen coordinate).
+- `β`: The Bardeen β value (screen coordinate).
+- `θo`: The inclination angle.
 
-    # Details
-    This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
-    It then computes the radial roots and adjusts them if necessary. 
-    Finally, it initializes an `IntensityPixel` object with the calculated values and the provided parameters.
-    """
-    function IntensityPixel(met::Kerr{T}, α::T, β::T, θo::T) where {T}
-        tempη = Krang.η(met, α, β, θo)
-        tempλ = Krang.λ(met, α, θo)
-        roots = Krang.get_radial_roots(met, tempη, tempλ)
-        numreals = sum(_isreal2.(roots))
-        if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
-            roots = (roots[1], roots[4], roots[2], roots[3])
-        end
-        I0_inf = Krang.Ir_inf(met, roots)
-        new{T}(
-            met,
-            (α, β),
-            roots,
-            I0_inf,
-            total_mino_time(met, roots),
-            Krang._absGθo_Gθhat(met, θo, tempη, tempλ),
-            θo,
-            tempη,
-            tempλ,
-        )
+# Returns
+- An `IntensityPixel` object initialized with the given parameters.
+
+# Details
+This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
+It then computes the radial roots and adjusts them if necessary. 
+Finally, it initializes an `IntensityPixel` object with the calculated values and the provided parameters.
+"""
+function IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
+    tempη = Krang.η(met, α, β, θo)
+    tempλ = Krang.λ(met, α, θo)
+    roots = Krang.get_radial_roots(met, tempη, tempλ)
+    numreals = sum(_isreal2, roots)
+    if (numreals == 2) && (abs(imag(roots[4]) / real(roots[4])) < eps(T))
+        roots = (roots[1], roots[4], roots[2], roots[3])
     end
+    I0_inf = Krang.Ir_inf(met, roots)
+    τ_total = total_mino_time(met, roots)
+    Gθo_Gθhat = Krang._absGθo_Gθhat(met, θo, tempη, tempλ)
+    IntensityPixel(
+        met,
+        (α, β),
+        roots,
+        I0_inf,
+        τ_total,
+        Gθo_Gθhat,
+        θo,
+        tempη,
+        tempλ,
+    )
 end
 
 """
@@ -67,78 +70,29 @@ end
 
 Screen made of `IntensityPixel`s.
 """
-struct IntensityScreen{T,A<:AbstractMatrix} <: AbstractScreen
+struct IntensityScreen{A<:AbstractMatrix} <: AbstractScreen
     "Minimum and Maximum Bardeen α values"
-    αrange::NTuple{2,T}
+    αrange::NTuple{2}
 
     "Minimum and Maximum Bardeen β values"
-    βrange::NTuple{2,T}
+    βrange::NTuple{2}
 
     "Data type that stores screen pixel information"
     pixels::A
 
-    @kernel function _generate_screen!(
-        screen,
-        met::Kerr{T},
-        αmin,
-        αmax,
-        βmin,
-        βmax,
-        θo,
-        res,
-    ) where {T}
-        I, J = @index(Global, NTuple)
-        α = αmin + (αmax - αmin) * (T(I) - 1) / (res - 1)
-        β = βmin + (βmax - βmin) * (T(J) - 1) / (res - 1)
-        screen[I, J] = IntensityPixel(met, α, β, θo)
-    end
+    IntensityScreen{A}(αrange::NTuple{2}, βrange::NTuple{2}, pixels::A) where {A<:AbstractMatrix} =
+        new{A}(αrange, βrange, pixels)
 
-    @doc """
-        IntensityScreen(met::Kerr{T}, αmin::T, αmax::T, βmin::T, βmax::T, θo::T, res::Int; A=Matrix) where {T}
-
-    Creates an intensity screen for the given Kerr metric. 
-    This camera caches information for fast light computations.
-
-    # Arguments
-    - `met::Kerr{T}`: The Kerr metric.
-    - `αmin::T`: Minimum value of α.
-    - `αmax::T`: Maximum value of α.
-    - `βmin::T`: Minimum value of β.
-    - `βmax::T`: Maximum value of β.
-    - `θo::T`: Observer's inclination angle. θo ∈ (0, π).
-    - `res::Int`: Resolution of the screen.
-    - `A=Matrix`: Optional argument to specify the type of matrix to use. A GPUMatrix can be used for GPU computations.
-
-    # Returns
-    - `IntensityScreen{T, A}`: An intensity screen object.
-    """
-    function IntensityScreen(
-        met::Kerr{T},
-        αmin::T,
-        αmax::T,
-        βmin::T,
-        βmax::T,
-        θo::T,
-        res;
-        A = Matrix,
-    ) where {T}
-        screen = A(Matrix{IntensityPixel{T}}(undef, res, res))
-
-        backend = get_backend(screen)
-
-        _generate_screen!(backend)(
-            screen,
-            met,
-            αmin,
-            αmax,
-            βmin,
-            βmax,
-            θo,
-            res,
-            ndrange = (res, res),
-        )
-
-        new{T,A}((αmin, αmax), (βmin, βmax), screen)
+    function IntensityScreen(met::Kerr, αmin, αmax, βmin, βmax, θo, res)
+        screen = Matrix{IntensityPixel}(undef, res, res)
+        αvals = range(αmin, αmax, length=res)
+        βvals = range(βmin, βmax, length=res)
+        for (iα, α) in enumerate(αvals)
+            for (iβ, β) in enumerate(βvals)
+                screen[iα, iβ] = IntensityPixel(met, α, β, θo)
+            end
+        end
+        new{typeof(screen)}((αmin, αmax), (βmin, βmax), screen)
     end
 end
 
@@ -148,12 +102,12 @@ end
 Camera that caches fast light raytracing information for an observer sitting at radial infinity.
 The frame of this observer is alligned with the Boyer-Lindquist frame.
 """
-struct IntensityCamera{T,A} <: AbstractCamera
-    metric::Kerr{T}
+struct IntensityCamera{A} <: AbstractCamera
+    metric::Kerr
     "Data type that stores screen pixel information"
-    screen::IntensityScreen{T,A}
+    screen::IntensityScreen{A}
     "Observer screen_coordinate"
-    screen_coordinate::NTuple{2,T}
+    screen_coordinate::NTuple{2}
 
     @doc """
         IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int; A=Matrix) where {T}
@@ -180,12 +134,12 @@ struct IntensityCamera{T,A} <: AbstractCamera
         αmax,
         βmin,
         βmax,
-        res::Int;
-        A = Matrix,
+        res::Int
     ) where {T}
-        new{T,A}(
+        screen = IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res)
+        new{typeof(screen.pixels)}(
             met,
-            IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res; A = A),
+            screen,
             (T(Inf), θo),
         )
     end

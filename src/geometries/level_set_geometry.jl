@@ -5,19 +5,37 @@ abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
 
 @inline function _raytrace(
     observation::A,
-    pixel::AbstractPixel{T},
+    pixel::AbstractPixel,
     mesh::Mesh{<:AbstractLevelSetGeometry,<:AbstractMaterial};
     res = 100,
-) where {A,T}
+) where {A}
     geometry = mesh.geometry
     material = mesh.material
-    τf = Krang.total_mino_time(pixel)
-    Δτ = τf / res - eps()
-    origin_bl = 1e100,pixel.θo, 0.0, true, true
-    for i in 1:res
-        τref = Δτ*i
-        τ = Krang.line_intersection(pixel, origin_bl, Δτ*(i-1), τref, geometry)
-        rs, θs, ϕs, νr, νθ = Krang.emission_coordinates_fast_light(pixel, τ)
+    T = typeof(pixel.metric.spin)
+    ray = Vector{Intersection{T}}(undef, res)
+    generate_ray!(ray, pixel, res)
+    (; rs, θs, ϕs, νr, νθ) = ray[1]
+    origin =
+        boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(pixel.metric, rs, θs, ϕs)
+    z = zero(A)
+    for i = 1:res
+        (; ts, rs, θs, ϕs, νr, νθ) = ray[i]
+        if rs <= Krang.horizon(pixel.metric) || iszero(rs)
+            continue
+        end
+        line_point_2 = boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
+            pixel.metric,
+            rs,
+            θs,
+            ϕs,
+        )
+        if isinf(line_point_2[1]) || isinf(line_point_2[2]) || isinf(line_point_2[3])
+            continue
+        end
+        didintersect, point = line_intersection(origin, line_point_2, geometry)
+        rs = sqrt(sum(point .^ 2))
+        θs = acos(point[3] / rs)
+        ϕs = ϕ_BL(pixel.metric, rs, atan(point[2], point[1]))
 
         if rs < Krang.horizon(pixel.metric)
             continue
