@@ -17,5 +17,5 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 FastGaussQuadrature = "0.5"
-Integrals = "5"
+Integrals = "5.4"
 Polynomials = "4.0"

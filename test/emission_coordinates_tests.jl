@@ -208,16 +208,16 @@
                     a *
                     (2r - a * λtemp) *
                     inv((r^2 - 2r + a^2) * √(r_potential(met, ηtemp, λtemp, r)))
-                probϕ = IntegralProblem(fϕ, testrs, Inf; nout = 1)
+                probϕ = IntegralProblem(fϕ, (testrs, Inf))
                 solϕ = solve(probϕ, HCubatureJL(); reltol = 1e-8, abstol = 1e-8)
                 Iϕ = solϕ.u
 
                 gϕ(θ, p) = csc(θ)^2 * inv(√(Krang.θ_potential(met, ηtemp, λtemp, θ)))
-                probϕs = IntegralProblem(gϕ, θs, π / 2; nout = 1)
+                probϕs = IntegralProblem(gϕ, (θs, π / 2))
                 solθs = solve(probϕs, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
-                probϕo = IntegralProblem(gϕ, θo, π / 2; nout = 1)
+                probϕo = IntegralProblem(gϕ, (θo, π / 2))
                 solθo = solve(probϕo, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
-                probϕ = IntegralProblem(gϕ, θturning, π / 2; nout = 1)
+                probϕ = IntegralProblem(gϕ, (θturning, π / 2))
                 solθt = solve(probϕ, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
 
                 Gϕ = 0
@@ -241,16 +241,16 @@
                     (r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λtemp)) *
                     inv((r^2 - 2r + a^2) * √(r_potential(met, ηtemp, λtemp, r)))
                 )
-                probt = IntegralProblem(ft, testrs, 1e6; nout = 1)
+                probt = IntegralProblem(ft, (testrs, 1e6))
                 solt = solve(probt, HCubatureJL(); reltol = 1e-8, abstol = 1e-8)
                 It = solt.u
 
                 gt(θ, p) = cos(θ)^2 * inv(√(Krang.θ_potential(met, ηtemp, λtemp, θ)))
-                probts = IntegralProblem(gt, θs, π / 2; nout = 1)
+                probts = IntegralProblem(gt, (θs, π / 2))
                 solθs = solve(probts, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
-                probto = IntegralProblem(gt, θo, π / 2; nout = 1)
+                probto = IntegralProblem(gt, (θo, π / 2))
                 solθo = solve(probto, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
-                probt = IntegralProblem(gt, θturning, π / 2; nout = 1)
+                probt = IntegralProblem(gt, (θturning, π / 2))
                 solθt = solve(probt, HCubatureJL(); reltol = 1e-12, abstol = 1e-12)
 
                 Gt = 0

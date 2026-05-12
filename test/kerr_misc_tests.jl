@@ -45,17 +45,17 @@
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ1, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase1, λcase1, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τ1 / sol.u ≈ 1.0 atol = 1e-5
 
-                    prob = IntegralProblem(f, real(root), Inf; nout = 1)
+                    prob = IntegralProblem(f, (real(root), Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τf / (2sol.u) ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase1, λcase1, r)))
-                    prob1 = IntegralProblem(f1, rs, 1e6; nout = 1)
+                    prob1 = IntegralProblem(f1, (rs, 1e6))
                     sol1 = solve(prob1, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test I1 / (sol1.u - log(1e6)) ≈ 1.0 atol = 1e-5
                 end
@@ -63,7 +63,7 @@
                 @testset "I2" begin
                     #Regularized Time            
                     f2(r, p) = r^2 * inv(√(r_potential(met, ηcase1, λcase1, r)))
-                    prob2 = IntegralProblem(f2, rs, 1e6; nout = 1)
+                    prob2 = IntegralProblem(f2, (rs, 1e6))
                     sol2 = solve(prob2, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test I2 / (sol2.u - 1e6) ≈ 1.0 atol = 1e-3
                 end
@@ -93,24 +93,24 @@
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ3, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-5, abstol = 1e-5)
                     @test τ3 / sol.u ≈ 1.0 atol = 1e-5
 
-                    prob = IntegralProblem(f, rh, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rh, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-5, abstol = 1e-5)
                     @test τf / sol.u ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob1 = IntegralProblem(f1, rs, 1e6; nout = 1)
+                    prob1 = IntegralProblem(f1, (rs, 1e6))
                     sol1 = solve(prob1, HCubatureJL(); reltol = 1e-8, abstol = 1e-8)
                     @test I1 / (sol1.u - log(1e6)) ≈ 1.0 atol = 1e-5
                 end
                 @testset "I2" begin
                     #Regularized Time            
                     f2(r, p) = r^2 * inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob2 = IntegralProblem(f2, rs, 1e6; nout = 1)
+                    prob2 = IntegralProblem(f2, (rs, 1e6))
                     sol2 = solve(prob2, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test I2 / (sol2.u - 1e6) ≈ 1.0 atol = 1e-5
                 end
@@ -139,24 +139,24 @@
                 I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ4, true)
                 @testset "I0/Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase4, λcase4, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τ4 / sol.u ≈ 1.0 atol = 1e-5
 
-                    prob = IntegralProblem(f, rh, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rh, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τf / sol.u ≈ 1.0 atol = 1e-5
                 end
                 @testset "I1" begin
                     f1(r, p) = r * inv(√(r_potential(met, ηcase4, λcase4, r)))
-                    prob1 = IntegralProblem(f1, rs, 1e10; nout = 1)
+                    prob1 = IntegralProblem(f1, (rs, 1e10))
                     sol1 = solve(prob1, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test I1 / (sol1.u - log(1e10)) ≈ 1.0 atol = 1e-5
                 end
                 @testset "I2" begin
                     #Regularized Time            
                     f2(r, p) = r^2 * inv(√(r_potential(met, ηcase4, λcase4, r)))
-                    prob2 = IntegralProblem(f2, rs, 1e6; nout = 1)
+                    prob2 = IntegralProblem(f2, (rs, 1e6))
                     sol2 = solve(prob2, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test I2 / (sol2.u - 1e6) ≈ 1.0 atol = 1e-5
                 end
@@ -188,7 +188,7 @@
                 τ1 = Ir(pix, true, rs)[1]
                 @testset "Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase1, λcase1, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τ1 / sol.u ≈ 1.0 atol = 1e-5
                 end
@@ -198,7 +198,7 @@
                         a *
                         (2r - a * λcase1) *
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase1, λcase1, r)))
-                    probϕ = IntegralProblem(fϕ, rs, Inf; nout = 1)
+                    probϕ = IntegralProblem(fϕ, (rs, Inf))
                     solϕ = solve(probϕ, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     Iϕ = Krang.Iϕ(pix, rs, τ1, true)
                     @test Iϕ / solϕ.u ≈ 1.0 atol = 1e-5
@@ -211,7 +211,7 @@
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase1, λcase1, r)))
                     )
 
-                    probt = IntegralProblem(ft, rs, 1e6; nout = 1)
+                    probt = IntegralProblem(ft, (rs, 1e6))
                     solt = solve(probt, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     It = Krang.It(pix, rs, τ1, true)
                     @test It / (solt.u + 1e6 + 2log(1e6)) ≈ 1.0 atol = 1e-3
@@ -239,7 +239,7 @@
                 τ3 = Ir(pix, true, rs)[1]
                 @testset "Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase3, λcase3, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-5, abstol = 1e-5)
                     @test τ3 / sol.u ≈ 1.0 atol = 1e-5
                 end
@@ -248,7 +248,7 @@
                         a *
                         (2r - a * λcase3) *
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase3, λcase3, r)))
-                    probϕ = IntegralProblem(fϕ, rs, Inf; nout = 1)
+                    probϕ = IntegralProblem(fϕ, (rs, Inf))
                     solϕ = solve(probϕ, HCubatureJL(); reltol = 1e-8, abstol = 1e-8)
                     Iϕ = Krang.Iϕ(pix, rs, τ3, true)
                     @test Iϕ / (solϕ.u) ≈ 1.0 atol = 1e-5
@@ -259,7 +259,7 @@
                         (r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λcase3)) *
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase3, λcase3, r)))
                     )
-                    probt = IntegralProblem(ft, rs, 1e6; nout = 1)
+                    probt = IntegralProblem(ft, (rs, 1e6))
                     solt = solve(probt, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     It = Krang.It(pix, rs, τ3, true)
                     #@test It ≈ solt.u + 1e6 + 2log(1e6) atol = 1e-3
@@ -288,7 +288,7 @@
                 τ4 = Ir(pix, true, rs)[1]
                 @testset "Ir" begin
                     f(r, p) = inv(√(r_potential(met, ηcase4, λcase4, r)))
-                    prob = IntegralProblem(f, rs, Inf; nout = 1)
+                    prob = IntegralProblem(f, (rs, Inf))
                     sol = solve(prob, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     @test τ4 / sol.u ≈ 1.0 atol = 1e-5
                 end
@@ -297,7 +297,7 @@
                         a *
                         (2r - a * λcase4) *
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase4, λcase4, r)))
-                    probϕ = IntegralProblem(fϕ, rs, Inf; nout = 1)
+                    probϕ = IntegralProblem(fϕ, (rs, Inf))
                     solϕ = solve(probϕ, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     Iϕ = Krang.Iϕ(pix, rs, τ4, true)
                     @test Iϕ / solϕ.u ≈ 1.0 atol = 2e-2
@@ -308,7 +308,7 @@
                         (r^2 * (r^2 - 2r + a^2) + 2r * (r^2 + a^2 - a * λcase4)) *
                         inv((r^2 - 2r + a^2) * √(r_potential(met, ηcase4, λcase4, r)))
                     )
-                    probt = IntegralProblem(ft, rs, 1e6; nout = 1)
+                    probt = IntegralProblem(ft, (rs, 1e6))
                     solt = solve(probt, HCubatureJL(); reltol = 1e-10, abstol = 1e-10)
                     It = Krang.It(pix, rs, τ4, true)
 
@@ -352,21 +352,21 @@
                                 π,
                             )
                                 fθ(θ, p) = inv(√(Krang.θ_potential(met, tempη, tempλ, θ)))
-                                probts = IntegralProblem(fθ, θs, π / 2; nout = 1)
+                                probts = IntegralProblem(fθ, (θs, π / 2))
                                 solθs = solve(
                                     probts,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probto = IntegralProblem(fθ, θo, π / 2; nout = 1)
+                                probto = IntegralProblem(fθ, (θo, π / 2))
                                 solθo = solve(
                                     probto,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probt = IntegralProblem(fθ, θturning, π / 2; nout = 1)
+                                probt = IntegralProblem(fθ, (θturning, π / 2))
                                 solθt = solve(
                                     probt,
                                     HCubatureJL();
@@ -400,21 +400,21 @@
                                 fθ(θ, p) =
                                     csc(θ)^2 *
                                     inv(√(Krang.θ_potential(met, tempη, tempλ, θ)))
-                                probts = IntegralProblem(fθ, θs, π / 2; nout = 1)
+                                probts = IntegralProblem(fθ, (θs, π / 2))
                                 solθs = solve(
                                     probts,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probto = IntegralProblem(fθ, θo, π / 2; nout = 1)
+                                probto = IntegralProblem(fθ, (θo, π / 2))
                                 solθo = solve(
                                     probto,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probt = IntegralProblem(fθ, θturning, π / 2; nout = 1)
+                                probt = IntegralProblem(fθ, (θturning, π / 2))
                                 solθt = solve(
                                     probt,
                                     HCubatureJL();
@@ -447,21 +447,21 @@
                                 ft(θ, p) =
                                     cos(θ)^2 *
                                     inv(√(Krang.θ_potential(met, tempη, tempλ, θ)))
-                                probts = IntegralProblem(ft, θs, π / 2; nout = 1)
+                                probts = IntegralProblem(ft, (θs, π / 2))
                                 solθs = solve(
                                     probts,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probto = IntegralProblem(ft, θo, π / 2; nout = 1)
+                                probto = IntegralProblem(ft, (θo, π / 2))
                                 solθo = solve(
                                     probto,
                                     HCubatureJL();
                                     reltol = 1e-12,
                                     abstol = 1e-12,
                                 )
-                                probt = IntegralProblem(ft, θturning, π / 2; nout = 1)
+                                probt = IntegralProblem(ft, (θturning, π / 2))
                                 solθt = solve(
                                     probt,
                                     HCubatureJL();
