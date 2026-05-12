@@ -2,9 +2,8 @@ module KrangMetalExt
 using Krang
 using Metal
 
-@inline function _custom_pow(x::ComplexF32, y::Float32)
-    return abs(x)^y * cis(y * angle(x))
-end
+@inline _complex_inv(z::ComplexF32) = conj(z) / abs2(z)
+@inline _complex_cbrt(z::ComplexF32) = abs(z)^(1f0/3) * cis(angle(z) / 3f0)
 
 @inline function _argmax_real3(x1, x2, x3)
     if real(x1) >= real(x2)
@@ -26,18 +25,18 @@ function Krang.get_radial_roots(metric::Krang.Kerr{T}, η::T, λ::T) where {T<:F
     Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B^2 / T(8)
 
     negΔ3 = T(4) * P * P * P + T(27) * (Q^2)
-    ωp =  _custom_pow(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im,  T(1 / 3))
+    ωp = _complex_cbrt(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im)
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1 / 2) + (√T(3) / 2)im, -T(1 / 2) - T(√T(3) / 2)im, one(T) + zero(T)im) .* ωp
 
-    v = -P .* _custom_pow.(T(3) .* C, -one(T))
+    v = -P .* _complex_inv.(T(3) .* C)
 
     ξ0 = _argmax_real3(C[1] + v[1], C[2] + v[2], C[3] + v[3]) - A / T(3)
     ξ02 = 2ξ0
 
     predet1 = A2 + ξ02
-    predet2 = (sqrt(T(2)) * B) * _custom_pow(sqrt(ξ0), -one(T))
+    predet2 = (sqrt(T(2)) * B) * _complex_inv(sqrt(ξ0))
     det1 = sqrt(-(predet1 - predet2))
     det2 = sqrt(-(predet1 + predet2))
 
