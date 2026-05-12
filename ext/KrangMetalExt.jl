@@ -2,9 +2,8 @@ module KrangMetalExt
 using Krang
 using Metal
 
-function _custom_pow(x::ComplexF32, y::Float32) 
-    s,c = sincos(y*angle(x)*one(x))
-    return (abs(x)^y)*(c-s*one(x)im)
+@inline function _custom_pow(x::ComplexF32, y::Float32)
+    return abs(x)^y * cis(y * angle(x))
 end
 
 @inline function _argmax_real3(x1, x2, x3)
