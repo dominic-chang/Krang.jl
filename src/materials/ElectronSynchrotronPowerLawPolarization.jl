@@ -70,8 +70,8 @@ Calculates the polarization of a photon emitted from a fluid particle with momen
     B = @SMatrix [
         z z -a*sinθs z
         z z z z
-        a*sinθs z z -(ri^2 + a^2)
-        z z (ri^2+a^2) z
+        a*sinθs z z -(ri^2 + a^2)*sinθs
+        z z (ri^2+a^2)*sinθs z
     ]
     f_temp_d = ((A - B * im) * (ri - a * cos(θs) * im)) * (f_bl_u)
     κ = sum(curr_p_bl_u .* f_temp_d)
