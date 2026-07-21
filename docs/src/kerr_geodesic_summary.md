@@ -16,10 +16,10 @@ defined on a manifold with metric $g_{\mu\nu}$, which in the case of the Kerr, c
 \begin{equation}
 g_{\mu\nu}=\left(
 \begin{array}{cccc}
- \frac{r_s r}{\Sigma }-1 & 0 & 0 & -\frac{a^2   r_s r\sin ^2\theta}{\Sigma } \\
+ \frac{r_s r}{\Sigma }-1 & 0 & 0 & -\frac{a r_s r\sin ^2\theta}{\Sigma } \\
  0 & \frac{\Sigma }{\Delta } & 0 & 0 \\
  0 & 0 & \Sigma  & 0 \\
- -\frac{a^2 r  r_s\sin ^2\theta }{\Sigma } & 0 & 0 & \sin ^2\theta  \left(\frac{a^2
+ -\frac{a r r_s\sin ^2\theta }{\Sigma } & 0 & 0 & \sin ^2\theta  \left(\frac{a^2
     r_s r\sin ^2\theta }{\Sigma }+a^2+r^2\right) \\
 \end{array}
 \right),
@@ -59,7 +59,7 @@ p_\mu
 \end{align}
 ```
 
-The Carter constant is useful since it allows for seperable solutions to the Hamilton-Jacobi equations, resulting in a Hamiltonian principle function that takes the form,
+The Carter constant is useful since it allows for separable solutions to the Hamilton-Jacobi equations, resulting in a Hamilton principal function that takes the form,
 
 ```math
 \begin{equation}
@@ -72,7 +72,7 @@ where $\kappa$ is the conserved four momentum magnitude, $E$ is the conserved en
 ```math
 \begin{align}
 \mathcal R
-    &=\Delta[-C+\kappa r - (L-aE)^2]+[E(r^2+a^2)-La]^2,\\
+    &=\Delta[-C+\kappa r^2 - (L-aE)^2]+[E(r^2+a^2)-La]^2,\\
 \Theta
     &=C+\cos^2\theta\left((\kappa+E^2)a^2-\frac{L^2}{\sin^2\theta}\right)
 \end{align}
@@ -148,10 +148,10 @@ Thus for a given observer location, $(t_f, r_f, \theta_f, \phi_f)$, and observer
 Details on the solutions to equations (15)-(18) can be found in this review article by [Gralla & Lupsasca](https://doi.org/10.1103/PhysRevD.101.044032)[^GL].
 
 ## References
-[^PW]: Walker, Martin, and Roger Penrose. ‘On Quadratic First Integrals of the Geodesic Equations for Type 22 Spacetimes’. Communications in Mathematical Physics, vol. 18, no. 4, Springer Science and Business Media LLC, Dec. 1970, pp. 265–274, https://doi.org10.1007/bf01649445.
+[^PW]: Walker, Martin, and Roger Penrose. ‘On Quadratic First Integrals of the Geodesic Equations for Type 22 Spacetimes’. Communications in Mathematical Physics, vol. 18, no. 4, Springer Science and Business Media LLC, Dec. 1970, pp. 265–274, https://doi.org/10.1007/bf01649445.
 
-[^Carter]: Carter, Brandon. ‘Global Structure of the Kerr Family of Gravitational Fields’. The Physical Review, vol. 174, no. 5, American Physical Society (APS), Oct. 1968, pp. 1559–1571, https://doi.org10.1103/physrev.174.1559.
+[^Carter]: Carter, Brandon. ‘Global Structure of the Kerr Family of Gravitational Fields’. The Physical Review, vol. 174, no. 5, American Physical Society (APS), Oct. 1968, pp. 1559–1571, https://doi.org/10.1103/physrev.174.1559.
 
 [^BL]: Robert H. Boyer, Richard W. Lindquist; Maximal Analytic Extension of the Kerr Metric. J. Math. Phys. 1 February 1967; 8 (2): 265–281. https://doi.org/10.1063/1.1705193
 
-[^GL]: Gralla, Samuel E., and Alexandru Lupsasca. ‘Null Geodesics of the Kerr Exterior’. Physical Review. D. (2016), vol. 101, no. 4, American Physical Society (APS), Feb. 2020, https://doi.org10.1103/physrevd.101.044032.
+[^GL]: Gralla, Samuel E., and Alexandru Lupsasca. ‘Null Geodesics of the Kerr Exterior’. Physical Review D, vol. 101, no. 4, American Physical Society (APS), Feb. 2020, https://doi.org/10.1103/physrevd.101.044032.

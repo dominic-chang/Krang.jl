@@ -19,7 +19,7 @@ struct Kerr{T} <: AbstractMetric
     Constructs a `Kerr` object representing the Kerr metric.
 
     # Arguments
-    - `spin::T`: The spin parameter `a = J/M`, where `J` is the angular momentum and `M` is the mass of the black hole. spin ∈ (-1, 0) ∪ (0, 1).
+    - `spin::T`: The spin parameter `a = J/M`, where `J` is the angular momentum and `M` is the mass of the black hole. In the package's units, `spin ∈ (-1, 1)` with 0 not included.
 
     # Returns
     - A `Kerr` object with the given spin and a default mass of 1.

@@ -81,7 +81,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 end
 
 """
-Emission inclination for point originating at inclination rs whose nth order image appears at screen coordinate (`α`, `β`).
+Emission inclination for a point originating at radius `rs` whose image appears at screen coordinate (`α`, `β`).
 
 # Arguments
 

@@ -155,7 +155,7 @@ struct SlowLightIntensityCamera{A} <: AbstractCamera
     "Observer screen_coordinate"
     screen_coordinate::NTuple{2}
     @doc """
-        SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res; A=Matrix) where {T}
+        SlowLightIntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res) where {T}
 
     Constructs a `SlowLightIntensityCamera` object.
 
@@ -167,8 +167,6 @@ struct SlowLightIntensityCamera{A} <: AbstractCamera
     - `βmin`: Minimum β coordinate on the screen.
     - `βmax`: Maximum β coordinate on the screen.
     - `res`: Resolution of the screen (number of pixels along one dimension).
-    - `A`: Data type that stores screen pixel information (default is `Matrix`). A GPUMatrix can be used for GPU computations.
-
     # Returns
     - A `SlowLightIntensityCamera` object.
     """

@@ -45,7 +45,7 @@ export default defineConfig({
       pattern: 'https://github.com/LuxDL/DocumenterVitepress.jl/edit/master/docs/src/:path' // TODO: replace this in makedocs!
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/dchang10/Krang.jl' },
+      { icon: 'github', link: 'https://github.com/dominic-chang/Krang.jl' },
       { icon: {
         svg: '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48" style="fill:#000000;"> <circle cx="14" cy="24" r="12" fill="#717171"></circle><ellipse cx="34" cy="24" fill="#717171" rx="6" ry="11"></ellipse><ellipse cx="44" cy="24" fill="#717171" rx="2" ry="10"></ellipse></svg>'
       }, link: 'https://medium.com/@domchang' }

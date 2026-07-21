@@ -1,6 +1,6 @@
-# Newmann-Penrose Formalism
+# Newman-Penrose Formalism
 
-The Newmann-Penrose (NP) Formalism is a set of notation that is ideal for expressing spacetime quantities in terms of a null-tetrad/null-spinoral basis.
+The Newman-Penrose (NP) formalism is a notation that is well suited to expressing spacetime quantities in terms of a null-tetrad or null-spinor basis.
 
 ## Notation
 We will use Greek indices, $\{\alpha,\beta,\dots\}$, to index through space time indices in some coordinate system.
@@ -54,7 +54,7 @@ are Levi-Civita symbols.
 The $\epsilon_{AB}$ and $\epsilon_{A'B'}$ serve the purpose of the metric on spinor space, and act to raise and lower spinoral indices.
 
 The notation is chosen to make a distinction between primed and unprimed indices. 
-This choice is conventient since it allows spinoral quantities that have pairs of primed and unprimed indices to be easily embedded into their tensoral equivalents with the use of the $\sigma^\mu{}_{AA'}$.
+This choice is convenient since it allows spinorial quantities that have pairs of primed and unprimed indices to be embedded into their tensor equivalents with the use of $\sigma^\mu{}_{AA'}$.
 In particular, spin vectors are embedded into vectors as;
 ```math
 \zeta^\mu=\sigma^{\mu}_{AA'}z^A\bar z^{A'},
@@ -87,9 +87,9 @@ It is possible to perform a spacetime classification based on the eigen bi-vecto
 \frac{1}{2}C^{\alpha\beta}{}_{\gamma\delta}X^{\gamma\delta}=\lambda \, X^{\alpha\beta}.
 ```
 The number eigen bi-vectors multiplicities define the spacetimes classes.
-type D spacetimes are of particular interst since this is the class that the Kerr family of metrics belong.
+Type D spacetimes are of particular interest because the Kerr family of metrics belongs to this class.
 
-Certain properties of spacetimes are better ellucidated through the Newmann-Penrose formalism.
+Certain properties of spacetimes are better elucidated through the Newman-Penrose formalism.
 In particular, one can show that that the Weyl spinor has only 1 scalar degree of freedom for the class of vacuum type D spacetimes.
 
 The Weyl scalar $\Psi_{ABCD}$ is related to the Weyl tensor $C_{\alpha\beta\gamma\delta}$ through the relationship,

@@ -4,6 +4,7 @@ authors = ["Dominic <dochang@g.harvard.edu> and contributors"]
 version = "0.4.1"
 
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 JacobiElliptic = "2a8b799e-c098-4961-872a-356c768d184c"
@@ -28,8 +29,8 @@ GeometryBasics = "0.5"
 JacobiElliptic = "0.3"
 PolarizedTypes = "0.1"
 Reactant = "0.2"
-Rotations = "1"
 Roots = "2.2"
+Rotations = "1"
 StaticArrays = "1"
 julia = "1.10"
 

@@ -103,7 +103,7 @@ struct IntensityCamera{A} <: AbstractCamera
     screen_coordinate::NTuple{2}
 
     @doc """
-        IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int; A=Matrix) where {T}
+        IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int) where {T}
 
     Constructor for an Intensity Camera.
 
@@ -115,10 +115,8 @@ struct IntensityCamera{A} <: AbstractCamera
     - `βmin`: Minimum value of β.
     - `βmax`: Maximum value of β.
     - `res::Int`: Resolution of the screen.
-    - `A=Matrix`: Optional argument to specify the type of matrix to use. A GPUMatrix can be used for GPU computations.
-
     # Returns
-    - `IntensityCamera{T, A}`: An intensity camera object.
+    - `IntensityCamera{A}`: An intensity camera object, where `A` is the screen's matrix type.
     """
     function IntensityCamera(met::Kerr{T}, θo, αmin, αmax, βmin, βmax, res::Int) where {T}
         screen = IntensityScreen(met, αmin, αmax, βmin, βmax, θo, res)

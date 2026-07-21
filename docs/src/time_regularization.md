@@ -26,7 +26,7 @@ where,
     \mathcal R(r)
         &= (r^2+a^2-a\lambda)^2-\Delta(r)[\eta+(\lambda-a)^2], \text{ and}\\
     \Theta(\theta)
-        &=\eta+a^2\cos^2\theta-\lambda^2\cot^s\theta.
+        &=\eta+a^2\cos^2\theta-\lambda^2\cot^2\theta.
 \end{align}
 ```
 

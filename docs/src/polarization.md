@@ -1,9 +1,9 @@
 # Linear-Polarization
 
 
-## Linear Polarization of null geodesics in the Newmann-Penrose Formalism
+## Linear Polarization of null geodesics in the Newman-Penrose Formalism
 
-The Newmann-Penrose formalism allows the linear polarization of a null vector to be modelled with the definition of a flag plane.
+The Newman-Penrose formalism allows the linear polarization of a null vector to be modeled with the definition of a flag plane.
 Here, we provide a summarized construction.[^PR]
 
 Let $k^\mu$ be a null vector.
@@ -15,13 +15,13 @@ There exists a set of equivalent spin vectors for each vector.
 These spin vectors are related to each other through a complex phase $\kappa\rightarrow e^{i\theta}\kappa$.
 The goal of this construction is to show that the orientation of the linear polarization can be encoded in the phase.
 
-The relationship between linear polarization and the phase is first acheived by constructing a polarization tensor from $\kappa^A$ and $\epsilon^{AB}$ as,
+The relationship between linear polarization and the phase is first established by constructing a polarization tensor from $\kappa^A$ and $\epsilon^{AB}$ as,
 ```math
 P^{\mu\nu}=\sigma^{\mu}{}_{AA'}\sigma^{\nu}{}_{BB'}\left(
     \kappa^{A}\kappa^B\epsilon^{A'B'}+
 \epsilon^{AB}\bar\kappa^{A'}\bar\kappa^{B'}\right).
 ```
-Both $\kappa^{A}\kappa^B$ and $\bar\kappa^{A}\bar\kappa^B$ are included in the defition of $P^{\mu\nu}$ to ensure that it is real.
+Both $\kappa^{A}\kappa^B$ and $\bar\kappa^{A}\bar\kappa^B$ are included in the definition of $P^{\mu\nu}$ to ensure that it is real.
 Then in general, $P^{\mu\nu}$ can be written as the antisymmetric outer product of $k^\mu=\sigma^\mu_{AA'}\kappa^A\bar\kappa^{A'}$ with another vector spacelike vector $f^\mu = \sigma^{\mu}{}_{AA'}(\kappa^A\bar\tau^{A'}+\tau^A\bar\kappa^{A'})$,
 ```math
 P^{\mu\nu}
@@ -74,7 +74,7 @@ where
     A
         &=k^tf^r-k^rf^t+a\sin^2\theta(k^r f^\phi-k^\phi f^r)\\
     B
-        &=\left[(r^2+a^2)(k^\phi f^\theta-k^\theta f^\phi)-a*(k^t f^\theta - k^\theta f^t)\right]\sin\theta.
+        &=\left[(r^2+a^2)(k^\phi f^\theta-k^\theta f^\phi)-a(k^t f^\theta-k^\theta f^t)\right]\sin\theta.
 \end{align}
 ```
 ## References

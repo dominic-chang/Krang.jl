@@ -187,7 +187,7 @@ Vertical Bardeen Screen Coordinate
 # Arguments
 
 - `metric`: Kerr
-- `λ`: Energy reduced Azimuthal angular momentul
+- `λ`: Energy-reduced azimuthal angular momentum
 - `η`: Energy reduced Carter integral 
 - `θo`: Observer inclination
 """
@@ -322,10 +322,10 @@ Mino time of trajectory between an observer at infinity and point at radius rs
 
 - `pix` : Pixel information
 - `rs` : Emission radius
-- `isindir` : Is the path direct or indirect?
+- `νr` : Sign of the radial velocity at emission.
 """
-function mino_time(pix, rs, isindir)
-    return Ir(pix, isindir, rs)[1]
+function mino_time(pix, rs, νr)
+    return Ir(pix, νr, rs)[1]
 end
 
 """
@@ -1497,7 +1497,6 @@ Returns the maximum mino time that can be accrued along a ray.
 
 - `metric` : Kerr metric
 - `roots` : Roots of the radial potential
-- `I0_inf` : Mino time at infinity
 """
 function total_mino_time(metric::Kerr{T}, roots::NTuple{4}) where {T}
     numreals = unsafe_trunc(Int, sum(Krang._isreal2, roots))
@@ -1531,7 +1530,7 @@ function Ir(pix::AbstractPixel, νr::Bool, rs)
 end
 
 """
-Returns the antiderivative \$I_ϕ=\\int\\frac{a(2Mr-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$.
+Returns the antiderivative \$I_ϕ=\\int\\frac{a(2Mr-a\\lambda)}{\\Delta\\sqrt{\\mathcal{R}(r)}}dr\$.
 See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
@@ -1551,7 +1550,7 @@ function Iϕ(pix::AbstractPixel, rs, τ, νr)
 end
 
 """
-Returns the antiderivative \$I_t=\\int\\frac{a(2Mr-a\\lambda)}{\\sqrt{\\Delta\\mathcal{R(r)}}}dr\$.
+Returns the antiderivative \$I_t=\\int\\frac{r^2\\Delta+2Mr(r^2+a^2-a\\lambda)}{\\Delta\\sqrt{\\mathcal{R}(r)}}dr\$.
 See [`r_potential(x)`](@ref) for an implementation of \$\\mathcal{R}(r)\$.
 
 # Arguments
