@@ -19,8 +19,8 @@ Checks if a complex number is real to within √eps of its own magnitude
 (or √eps absolute, whichever is larger).
 """
 function _isreal2(num)
-    T = real(typeof(num))
-    abs2(imag(num)) <= eps(T) * max(abs2(num), one(T))
+    T = typeof(real(num))
+    return 0 + (abs2(imag(num)) <= eps(T) * max(abs2(num), one(T)))
 end
 
 """
@@ -305,8 +305,15 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     r4 = (sqrtξ02 + det2) / 2
 
     roots = (r1, r2, r3, r4)
-    if (sum(_isreal2, roots) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
-        roots = (roots[1], roots[4], roots[2], roots[3])
+    # All case-3 formulas assume that the two real roots precede the complex
+    # conjugate pair.  Near a branch boundary the quartic formula can instead
+    # return them in slots 1 and 4, which makes products such as
+    # (r3 - r2) * (r4 - r2) spuriously negative after taking `real`.
+    root_is_real = _isreal2.(roots)
+    if root_is_real == (1, 0, 0, 1)
+        # Keep the conventional orientation of the conjugate pair as well:
+        # positive imaginary part in slot 3 and negative in slot 4.
+        roots = (roots[1], roots[4], roots[3], roots[2])
     end
     return roots
 end
@@ -366,8 +373,8 @@ function Ir_inf_case3(::Kerr, roots::NTuple{4})
 
     r1, r2, r21 = real.((r1, r2, r21))
 
-    A2 = abs(r32 * r42)
-    B2 = abs(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
@@ -436,8 +443,8 @@ function Ir_s_case3(::Kerr, rs, roots::NTuple{4})
 
     r1, r2, r21 = real.((r1, r2, r21))
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     A, B = √A2, √B2
 
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
@@ -545,8 +552,8 @@ function Iϕ_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm1 = real(rm - r1)
     rm2 = real(rm - r2)
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     if A2 < zero(T) || B2 < zero(T)
         return T(Inf)
     end
@@ -680,8 +687,8 @@ function Iϕ_w_I0_terms_case3(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     rm1 = real(rm - r1)
     rm2 = real(rm - r2)
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     if A2 < zero(T) || B2 < zero(T)
         return T(Inf)
     end
@@ -829,8 +836,8 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     rm1 = real(rm - r1)
     rm2 = real(rm - r2)
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     if A2 < zero(T) || B2 < zero(T)
         return T(Inf)
     end
@@ -1046,8 +1053,8 @@ end
     rm1 = real(rm - r1)
     rm2 = real(rm - r2)
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     if A2 < zero(T) || B2 < zero(T)
         return T(Inf)
     end
@@ -1218,8 +1225,8 @@ Returns the radial integrals for the case where there are two real roots in the 
     rm1 = rm - r1
     rm2 = rm - r2
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
 
@@ -1404,8 +1411,8 @@ Returns the radial integrals for the case where there are two real roots in the 
     rm1 = rm - r1
     rm2 = rm - r2
 
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
+    A2 = abs2(r32)
+    B2 = abs2(r31)
     A, B = √A2, √B2
     k3 = ((A + B)^2 - r21^2) / (4 * A * B)
     temprat = B * (rs - r2) * inv(A * (rs - r1))
@@ -1617,8 +1624,8 @@ end
 
     err_return = (T(Inf), false, false)
     fo = I0_inf(pix)
-    A = √abs(r32 * r42)
-    B = √abs(r31 * r41)
+    A = √abs2(r32)
+    B = √abs2(r31)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
     temprat = B * (rh - r2) / (A * (rh - r1))
     x3_s = clamp(((1 - temprat) / (1 + temprat)), -1, 1)
