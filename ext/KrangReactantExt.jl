@@ -54,8 +54,8 @@ _rs_case1_and_2 = Krang._rs_case1_and_2
 _rs_case3 = Krang._rs_case3
 _rs_case4 = Krang._rs_case4
 
-@inline _ellE(m) = JacobiElliptic.ArithmeticGeometricMeanAlg.E(m)
-@inline _ellE(φ, m) = JacobiElliptic.CarlsonAlg.E(φ, m)
+@inline _ellE(m) = JacobiElliptic.E(m)
+@inline _ellE(φ, m) = JacobiElliptic.E(φ, m)
 
 function _regularize_zero(x, ::Type{T}) where {T}
     return Base.ifelse(x == zero(T), eps(T), x)
@@ -73,33 +73,32 @@ end
     )
 end
 
-Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr, η, λ)
+Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr{T1}, η::T2, λ::T3) where {T1, T2, T3}
+    T = promote_type(T1, T2, T3)
     a = metric.spin
-    TT = typeof(a)
-    a2 = a * a
+
+    a2 = a^2
     A = a2 - η - λ * λ
     A2 = A + A
-    B = TT(2) * (η + (λ - a)^2)
-    C0 = -a2 * η
+    B = T(2) * (η + (λ - a)^2)
+    C = -a2 * η
 
-    P = -A * A / TT(12) - C0
-    Q = -A / TT(3) * (A * A / TT(36) + zero(TT)im - C0) - B * B / TT(8)
+    P = -A^2 / T(12) - C
+    Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B^2 / T(8)
 
-    Δ3 = -TT(4) * P * P * P - TT(27) * Q * Q
-    ωp = (-Q / TT(2) + sqrt(-Δ3 / TT(108)) + zero(TT)im)^(TT(1 / 3))
+    negΔ3 = T(4) * P * P * P + T(27) * (Q^2)
+    ωp = ^(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im, T(1 / 3))
 
+    #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
+    C = (-T(1 / 2) + T(√3 / 2)im, -T(1 / 2) - T(√3 / 2)im, one(T) + zero(T)im) .* ωp
 
-    C1 = (complex(-TT(1 / 2), TT(√3 / 2))) * ωp
-    C2 = (complex(-TT(1 / 2), - TT(√3 / 2))) * ωp
-    C3 = (complex(one(TT), zero(TT))) * ωp
-    V1 = -P / (TT(3) * C1)
-    V2 = -P / (TT(3) * C2)
-    V3 = -P / (TT(3) * C3)
-    ξ0 = _argmax_real3(C1 + V1, C2 + V2, C3 + V3) - A / TT(3)
-    ξ02 = ξ0 + ξ0
+    v = -P .* inv.(T(3) .* C)
+
+    ξ0 = _argmax_real3((C .+ v)...) - A / T(3)
+    ξ02 = 2ξ0
 
     predet1 = A2 + ξ02
-    predet2 = (√TT(2) * B) * inv(sqrt(ξ0))
+    predet2 = (√T(2) * B) * inv(sqrt(ξ0))
     det1 = sqrt(-(predet1 - predet2))
     det2 = sqrt(-(predet1 + predet2))
 
@@ -110,9 +109,9 @@ Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr, �
     r3 = (sqrtξ02 - det2) / 2
     r4 = (sqrtξ02 + det2) / 2
 
-    numreals = sum(_isreal2, (r1, r2, r3, r4))
-    check = (numreals == 2) & (abs(imag(r4)) < sqrt(eps(TT)))
-    return NTuple{4,typeof(r1)}((
+    #numreals = sum(_isreal2, (r1, r2, r3, r4))
+    check = _isreal2(r1) & _isreal2(r4) & !_isreal2(r2) & !_isreal2(r3)
+    return ((
         r1,
         Base.ifelse(check, r4, r2),
         Base.ifelse(check, r2, r3),
@@ -120,22 +119,8 @@ Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr, �
     ))
 end
 
-#for (ηT, λT) in Iterators.product(types, types)
-#    if ηT == λT == Any
-#        continue
-#    end
-#
-#    @eval function Krang.get_radial_roots(
-#        met::Krang.Kerr,
-#        η::$ηT,
-#        λ::$λT,
-#    ) 
-#        return _reactant_get_radial_roots(met, η, λ)
-#    end
-#end
-
 Reactant.@reactant_overlay function Krang.Ir_inf(metric::Krang.Kerr, roots)
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     func1 = Krang.Ir_inf_case1_and_2
     func2 = Krang.Ir_inf_case3
     func3 = Krang.Ir_inf_case4
@@ -154,7 +139,7 @@ Reactant.@reactant_overlay function Krang.Ir_s(metric::Krang.Kerr, rs, roots, ν
     func1 = Krang.Ir_s_case1_and_2
     func2 = Krang.Ir_s_case3
     func3 = Krang.Ir_s_case4
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     result = roots[1]
     Reactant.@trace if numreals == 4
         result = func1(metric, rs, Base.real.(roots), νr)
@@ -185,7 +170,7 @@ Reactant.@reactant_overlay function Krang.Ir_s_case1_and_2(
 end
 
 Reactant.@reactant_overlay function Krang.Iϕ_inf(metric::Krang.Kerr, roots, λ)
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     result = λ
     Reactant.@trace if numreals == 4
         result = Iϕ_inf_case2(metric, real.(roots), λ)
@@ -332,7 +317,7 @@ Reactant.@reactant_overlay function Krang.It_inf(
     roots::NTuple{4,<:TracedRNumber},
     λ,
 )
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     result = λ
     Reactant.@trace if numreals == 4
         result = It_inf_case2(metric, real.(roots), λ)
@@ -528,7 +513,7 @@ Reactant.@reactant_overlay function Krang.radial_inf_integrals(met::Krang.Kerr, 
     func1 = radial_inf_integrals_case2
     func2 = radial_inf_integrals_case3
     func3 = radial_inf_integrals_case4
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x) , 1 , 0), roots)
     Reactant.@trace if numreals == 4
         result = func1(met, roots)
     elseif numreals == 2
@@ -578,7 +563,7 @@ Reactant.@reactant_overlay function Krang.radial_inf_integrals_case2(
 end
 
 Reactant.@reactant_overlay function Krang.total_mino_time(metric::Krang.Kerr, roots)
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     I0_inf = Ir_inf(metric, roots)
     rh = horizon(metric)
     τf = roots[1]
@@ -629,21 +614,6 @@ end
     return Go, Ghat
 end
 
-#for (θT, ηT, λT) in Iterators.product(types, types, types)
-#    if θT == ηT == λT == Any
-#        continue
-#    end
-#
-#    @eval function Krang._absGθo_Gθhat(
-#        met::Krang.Kerr,
-#        θ::$θT,
-#        η::$ηT,
-#        λ::$λT,
-#    ) 
-#        return _reactant_absGθo_Gθhat(met, θ, η, λ)
-#    end
-#end
-
 Reactant.@reactant_overlay function Krang._absGϕo_Gϕhat(
     metric::Krang.Kerr,
     θo::A,
@@ -681,21 +651,6 @@ Reactant.@reactant_overlay function Krang._absGϕo_Gϕhat(
 
     return Go, Ghat
 end
-
-#for (θT, ηT, λT) in Iterators.product(types, types, types)
-#    if θT == ηT == λT == Any
-#        continue
-#    end
-#
-#    @eval function Krang._absGϕo_Gϕhat(
-#        met::Krang.Kerr,
-#        θ::$θT,
-#        η::$ηT,
-#        λ::$λT,
-#    ) 
-#        return _reactant_absGϕo_Gϕhat(met, θ, η, λ)
-#    end
-#end
 
 Reactant.@reactant_overlay function Krang._absGto_Gthat(
     metric::Krang.Kerr,
@@ -970,7 +925,7 @@ Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals(
     τ,
     νr,
 )
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     result = (
         zero(real(roots[1])),
         zero(real(roots[1])),
@@ -1398,7 +1353,7 @@ end
 
 function _reactant_emission_radius_tau(pix::Krang.SlowLightIntensityPixel, τ)
     rh = horizon(metric(pix))
-    numreals = sum(_isreal2, roots(pix))
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots(pix))
     rs4, valid4 = Krang.rs_case1_and_2(pix, rh, τ)
     rs2, valid2 = Krang._rs_case3(pix, rh, τ)
     rs0, valid0 = Krang._rs_case4(pix, rh, τ)
@@ -1440,70 +1395,6 @@ function _reactant_emission_radius_theta(pix::Krang.SlowLightIntensityPixel, θs
     return rs, valid
 end
 
-function _emission_radius(pix::Krang.SlowLightIntensityPixel, τ)
-    TT = typeof(metric(pix).spin)
-    numreals = sum(_isreal2, roots(pix))
-    rh = horizon(metric(pix))
-    fo = I0_inf(pix)
-
-    rs4, valid4 = _reactant_rs_case1_and_2(pix, rh, τ, TT)
-    rs2, valid2 = _reactant_rs_case3(pix, rh, τ, TT)
-    rs0, valid0 = _reactant_rs_case4(pix, rh, τ, TT)
-
-    radial_roots_real = real.(roots(pix))
-    _, _, r3, r4 = radial_roots_real
-    _, r31, _, r41, r42, _ = _get_root_diffs(radial_roots_real...)
-    X2 = √(r31 * r42) * (fo - τ) / 2
-    νr4 = X2 > zero(TT)
-
-    radial_roots = roots(pix)
-    r1, r2, _, _ = radial_roots
-    r21, r31c, r32, r41c, r42c, _ = _get_root_diffs(radial_roots...)
-    r1, r2, r21 = real.((r1, r2, r21))
-    A = √abs(r32 * r42c)
-    B = √abs(r31c * r41c)
-    X3 = √(A * B) * real(fo - τ)
-    νr2 = X3 > zero(TT)
-
-    _, r2c, _, r4c = radial_roots
-    a1 = abs(imag(r4c))
-    a2 = abs(imag(r2c))
-    b1 = real(r4c)
-    b2 = real(r2c)
-    C = sqrt((a1 - a2)^2 + (b1 - b2)^2)
-    D = sqrt((a1 + a2)^2 + (b1 - b2)^2)
-    X4 = (C + D) / TT(2) * (fo - τ)
-    νr0 = X4 > zero(TT)
-
-    is4 = numreals == 4
-    is2 = numreals == 2
-    rs = Base.ifelse(is4, rs4, Base.ifelse(is2, rs2, rs0))
-    νri = Base.ifelse(is4, νr4, Base.ifelse(is2, νr2, νr0))
-    validi = Base.ifelse(is4, valid4, Base.ifelse(is2, valid2, valid0))
-    issuccess = validi > zero(validi)
-
-    return rs, νri, numreals, issuccess
-end
-
-
-#for type_list in Iterators.product((types for _ in 1:18)...)
-#    if all(x-> x == Any, type_list)
-#        continue
-#    end
-#
-#    symbols = (Symbol(:T, i) for i = 1:18) 
-#    for (i, symbol) in enumerate(symbols)
-#        @eval $symbol = $type_list[$i]
-#    end
-#
-#    @eval function Krang.emission_radius(
-#        pix::Krang.SlowLightIntensityPixel{$T1,$T2,$T3,$T4,$T5,$T6,$T7,$T8,$T9,$T10,$T11,$T12,$T13,$T14,$T15,$T16,$T17},
-#        τ::$T18,
-#    ) 
-#        return _reactant_get_radial_roots(met, τ)
-#    end
-#end
-
 Reactant.@reactant_overlay function Krang.emission_radius(pix::Krang.AbstractPixel, τ)
     met = metric(pix)
     a = met.spin
@@ -1513,7 +1404,7 @@ Reactant.@reactant_overlay function Krang.emission_radius(pix::Krang.AbstractPix
 
     rh = one(T) + √(one(T) - a^2)
 
-    numreals = sum(_isreal2, roots(pix))
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots(pix))
 
     @trace if numreals == 4 #case 1 & 2
         ans, νr, issuccess = _rs_case1_and_2(pix, rh, τ)
@@ -1729,7 +1620,7 @@ function _reactant_slow_light_intensity_pixel(met::Krang.Kerr, α, β, θo)
     tempλ = Krang.λ(met, α, θo)
     roots = Krang.get_radial_roots(met, tempη, tempλ)
     r1, r2, r3, r4 = roots
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
 
     roots = Base.ifelse(
         (numreals == 2) & (abs(imag(r4)) < sqrt(eps(TT))),
@@ -1774,7 +1665,7 @@ function _reactant_intensity_pixel(met::Krang.Kerr, α, β, θo)
     roots = zeros(Complex{typeof(tempλ)}, 4)
     roots = get_radial_roots(met, tempη, tempλ)
     r1, r2, r3, r4 = roots
-    numreals = sum(_isreal2, roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
 
     roots = Base.ifelse(
         (numreals == 2) & (abs(imag(r4)) < sqrt(eps(TT))),

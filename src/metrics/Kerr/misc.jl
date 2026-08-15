@@ -20,7 +20,7 @@ Checks if a complex number is real to within √eps of its own magnitude
 """
 function _isreal2(num)
     T = typeof(real(num))
-    return 0 + (abs2(imag(num)) <= eps(T) * max(abs2(num), one(T)))
+    return (abs2(imag(num)) <= eps(T) * max(abs2(num), one(T)))
 end
 
 """
@@ -304,16 +304,15 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     r3 = (sqrtξ02 - det2) / 2
     r4 = (sqrtξ02 + det2) / 2
 
-    roots = (r1, r2, r3, r4)
     # All case-3 formulas assume that the two real roots precede the complex
     # conjugate pair.  Near a branch boundary the quartic formula can instead
     # return them in slots 1 and 4, which makes products such as
     # (r3 - r2) * (r4 - r2) spuriously negative after taking `real`.
-    root_is_real = _isreal2.(roots)
-    if root_is_real == (1, 0, 0, 1)
+    roots = (r1, r2, r3, r4)
+    if _isreal2(r1) && _isreal2(r4) && !_isreal2(r2) && !_isreal2(r3)
         # Keep the conventional orientation of the conjugate pair as well:
         # positive imaginary part in slot 3 and negative in slot 4.
-        roots = (roots[1], roots[4], roots[3], roots[2])
+        roots = (r1, r4, r2, r3)
     end
     return roots
 end
