@@ -19,6 +19,21 @@ Abstract Pixel Type
 """
 abstract type AbstractPixel end
 
+function _build_screen(
+    pixel_type,
+    met,
+    αmin,
+    αmax,
+    βmin,
+    βmax,
+    θo,
+    res,
+)
+    αvals = range(αmin, αmax, length = res)
+    βvals = range(βmin, βmax, length = res)
+    return [pixel_type(met, α, β, θo) for α in αvals, β in βvals]
+end
+
 """
     screen_coordinate(pix::AbstractPixel)
 
