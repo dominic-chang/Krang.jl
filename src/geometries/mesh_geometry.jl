@@ -1,13 +1,9 @@
-export load, translate, scale, rotate, MeshGeometry
+export translate, scale, rotate, MeshGeometry
 
 @doc """
-    Load a mesh from a file.
+    MeshGeometry(mesh::GeometryBasics.Mesh)
     
-    # Arguments
-    - `filename::String`: The path to the file containing the mesh.
-    
-    # Returns
-    - A `Mesh` object representing the mesh.
+Wrap a `GeometryBasics.Mesh` for ray tracing.
 """
 struct MeshGeometry <: AbstractGeometry
     geometryBasicsMesh::GeometryBasics.Mesh

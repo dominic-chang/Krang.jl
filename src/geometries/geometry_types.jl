@@ -31,6 +31,8 @@ function add(scene::Scene, mesh::Mesh)
     return (scene..., mesh)
 end
 
+Rotations.:⊕(scene::Scene, mesh::Mesh) = add(scene, mesh)
+
 """
     $TYPEDEF
 
@@ -85,4 +87,4 @@ end
 end
 
 
-Disk(; attributes = nothing) = ConeGeometry(π / 2; attributes = attributes)
+Disk(; attributes = nothing) = ConeGeometry(π / 2, attributes)

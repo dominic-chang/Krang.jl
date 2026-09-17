@@ -1,4 +1,16 @@
 @testset "Mesh Geometry Manipulation" begin
+    struct GeometryTestMaterial <: Krang.AbstractMaterial end
+
+    disk = Krang.Disk()
+    attributed_disk = Krang.Disk(attributes = (name = :disk,))
+    mesh = Krang.Mesh(disk, GeometryTestMaterial())
+    append_scene = getfield(Krang, Symbol("⊕"))
+
+    @test disk.attributes === nothing
+    @test attributed_disk.attributes == (name = :disk,)
+    @test append_scene(Krang.Scene(), mesh) == Krang.add(Krang.Scene(), mesh)
+    @test :load ∉ names(Krang)
+
     bunny = FileIO.load(
         Downloads.download(
             "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",

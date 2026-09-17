@@ -1,4 +1,34 @@
 @testset "Raytracer Functions" begin
+    @testset "Generate ray" begin
+        for T in (Float32, Float64)
+            pixel = Krang.IntensityPixel(Krang.Kerr(T(0.5)), T(4), T(4), T(0.5))
+            ray = Krang.generate_ray(pixel, 2)
+
+            @test ray isa Vector{Krang.Intersection{T}}
+            @test length(ray) == 2
+        end
+    end
+
+    @testset "Threaded rendering" begin
+        struct ThreadedTestMaterial <: Krang.AbstractMaterial
+            weight::Float64
+        end
+        (material::ThreadedTestMaterial)(pixel, geometry::Krang.ConeGeometry) =
+            material.weight
+
+        camera = Krang.IntensityCamera(Krang.Kerr(0.5), 0.5, -1.0, 1.0, -1.0, 1.0, 2)
+        scene = (
+            Krang.Mesh(Krang.ConeGeometry(0.2), ThreadedTestMaterial(1.0)),
+            Krang.Mesh(Krang.ConeGeometry(0.4), ThreadedTestMaterial(2.0)),
+        )
+        store = zeros(2, 2)
+
+        rendered = Krang.render_cpu_threaded!(store, camera, scene)
+
+        @test rendered === store
+        @test store == fill(3.0, 2, 2)
+    end
+
     @testset "Boyer-Lindquist to Kerr-Schild transformations" begin
         met = Krang.Kerr(0.99)
         rs = 1e10
