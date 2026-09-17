@@ -19,7 +19,8 @@ function generate_ray!(
 end
 
 function generate_ray(pixel::AbstractPixel, res::Int)
-    ray = Vector{Intersection}(undef, res)#zeros(T, 3, res)
+    T = typeof(metric(pixel).spin)
+    ray = Vector{Intersection{T}}(undef, res)
     generate_ray!(ray, pixel, res)
     return ray
 end
