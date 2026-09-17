@@ -73,7 +73,11 @@ end
     )
 end
 
-Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr{T1}, η::T2, λ::T3) where {T1, T2, T3}
+Reactant.@reactant_overlay function Krang.get_radial_roots(
+    metric::Krang.Kerr{T1},
+    η::T2,
+    λ::T3,
+) where {T1,T2,T3}
     T = promote_type(T1, T2, T3)
     a = metric.spin
 
@@ -513,7 +517,7 @@ Reactant.@reactant_overlay function Krang.radial_inf_integrals(met::Krang.Kerr, 
     func1 = radial_inf_integrals_case2
     func2 = radial_inf_integrals_case3
     func3 = radial_inf_integrals_case4
-    numreals = sum(x->Base.ifelse(_isreal2(x) , 1 , 0), roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     Reactant.@trace if numreals == 4
         result = func1(met, roots)
     elseif numreals == 2

@@ -115,14 +115,14 @@
             ]
                 @testset "θs:$θs" for θs in
                                       [π / 5, π / 4, π / 3, π / 2, 2π / 3, 3π / 4, 4π / 5]
-                    θo = π/4.1;
-                    ρmax = 7.0;
-                    sze = 400;
-                    rmax = 1000.0; # maximum radius to be ray traced
+                    θo = π/4.1
+                    ρmax = 7.0
+                    sze = 400
+                    rmax = 1000.0 # maximum radius to be ray traced
 
                     pixels = Vector{Krang.AbstractPixel}(undef, 3)
 
-                    cam = fcam(met, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+                    cam = fcam(met, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
                     geometries =
                         (Krang.ConeGeometry(θs, (i, Krang.horizon(met), rmax)) for i = 0:2)
 

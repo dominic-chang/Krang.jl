@@ -336,7 +336,7 @@
                 end
                 @testset "radial_inf_integrals_case4 Im" begin
                     # direct Im check vs adaptive numerical integration
-                    rp = 1 + √(1 - a^2);
+                    rp = 1 + √(1 - a^2)
                     rm = 1 - √(1 - a^2)
                     _, _, _, Im_anal = Krang.radial_inf_integrals_case4(met, roots)
                     _, _, _, Im_s =
