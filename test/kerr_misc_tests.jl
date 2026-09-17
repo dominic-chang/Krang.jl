@@ -28,6 +28,26 @@
         @test isfinite(pix.I0_inf)
     end
 
+    @testset "Case-3 roots keep real roots first" begin
+        # Regression for a branch-boundary pixel where the closed-form quartic
+        # solver used to return the real roots in slots 1 and 4.
+        met = Kerr(0.94)
+        θo = deg2rad(65.0)
+        α = -1.4666666666666666
+        β = 0.0
+        roots = get_radial_roots(met, η(met, α, β, θo), λ(met, α, θo))
+
+        @test Krang._isreal2.(roots) == (1, 1, 0, 0)
+        @test imag(roots[3]) >= 0
+        @test roots[3] ≈ conj(roots[4])
+        _, r31, r32, r41, r42, _ = Krang._get_root_diffs(roots...)
+        @test real(r32 * r42) >= 0
+        @test real(r31 * r41) >= 0
+        @test abs2(r32) ≈ real(r32 * r42)
+        @test abs2(r31) ≈ real(r31 * r41)
+        @test_nowarn Krang.SlowLightIntensityPixel(met, α, β, θo)
+    end
+
 
     @testset "Radial Integrals 1" begin
         a = 0.99

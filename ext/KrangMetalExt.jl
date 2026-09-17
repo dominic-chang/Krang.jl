@@ -51,7 +51,7 @@ function Krang.get_radial_roots(metric::Krang.Kerr{T}, η::T, λ::T) where {T<:F
 
     roots = (r1, r2, r3, r4)
     if (sum(Krang._isreal2, roots) == 2) && (abs(imag(roots[4])) < sqrt(eps(T)))
-        roots = (roots[1], roots[4], roots[2], roots[3])
+        roots = (roots[1], roots[4], roots[3], roots[2])
     end
     return roots
 end

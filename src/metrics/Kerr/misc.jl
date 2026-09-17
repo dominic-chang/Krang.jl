@@ -312,7 +312,7 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     if _isreal2(r1) && _isreal2(r4) && !_isreal2(r2) && !_isreal2(r3)
         # Keep the conventional orientation of the conjugate pair as well:
         # positive imaginary part in slot 3 and negative in slot 4.
-        roots = (r1, r4, r2, r3)
+        roots = (r1, r4, r3, r2)
     end
     return roots
 end
