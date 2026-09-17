@@ -33,14 +33,9 @@ end
 
 function render_cpu_threaded!(store, camera::AbstractCamera, scene::Scene)
     @assert size(store) == size(camera.screen.pixels)
-    mapreduce(
-        mesh -> begin
-            Threads.@threads for I in CartesianIndices(camera.screen.pixels)
-                store[I] = mesh.material(camera.screen.pixels[I], mesh.geometry)
-            end
-            store
-        end,
-        +,
-        scene,
-    )
+    Threads.@threads for I in CartesianIndices(camera.screen.pixels)
+        pixel = camera.screen.pixels[I]
+        store[I] = sum(mesh.material(pixel, mesh.geometry) for mesh in scene)
+    end
+    return store
 end
