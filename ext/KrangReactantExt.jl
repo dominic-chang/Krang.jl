@@ -779,7 +779,7 @@ function _reactant_Gθ_nonvortical_minotime(
     return τ, validi
 end
 
-function _reactant_Gϕ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
+function _reactant_Gϕ_minotime(pix::Krang.AbstractPixel, θs, isindir, n)
     α, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
@@ -1205,7 +1205,7 @@ Reactant.@reactant_overlay function Krang.emission_inclination(pix::Krang.Abstra
     return _reactant_θs(met, sign(β), θo, Krang.η(pix), Krang.λ(pix), τ)
 end
 
-function _reactant_Gθ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
+function _reactant_Gθ_minotime(pix::Krang.AbstractPixel, θs, isindir, n)
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
@@ -1718,5 +1718,89 @@ end
 #        return _reactant_intensity_pixel(met, α, β, θo)
 #    end
 #end
+
+
+# Fast-light emission coordinates for any pixel type, with the same semantics as
+# Krang.emission_coordinates_fast_light(pix, θs, isindir, n): the in-cone test and the βboundary
+# blocking (applied only outside the cone, for either hemisphere) follow the fast-light source, which
+# differs from the slow-light overlay above for θs > π/2. Everything is evaluated unconditionally and
+# masked with issuccess; failed rays return zeros like the CPU version.
+Reactant.@reactant_overlay function Krang.emission_coordinates_fast_light(
+    pix::Krang.AbstractPixel,
+    θs,
+    isindir,
+    n,
+)
+    α, β = screen_coordinate(pix)
+    met = metric(pix)
+    θo = inclination(pix)
+    TT = typeof(met.spin)
+    πT = TT(Base.pi)
+
+    isincone = ((θo <= θs) & (θs <= πT - θo)) | (((πT - θo) <= θs) & (θs <= θo))
+    αmin = αboundary(met, θs)
+    βbound = Base.ifelse(abs(α) >= (αmin + eps(TT)), βboundary(met, α, θo, θs), zero(TT))
+    blocked = (!isincone) & ((abs(β) + eps(TT)) < βbound)
+
+    τ, τvalid = _reactant_Gθ_minotime(pix, θs, isindir, n)
+    rs, νr, _, rssuccess = Krang.emission_radius(pix, τ)
+
+    a = met.spin
+    λtemp = Krang.λ(pix)
+    _, _, _, Ip, Im = Krang.radial_integrals(pix, rs, τ, νr)
+    rp = one(TT) + √(one(TT) - a^2)
+    rm = one(TT) - √(one(TT) - a^2)
+    Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
+    Gϕtemp, Gϕvalid = _reactant_Gϕ_minotime(pix, θs, isindir, n)
+    ϕs = Iϕ + λtemp * Gϕtemp
+
+    νθ = Base.ifelse(isincone, (θo > θs) ⊻ (n % 2 == 1), !isindir)
+    issuccess = (!blocked) & τvalid & rssuccess & Gϕvalid & !isnan(τ)
+
+    r = Base.ifelse(issuccess, rs, zero(TT))
+    ϕ = Base.ifelse(issuccess, ϕs, zero(TT))
+    νr = Base.ifelse(issuccess, νr, false)
+    νθ = Base.ifelse(issuccess, νθ, false)
+    return r, ϕ, νr, νθ, issuccess
+end
+
+# Branch-free versions of the Bool-signed momentum and the Kerr–Schild azimuth.
+Reactant.@reactant_overlay function Krang.p_bl_d(metric::Krang.Kerr{T}, r, θ, η, λ, νr, νθ) where {T}
+    return Krang.@SVector[
+        -one(T),
+        Base.ifelse(νr, one(T), -one(T)) * √max(zero(T), Krang.r_potential(metric, η, λ, r)) / Krang.Δ(metric, r),
+        Base.ifelse(νθ, one(T), -one(T)) * √max(zero(T), Krang.θ_potential(metric, η, λ, θ)),
+        λ,
+    ]
+end
+
+Reactant.@reactant_overlay function Krang.ϕ_kerr_schild(metric::Krang.Kerr{T}, rBL, ϕBL) where {T}
+    a = metric.spin
+    temp = sqrt(1 - a^2)
+    rp = 1 + temp
+    rm = 1 - temp
+    num = rBL - rp + eps(T)
+    den = rBL - rm + eps(T)
+    term1 = a / (2temp) * log(abs(num / den))
+    term2 = -atan(a, rBL)
+    ans = ϕBL + term1 + term2
+    return Base.ifelse(isinf(ans), ϕBL + term2, ans)
+end
+
+# tan/cot-free versions: Enzyme-MLIR has no adjoint for stablehlo.tan (needed for gradients).
+Reactant.@reactant_overlay function Krang.θ_potential(metric::Krang.Kerr, η, λ, θ)
+    a = metric.spin
+    sθ, cθ = sin(θ), cos(θ)
+    return η + a^2 * cθ^2 - λ^2 * (cθ / sθ)^2
+end
+
+Reactant.@reactant_overlay function Krang.S2(α, φ, j)
+    sφ, cφ = sin(φ), cos(φ)
+    return -inv((1 + α^2) * (1 - j + α^2)) * (
+        (1 - j) * JacobiElliptic.F(φ, j) +
+        α^2 * JacobiElliptic.E(φ, j) +
+        α^2 * √(1 - j * sφ^2) * (α * cφ - sφ) / (cφ + α * sφ) - α^3
+    ) + (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * Krang.S1(α, φ, j)
+end
 
 end
