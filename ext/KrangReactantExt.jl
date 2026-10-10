@@ -1776,8 +1776,10 @@ Reactant.@reactant_overlay function Krang.p_bl_d(
 ) where {T}
     return Krang.@SVector[
         -one(T),
-        Base.ifelse(νr, one(T), -one(T)) * √max(zero(T), Krang.r_potential(metric, η, λ, r)) / Krang.Δ(metric, r),
-        Base.ifelse(νθ, one(T), -one(T)) * √max(zero(T), Krang.θ_potential(metric, η, λ, θ)),
+        Base.ifelse(νr, one(T), -one(T)) *
+        √max(zero(T), Krang.r_potential(metric, η, λ, r)) / Krang.Δ(metric, r),
+        Base.ifelse(νθ, one(T), -one(T)) *
+        √max(zero(T), Krang.θ_potential(metric, η, λ, θ)),
         λ,
     ]
 end
