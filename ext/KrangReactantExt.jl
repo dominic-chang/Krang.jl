@@ -1774,7 +1774,11 @@ Reactant.@reactant_overlay function Krang.p_bl_d(metric::Krang.Kerr{T}, r, θ, �
     ]
 end
 
-Reactant.@reactant_overlay function Krang.ϕ_kerr_schild(metric::Krang.Kerr{T}, rBL, ϕBL) where {T}
+Reactant.@reactant_overlay function Krang.ϕ_kerr_schild(
+    metric::Krang.Kerr{T},
+    rBL,
+    ϕBL,
+) where {T}
     a = metric.spin
     temp = sqrt(1 - a^2)
     rp = 1 + temp
