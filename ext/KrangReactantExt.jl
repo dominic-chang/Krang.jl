@@ -1765,7 +1765,15 @@ Reactant.@reactant_overlay function Krang.emission_coordinates_fast_light(
 end
 
 # Branch-free versions of the Bool-signed momentum and the Kerr–Schild azimuth.
-Reactant.@reactant_overlay function Krang.p_bl_d(metric::Krang.Kerr{T}, r, θ, η, λ, νr, νθ) where {T}
+Reactant.@reactant_overlay function Krang.p_bl_d(
+    metric::Krang.Kerr{T},
+    r,
+    θ,
+    η,
+    λ,
+    νr,
+    νθ,
+) where {T}
     return Krang.@SVector[
         -one(T),
         Base.ifelse(νr, one(T), -one(T)) * √max(zero(T), Krang.r_potential(metric, η, λ, r)) / Krang.Δ(metric, r),
