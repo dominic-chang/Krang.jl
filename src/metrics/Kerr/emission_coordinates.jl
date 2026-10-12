@@ -48,6 +48,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
 
     ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
+    issuccess || return err_return
     return ans, νr, νθ, numreals, issuccess
 end
 

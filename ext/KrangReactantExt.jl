@@ -109,14 +109,8 @@ Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr{T1
     r3 = (sqrtξ02 - det2) / 2
     r4 = (sqrtξ02 + det2) / 2
 
-    #numreals = sum(_isreal2, (r1, r2, r3, r4))
     check = _isreal2(r1) & _isreal2(r4) & !_isreal2(r2) & !_isreal2(r3)
-    return ((
-        r1,
-        Base.ifelse(check, r4, r2),
-        Base.ifelse(check, r2, r3),
-        Base.ifelse(check, r3, r4),
-    ))
+    return ((r1, Base.ifelse(check, r4, r2), r3, Base.ifelse(check, r2, r4)))
 end
 
 Reactant.@reactant_overlay function Krang.Ir_inf(metric::Krang.Kerr, roots)
@@ -1285,7 +1279,7 @@ Reactant.@reactant_overlay function Krang._rs_case1_and_2(pix::Krang.AbstractPix
     fo = I0_inf(pix)
     X2 = √(r31 * r42) * (fo - τ) / 2
 
-    return_vals = (T(Inf), false, false)
+    return_vals = (zero(T), false, false)
     @trace if !(((r4 < rh) & (τ > (fo - Ir_s))) | (τ > 2fo))# invalid case2
         sn = r41 * ellsn(X2, k)^2
         return_vals = (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
@@ -1311,7 +1305,7 @@ Reactant.@reactant_overlay function Krang._rs_case3(pix::Krang.AbstractPixel, rh
     Ir_s = coef * ellF((acos(x3_s)), k)
     X3 = √(A * B) * real(fo - τ)
 
-    return_vals = (T(Inf), false, false)
+    return_vals = (zero(T), false, false)
     @trace if !((X3 < zero(T)) | (τ > (fo - Ir_s)))
         cn = ellcn(X3, k)
         num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
@@ -1340,7 +1334,7 @@ Reactant.@reactant_overlay function Krang._rs_case4(pix::Krang.AbstractPixel, rh
     Ir_s = coef * ellF(atan(x4_s) + atan(go), k4)
     fo = I0_inf(pix)
 
-    return_vals = (T(Inf), false, false)
+    return_vals = (zero(T), false, false)
     @trace if !(τ > (fo - Ir_s))
         X4 = (C + D) / T(2) * (fo - τ)
         num = go - ellsc(X4, k4)
@@ -1615,18 +1609,9 @@ Reactant.@reactant_overlay function Krang._raytrace(
 end
 
 function _reactant_slow_light_intensity_pixel(met::Krang.Kerr, α, β, θo)
-    TT = typeof(met.spin)
     tempη = Krang.η(met, α, β, θo)
     tempλ = Krang.λ(met, α, θo)
     roots = Krang.get_radial_roots(met, tempη, tempλ)
-    r1, r2, r3, r4 = roots
-    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
-
-    roots = Base.ifelse(
-        (numreals == 2) & (abs(imag(r4)) < sqrt(eps(TT))),
-        (r1, r4, r2, r3),
-        roots,
-    )
 
     I1, I2, Ip, Im = Krang.radial_inf_integrals(met, roots)
     I0_inf = Krang.Ir_inf(met, roots)
@@ -1659,19 +1644,9 @@ function _reactant_slow_light_intensity_pixel(met::Krang.Kerr, α, β, θo)
 end
 
 function _reactant_intensity_pixel(met::Krang.Kerr, α, β, θo)
-    TT = typeof(met.spin)
     tempη = Krang.η(met, α, β, θo)
     tempλ = Krang.λ(met, α, θo)
-    roots = zeros(Complex{typeof(tempλ)}, 4)
     roots = get_radial_roots(met, tempη, tempλ)
-    r1, r2, r3, r4 = roots
-    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
-
-    roots = Base.ifelse(
-        (numreals == 2) & (abs(imag(r4)) < sqrt(eps(TT))),
-        (r1, r4, r2, r3),
-        roots,
-    )
 
     I0_inf = Krang.Ir_inf(met, roots)
     τ_total = Krang.total_mino_time(met, roots)

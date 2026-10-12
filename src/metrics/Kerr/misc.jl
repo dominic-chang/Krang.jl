@@ -1598,7 +1598,7 @@ end
     if (rh == r3)
         rh += eps(T)
     end
-    err_return = (T(Inf), false, false)
+    err_return = (zero(T), false, false)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
     Ir_s = !(x2_s < 1) ? zero(T) : coef * JacobiElliptic.F(asin(x2_s), k)
@@ -1621,7 +1621,7 @@ end
     r21, r31, r32, r41, r42, _ = _get_root_diffs(radial_roots...)
     r1, r2, r21 = real.((r1, r2, r21))
 
-    err_return = (T(Inf), false, false)
+    err_return = (zero(T), false, false)
     fo = I0_inf(pix)
     A = √abs2(r32)
     B = √abs2(r31)
@@ -1661,7 +1661,7 @@ end
     Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
 
     fo = I0_inf(pix)
-    τ > (fo - Ir_s) && return (T(Inf), false, false)
+    τ > (fo - Ir_s) && return (zero(T), false, false)
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
