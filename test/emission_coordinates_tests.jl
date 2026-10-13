@@ -115,14 +115,14 @@
             ]
                 @testset "θs:$θs" for θs in
                                       [π / 5, π / 4, π / 3, π / 2, 2π / 3, 3π / 4, 4π / 5]
-                    θo = π/4.1;
-                    ρmax = 7.0;
-                    sze = 400;
-                    rmax = 1000.0; # maximum radius to be ray traced
+                    θo = π/4.1
+                    ρmax = 7.0
+                    sze = 400
+                    rmax = 1000.0 # maximum radius to be ray traced
 
                     pixels = Vector{Krang.AbstractPixel}(undef, 3)
 
-                    cam = fcam(met, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
+                    cam = fcam(met, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
                     geometries =
                         (Krang.ConeGeometry(θs, (i, Krang.horizon(met), rmax)) for i = 0:2)
 
@@ -272,4 +272,41 @@
             end
         end
     end
+end
+
+@testset "Emission radius failure sentinel" begin
+    # When the emission coordinate does not exist, the documented convention is to return
+    # zeros plus `issuccess = false` (never a non-finite radius), so the result stays
+    # Enzyme-differentiable and matches the branch-free Reactant/Metal paths.
+    θs = π / 2
+    bad_θs_form = Tuple[]
+    bad_τ_form = Tuple[]
+    for a in (0.0, 0.5, 0.94, 0.99),
+        θo in (5π / 180, 45π / 180, 85π / 180),
+        isindir in (false, true),
+        n in (0, 1, 2)
+
+        met = Krang.Kerr(a)
+        for α in range(-10.0, 10.0, length = 12), β in range(-10.0, 10.0, length = 12)
+            for pix in (
+                Krang.SlowLightIntensityPixel(met, α, β, θo),
+                Krang.IntensityPixel(met, α, β, θo),
+            )
+                rs, νr, νθ, numreals, issuccess = Krang.emission_radius(pix, θs, isindir, n)
+                ok =
+                    issuccess ? isfinite(rs) :
+                    (rs, νr, νθ, numreals) == (zero(rs), true, true, 0)
+                ok || push!(bad_θs_form, (a, θo, isindir, n, α, β, rs, issuccess))
+
+                # the Mino-time overload shares the same `_rs_case*` helpers
+                for τ in (0.1, 1.0, 5.0)
+                    rsτ, _, _, okτ = Krang.emission_radius(pix, τ)
+                    (okτ ? isfinite(rsτ) : rsτ == zero(rsτ)) ||
+                        push!(bad_τ_form, (a, θo, α, β, τ, rsτ, okτ))
+                end
+            end
+        end
+    end
+    @test isempty(bad_θs_form)
+    @test isempty(bad_τ_form)
 end

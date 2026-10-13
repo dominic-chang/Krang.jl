@@ -1,79 +1,11 @@
-module KrangReactantExt
-#include("SlowLightIntensityPixel.jl")
+# metrics/Kerr/misc.jl
+# Reactant specialisations mirroring the corresponding file in `src/`.
 
-using Krang
-import Krang.JacobiElliptic as JacobiElliptic
-using Reactant
-import Reactant: TracedRNumber
-
-
-types = (TracedRNumber, Any)
-Ts = Union{TracedRNumber,Any}
-_isreal2 = Krang._isreal2
-Ir_inf = Krang.Ir_inf
-horizon = Krang.horizon
-Ir_s = Krang.Ir_s
-Iϕ_inf_case2 = Krang.Iϕ_inf_case2
-Iϕ_inf_case3 = Krang.Iϕ_inf_case3
-Iϕ_inf_case4 = Krang.Iϕ_inf_case4
-It_inf_case2 = Krang.It_inf_case2
-It_inf_case3 = Krang.It_inf_case3
-It_inf_case4 = Krang.It_inf_case4
-radial_inf_integrals_case2 = Krang.radial_inf_integrals_case2
-radial_inf_integrals_case3 = Krang.radial_inf_integrals_case3
-radial_inf_integrals_case4 = Krang.radial_inf_integrals_case4
-radial_w_I0_terms_integrals_case2 = Krang.radial_w_I0_terms_integrals_case2
-radial_w_I0_terms_integrals_case3 = Krang.radial_w_I0_terms_integrals_case3
-radial_w_I0_terms_integrals_case4 = Krang.radial_w_I0_terms_integrals_case4
-_get_root_diffs = Krang._get_root_diffs
-screen_coordinate = Krang.screen_coordinate
-metric = Krang.metric
-inclination = Krang.inclination
-roots = Krang.roots
-I0_inf = Krang.I0_inf
-absGθo_Gθhat = Krang.absGθo_Gθhat
-αboundary = Krang.αboundary
-βboundary = Krang.βboundary
-Intersection = Krang.Intersection
-R1 = Krang.R1
-R2 = Krang.R2
-S1 = Krang.S1
-S2 = Krang.S2
-regularized_Pi = Krang.regularized_Pi
-regularized_R1 = Krang.regularized_R1
-regularized_R2 = Krang.regularized_R2
-regularizedS1 = Krang.regularizedS1
-regularizedS2 = Krang.regularizedS2
-ellF = JacobiElliptic.F
-ellK = JacobiElliptic.K
-ellPi = JacobiElliptic.Pi
-ellsn = JacobiElliptic.sn
-ellcn = JacobiElliptic.cn
-ellsc = JacobiElliptic.sc
-_rs_case1_and_2 = Krang._rs_case1_and_2
-_rs_case3 = Krang._rs_case3
-_rs_case4 = Krang._rs_case4
-
-@inline _ellE(m) = JacobiElliptic.E(m)
-@inline _ellE(φ, m) = JacobiElliptic.E(φ, m)
-
-function _regularize_zero(x, ::Type{T}) where {T}
-    return Base.ifelse(x == zero(T), eps(T), x)
-end
-
-function _regularize_equal(x, y, ::Type{T}) where {T}
-    return Base.ifelse(x == y, x + eps(T), x)
-end
-
-@inline function _argmax_real3(x1, x2, x3)
-    return Base.ifelse(
-        real(x1) >= real(x2),
-        Base.ifelse(real(x1) >= real(x3), x1, x3),
-        Base.ifelse(real(x2) >= real(x3), x2, x3),
-    )
-end
-
-Reactant.@reactant_overlay function Krang.get_radial_roots(metric::Krang.Kerr{T1}, η::T2, λ::T3) where {T1, T2, T3}
+Reactant.@reactant_overlay function Krang.get_radial_roots(
+    metric::Krang.Kerr{T1},
+    η::T2,
+    λ::T3,
+) where {T1,T2,T3}
     T = promote_type(T1, T2, T3)
     a = metric.spin
 
@@ -507,7 +439,7 @@ Reactant.@reactant_overlay function Krang.radial_inf_integrals(met::Krang.Kerr, 
     func1 = radial_inf_integrals_case2
     func2 = radial_inf_integrals_case3
     func3 = radial_inf_integrals_case4
-    numreals = sum(x->Base.ifelse(_isreal2(x) , 1 , 0), roots)
+    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
     Reactant.@trace if numreals == 4
         result = func1(met, roots)
     elseif numreals == 2
@@ -734,8 +666,11 @@ function _reactant_Gθ_vortical_minotime(
     )
     τ = Base.ifelse(invalid, zero(Go), τcand)
     validi = Base.ifelse(invalid, zero(Go), one(Go))
+    # On the vortical failure path `Krang.Gθ` returns the *cached* Go/Ghat, not zeros.
+    Gs_out = Base.ifelse(invalid, zero(Go), Gs)
+    Go_out = Base.ifelse(invalid, Go, Go2)
 
-    return τ, validi
+    return τ, Gs_out, Go_out, Ghat, validi
 end
 
 function _reactant_Gθ_nonvortical_minotime(
@@ -769,8 +704,12 @@ function _reactant_Gθ_nonvortical_minotime(
     )
     τ = Base.ifelse(invalid, zero(Go), τcand)
     validi = Base.ifelse(invalid, zero(Go), one(Go))
+    # Unlike the vortical branch, `Krang.Gθ` zeroes Go/Ghat when this one fails.
+    Gs_out = Base.ifelse(invalid, zero(Go), Gs)
+    Go_out = Base.ifelse(invalid, zero(Go), Go)
+    Ghat_out = Base.ifelse(invalid, zero(Ghat), Ghat)
 
-    return τ, validi
+    return τ, Gs_out, Go_out, Ghat_out, validi
 end
 
 function _reactant_Gϕ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
@@ -905,11 +844,6 @@ function _reactant_Gt_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir,
     validi = Base.ifelse(bad, zero(TT), validi)
 
     return ans, validi > zero(TT)
-end
-
-@inline function _reactant_isapprox(x, y, ::Type{T}) where {T}
-    rtol = sqrt(eps(T))
-    return abs(x - y) <= rtol * max(abs(x), abs(y))
 end
 
 Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals(
@@ -1119,87 +1053,16 @@ Reactant.@reactant_overlay function Krang.radial_integrals(
     return τ, I1_o - I1_s, I2_o - I2_s, Ip_o - Ip_s, Im_o - Im_s
 end
 
-function _reactant_θs(metric::Krang.Kerr, signβ, θo, η, λ, τ)
-    T = typeof(metric.spin)
-    a = metric.spin
-    Ghat_2 = zero(T)
-    isvortical = η < zero(T)
+"""
+Branch-free counterpart of `Krang.Gθ`, returning the same six values:
+`(minotime, Gs, Go, Ghat, isvortical, issuccess)`.
 
-    Δθ = (one(T) - (η + λ^2) / a^2) / T(2)
-    dsc = √(Δθ^2 + η / a^2)
-    up = Δθ + dsc
-    um = Δθ - dsc
-    m = up / um
-
-    ans = zero(T)
-    argo = zero(T)
-    τs = zero(T)
-    τo = zero(T)
-    τhat = zero(T)
-    n = zero(Int)
-    isindir = false
-    tempfac = inv(√abs(um * a^2))
-
-    Reactant.@trace if isvortical
-        k = one(T) - m
-        argo = clamp((cos(θo)^2 - um) / (up - um), zero(T), one(T))
-        τo = tempfac * ellF(asin(√argo), k)
-        Ghat_2 = tempfac * ellK(k)
-        τhat = 2 * Ghat_2
-        Δτtemp =
-            mod(τ, τhat) + Base.ifelse(θo > T(Base.pi / 2), -one(T), one(T)) * signβ * τo
-        n = unsafe_trunc(Int, τ / τhat)
-        cand1 = τhat - Δτtemp
-        cand2 = Δτtemp
-        absτs = abs(Base.ifelse(abs(cand1) <= abs(cand2), cand1, cand2))
-        τs = Base.ifelse(θo > T(Base.pi / 2), -one(T), one(T)) * absτs
-        argr = ellsn(absτs / tempfac, k)^2
-        ans = acos(
-            Base.ifelse(θo > T(Base.pi / 2), -one(T), one(T)) * √((up - um) * argr + um),
-        )
-        signo = Base.ifelse(ans > T(Base.pi / 2), -one(T), one(T))
-        τo = signo * τo
-    else
-        k = m
-        argo = clamp(cos(θo) / √up, -one(T), one(T))
-        τo = tempfac * ellF(asin(argo), k)
-        Ghat_2 = tempfac * ellK(k)
-        τhat = Ghat_2 + Ghat_2
-        Δτtemp = mod(τ, τhat) + signβ * τo
-        n = unsafe_trunc(Int, τ / τhat)
-        signo = Base.ifelse(n % 2 == 1, -one(T), one(T))
-        cand1 = signo * signβ * (τhat - Δτtemp)
-        cand2 = signo * signβ * Δτtemp
-        τs = Base.ifelse(abs(cand1) <= abs(cand2), cand1, cand2)
-        newargs = ellsn(τs / tempfac, k)
-        ans = acos(√up * newargs)
-    end
-
-    isincone = abs(cos(ans)) < abs(cos(θo))
-    τ1 = zero(T)
-    Reactant.@trace if isincone
-        νθ = (n % 2 == 1) ⊻ (θo > ans)
-        τ1 = (n + 1) * τhat - signβ * τo + Base.ifelse(νθ, one(T), -one(T)) * τs
-        isindir = _reactant_isapprox(τ1, τ, T)
-    elseif ans < T(Base.pi / 2)
-        τ1 = (n + 1) * τhat - signβ * τo - τs
-        isindir = _reactant_isapprox(τ1, τ, T)
-    else
-        τ1 = (n + 1) * τhat - signβ * τo + τs
-        isindir = _reactant_isapprox(τ1, τ, T)
-    end
-
-    return ans, τs, τo, τhat, n, isindir
-end
-
-Reactant.@reactant_overlay function Krang.emission_inclination(pix::Krang.AbstractPixel, τ)
-    met = metric(pix)
-    θo = inclination(pix)
-    _, β = screen_coordinate(pix)
-    return _reactant_θs(met, sign(β), θo, Krang.η(pix), Krang.λ(pix), τ)
-end
-
-function _reactant_Gθ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
+Both the vortical and non-vortical branches are evaluated and selected with `ifelse`, and the
+`bad` angular gate is applied last so it wins, matching the order of the early returns in the
+CPU implementation. The failure values are not uniform there: the angular gate and the vortical
+branch hand back the *cached* `Go`/`Ghat`, while the non-vortical branch zeroes them.
+"""
+function _reactant_Gθ_full(pix::Krang.AbstractPixel, θs, isindir, n)
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
@@ -1215,14 +1078,12 @@ function _reactant_Gθ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir
     isincone = abs(cos(θs)) < abs(cos(θo))
     bad = _reactant_bad_angular_branch(signβ, θs, θo, isindir, n, isvortical, isincone, TT)
 
-    τ = zero(Go)
-    valid = true
     Δθ = (one(TT) - (ηtemp + λtemp^2) / a2) / TT(2)
     desc = √(Δθ^2 + ηtemp / a2)
     up = min(Δθ + desc, one(TT) - eps(TT))
     um = Δθ - desc
     m = up / um
-    τvort, validvort = _reactant_Gθ_vortical_minotime(
+    τvort, Gsvort, Govort, Ghatvort, validvort = _reactant_Gθ_vortical_minotime(
         Go,
         Ghat,
         θs,
@@ -1237,7 +1098,7 @@ function _reactant_Gθ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir
         isincone,
         TT,
     )
-    τnon, validnon = _reactant_Gθ_nonvortical_minotime(
+    τnon, Gsnon, Gonon, Ghatnon, validnon = _reactant_Gθ_nonvortical_minotime(
         Go,
         Ghat,
         θs,
@@ -1253,12 +1114,29 @@ function _reactant_Gθ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir
         TT,
     )
     τcandidate = Base.ifelse(isvortical, τvort, τnon)
+    Gscandidate = Base.ifelse(isvortical, Gsvort, Gsnon)
+    Gocandidate = Base.ifelse(isvortical, Govort, Gonon)
+    Ghatcandidate = Base.ifelse(isvortical, Ghatvort, Ghatnon)
     validi = Base.ifelse(isvortical, validvort, validnon)
+
+    # The angular gate returns the cached Go/Ghat with everything else zeroed.
     τ = Base.ifelse(bad, zero(Go), τcandidate)
+    Gsout = Base.ifelse(bad, zero(Go), Gscandidate)
+    Goout = Base.ifelse(bad, Go, Gocandidate)
+    Ghatout = Base.ifelse(bad, Ghat, Ghatcandidate)
     validi = Base.ifelse(bad, zero(Go), validi)
     valid = validi > zero(validi)
 
+    return τ, Gsout, Goout, Ghatout, isvortical, valid
+end
+
+function _reactant_Gθ_minotime(pix::Krang.AbstractPixel, θs, isindir, n)
+    τ, _, _, _, _, valid = _reactant_Gθ_full(pix, θs, isindir, n)
     return τ, valid
+end
+
+Reactant.@reactant_overlay function Krang.Gθ(pix::Krang.AbstractPixel, θs, isindir, n)
+    return _reactant_Gθ_full(pix, θs, isindir, n)
 end
 
 Reactant.@reactant_overlay function Krang._rs_case1_and_2(pix::Krang.AbstractPixel, rh, τ)
@@ -1345,110 +1223,6 @@ Reactant.@reactant_overlay function Krang._rs_case4(pix::Krang.AbstractPixel, rh
     return return_vals
 end
 
-function _reactant_emission_radius_tau(pix::Krang.SlowLightIntensityPixel, τ)
-    rh = horizon(metric(pix))
-    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots(pix))
-    rs4, valid4 = Krang.rs_case1_and_2(pix, rh, τ)
-    rs2, valid2 = Krang._rs_case3(pix, rh, τ)
-    rs0, valid0 = Krang._rs_case4(pix, rh, τ)
-    is4 = numreals == 4
-    is2 = numreals == 2
-    rs = Base.ifelse(is4, rs4, Base.ifelse(is2, rs2, rs0))
-    validi = Base.ifelse(is4, valid4, Base.ifelse(is2, valid2, valid0))
-    valid = validi > zero(validi)
-
-    return rs, valid
-end
-
-function _reactant_emission_radius_theta(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
-    α, β = screen_coordinate(pix)
-    θo = inclination(pix)
-    met = metric(pix)
-    TT = typeof(met.spin)
-    piT = TT(Base.pi)
-    isincone = ((θo <= θs) & (θs <= (piT - θo))) | (((piT - θo) <= θs) & (θs <= θo))
-
-    rs = zero(α)
-    αmin = αboundary(met, θs)
-    αoutside = abs(α) >= (αmin + eps(TT))
-    βbound = Base.ifelse((!isincone) & αoutside, βboundary(met, α, θo, θs), zero(α))
-    angular_gate = !((!isincone) & ((abs(β) + eps(TT)) < βbound))
-    result = (zero(α), zero(angular_gate))
-    Reactant.@trace result = if angular_gate
-        τ, τvalid = _reactant_Gθ_minotime(pix, θs, isindir, n)
-        if τvalid
-            _reactant_emission_radius_tau(pix, τ)
-        else
-            (zero(α), zero(τvalid))
-        end
-    else
-        (zero(α), zero(angular_gate))
-    end
-    rs, valid = result
-
-    return rs, valid
-end
-
-Reactant.@reactant_overlay function Krang.emission_radius(pix::Krang.AbstractPixel, τ)
-    met = metric(pix)
-    a = met.spin
-    T = typeof(a)
-    ans = zero(T)
-    νr = true
-
-    rh = one(T) + √(one(T) - a^2)
-
-    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots(pix))
-
-    @trace if numreals == 4 #case 1 & 2
-        ans, νr, issuccess = _rs_case1_and_2(pix, rh, τ)
-    elseif numreals == 2 #case3
-        ans, νr, issuccess = _rs_case3(pix, rh, τ)
-    else #case 4
-        ans, νr, issuccess = _rs_case4(pix, rh, τ)
-    end
-    return ans, νr, numreals, issuccess
-end
-
-
-
-Reactant.@reactant_overlay function Krang.emission_radius(
-    pix::Krang.SlowLightIntensityPixel,
-    θs,
-    isindir,
-    n,
-)
-    α, β = screen_coordinate(pix)
-    θo = inclination(pix)
-    met = metric(pix)
-    TT = typeof(met.spin)
-    piT = TT(Base.pi)
-    isincone = ((θo <= θs) & (θs <= (piT - θo))) | (((piT - θo) <= θs) & (θs <= θo))
-
-    err_rs = zero(TT)
-    err_νr = true
-    err_νθ = true
-    err_numreals = 0
-    err_success = false
-
-    αmin = αboundary(met, θs)
-    αoutside = abs(α) >= (αmin + eps(TT))
-    βbound = Base.ifelse((!isincone) & αoutside, βboundary(met, α, θo, θs), zero(TT))
-    blocked = (!isincone) & ((abs(β) + eps(TT)) < βbound)
-
-    τ, τvalid = _reactant_Gθ_minotime(pix, θs, isindir, n)
-    rs, νr, numreals, rssuccess = Krang.emission_radius(pix, τ)
-    νθ = Base.ifelse(isincone, (θo > θs) ⊻ (n % 2 == 1), !isindir)
-    issuccess = (!blocked) & τvalid & rssuccess
-
-    rs = Base.ifelse(issuccess, rs, err_rs)
-    νr = Base.ifelse(issuccess, νr, err_νr)
-    νθ = Base.ifelse(issuccess, νθ, err_νθ)
-    numreals = Base.ifelse(issuccess, numreals, err_numreals)
-
-    return rs, νr, νθ, numreals, issuccess
-end
-
 Reactant.@reactant_overlay function Krang.Gϕ(
     pix::Krang.SlowLightIntensityPixel,
     θs,
@@ -1469,229 +1243,4 @@ Reactant.@reactant_overlay function Krang.Gt(
     ans, valid = _reactant_Gt_minotime(pix, θs, isindir, n)
     TT = typeof(metric(pix).spin)
     return ans, zero(TT), zero(TT), zero(TT), false, valid
-end
-
-Reactant.@reactant_overlay function Krang.emission_coordinates(
-    pix::Krang.SlowLightIntensityPixel,
-    θs,
-    isindir,
-    n,
-)
-    α, β = screen_coordinate(pix)
-    met = metric(pix)
-    θo = inclination(pix)
-    TT = typeof(met.spin)
-    cosθs = cos(θs)
-    cosθo = cos(θo)
-    err_return = (zero(TT), zero(TT), zero(TT), false, false, false)
-
-    αmin = αboundary(met, θs)
-    βbound = Base.ifelse(abs(α) >= (αmin + eps(TT)), βboundary(met, α, θo, θs), zero(TT))
-    blocked = (cosθs > abs(cosθo)) & ((abs(β) + eps(TT)) < βbound)
-
-    τ, τvalid = _reactant_Gθ_minotime(pix, θs, isindir, n)
-    rs, νr, _, rssuccess = Krang.emission_radius(pix, τ)
-
-    a = met.spin
-    λtemp = Krang.λ(pix)
-    I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ, νr)
-
-    rp = one(TT) + √(one(TT) - a^2)
-    rm = one(TT) - √(one(TT) - a^2)
-    It =
-        4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) +
-        4 * I0 +
-        2 * I1 +
-        I2
-    Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
-
-    Gϕtemp, Gϕvalid = _reactant_Gϕ_minotime(pix, θs, isindir, n)
-    Gttemp, Gtvalid = _reactant_Gt_minotime(pix, θs, isindir, n)
-
-    emission_azimuth = Iϕ + λtemp * Gϕtemp
-    emission_time_regularized = It + a^2 * Gttemp
-
-    νθ = Base.ifelse(
-        abs(cosθs) < abs(cosθo),
-        (n % 2 == 1) ⊻ (θo > θs),
-        !isindir ⊻ (θs > TT(Base.pi / 2)),
-    )
-    issuccess = (!blocked) & τvalid & rssuccess & Gϕvalid & Gtvalid & !isnan(τ)
-
-    t = Base.ifelse(issuccess, emission_time_regularized, zero(TT))
-    r = Base.ifelse(issuccess, rs, zero(TT))
-    ϕ = Base.ifelse(issuccess, emission_azimuth, zero(TT))
-    νr = Base.ifelse(issuccess, νr, false)
-    νθ = Base.ifelse(issuccess, νθ, false)
-
-    return t, r, ϕ, νr, νθ, issuccess
-end
-
-Reactant.@reactant_overlay function Krang.emission_coordinates(
-    pix::Krang.SlowLightIntensityPixel,
-    τ,
-)
-    α, β = screen_coordinate(pix)
-    met = metric(pix)
-    θo = inclination(pix)
-    TT = typeof(met.spin)
-
-    θs, _, _, _, n, isindir = Krang.emission_inclination(pix, τ)
-    αmin = αboundary(met, θs)
-    βbound = Base.ifelse(abs(α) >= (αmin + eps(TT)), βboundary(met, α, θo, θs), zero(TT))
-    blocked = (cos(θs) > abs(cos(θo))) & ((abs(β) + eps(TT)) < βbound)
-
-    a = met.spin
-    λtemp = Krang.λ(pix)
-    rs, νr, _, rssuccess = Krang.emission_radius(pix, τ)
-    I0, I1, I2, Ip, Im = Krang.radial_integrals(pix, rs, τ, νr)
-
-    rp = one(TT) + √(one(TT) - a^2)
-    rm = one(TT) - √(one(TT) - a^2)
-
-    It =
-        4 / (rp - rm) * (rp * (rp - a * λtemp / 2) * Ip - rm * (rm - a * λtemp / 2) * Im) +
-        4 * I0 +
-        2 * I1 +
-        I2
-    Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
-
-    Gϕtemp, Gϕvalid = _reactant_Gϕ_minotime(pix, θs, isindir, n)
-    Gttemp, Gtvalid = _reactant_Gt_minotime(pix, θs, isindir, n)
-
-    emission_azimuth = Iϕ + λtemp * Gϕtemp
-    emission_time_regularized = It + a^2 * Gttemp
-    νθ = Base.ifelse(
-        abs(cos(θs)) < abs(cos(θo)),
-        (n % 2 == 1) ⊻ (θo > θs),
-        !isindir ⊻ (θs > TT(Base.pi / 2)),
-    )
-    issuccess = (!blocked) & rssuccess & Gϕvalid & Gtvalid
-
-    t = Base.ifelse(issuccess, emission_time_regularized, zero(TT))
-    r = Base.ifelse(issuccess, rs, zero(TT))
-    θ = Base.ifelse(issuccess, θs, zero(TT))
-    ϕ = Base.ifelse(issuccess, emission_azimuth, zero(TT))
-    νr = Base.ifelse(issuccess, νr, true)
-    νθ = Base.ifelse(issuccess, νθ, true)
-
-    return t, r, θ, ϕ, νr, νθ, issuccess
-end
-
-Reactant.@reactant_overlay function Krang._raytrace(
-    observation,
-    pix::Krang.SlowLightIntensityPixel,
-    mesh::Krang.Mesh{<:Krang.ConeGeometry,<:Krang.AbstractMaterial};
-    res,
-)
-    geometry = mesh.geometry
-    material = mesh.material
-    θs = geometry.opening_angle
-    subimgs = material.subimgs
-
-    isindir = false
-    for _ = 1:2
-        isindir ⊻= true
-        for n in subimgs
-            rs = zero(typeof(metric(pix).spin))
-            issuccess = false
-            rs, issuccess = _reactant_emission_radius_theta(pix, θs, isindir, n)
-            θs_tr = zero(rs) + θs
-            intersection = Intersection(zero(rs), rs, θs_tr, zero(rs), true, true)
-
-            cond = issuccess & (horizon(metric(pix)) < rs) & (rs < T(Inf))
-            contribution = material(pix, intersection)
-            observation += Base.ifelse(cond, contribution, zero(contribution))
-        end
-    end
-
-    return observation
-end
-
-function _reactant_slow_light_intensity_pixel(met::Krang.Kerr, α, β, θo)
-    tempη = Krang.η(met, α, β, θo)
-    tempλ = Krang.λ(met, α, θo)
-    roots = Krang.get_radial_roots(met, tempη, tempλ)
-
-    I1, I2, Ip, Im = Krang.radial_inf_integrals(met, roots)
-    I0_inf = Krang.Ir_inf(met, roots)
-    τ_total = Krang.total_mino_time(met, roots)
-    Iϕ_inf_temp = Krang.Iϕ_inf(met, roots, tempλ)
-    It_inf_temp = Krang.It_inf(met, roots, tempλ)
-    absGθo_Gθhat = Krang._absGθo_Gθhat(met, θo, tempη, tempλ)
-    absGϕo_Gϕhat = Krang._absGϕo_Gϕhat(met, θo, tempη, tempλ)
-    absGto_Gthat = Krang._absGto_Gthat(met, θo, tempη, tempλ)
-
-    return Krang.SlowLightIntensityPixel(
-        met,
-        (α, β),
-        roots,
-        I0_inf,
-        τ_total,
-        Iϕ_inf_temp,
-        It_inf_temp,
-        I1,
-        I2,
-        Ip,
-        Im,
-        absGθo_Gθhat,
-        absGϕo_Gϕhat,
-        absGto_Gthat,
-        θo,
-        tempη,
-        tempλ,
-    )
-end
-
-function _reactant_intensity_pixel(met::Krang.Kerr, α, β, θo)
-    tempη = Krang.η(met, α, β, θo)
-    tempλ = Krang.λ(met, α, θo)
-    roots = get_radial_roots(met, tempη, tempλ)
-
-    I0_inf = Krang.Ir_inf(met, roots)
-    τ_total = Krang.total_mino_time(met, roots)
-    absGθo_Gθhat = Krang._absGθo_Gθhat(met, θo, tempη, tempλ)
-
-    return Krang.IntensityPixel(
-        met,
-        (α, β),
-        roots,
-        I0_inf,
-        τ_total,
-        absGθo_Gθhat,
-        θo,
-        tempη,
-        tempλ,
-    )
-end
-
-Reactant.@reactant_overlay function Krang.SlowLightIntensityPixel(met::Krang.Kerr, α, β, θo)
-    return _reactant_slow_light_intensity_pixel(met, α, β, θo)
-end
-
-
-#for (typespin, αT, βT, θT) in Iterators.product(types, types, types, types)
-#    if typespin == αT == βT == θT == Any
-#        continue
-#    end
-#
-#    @eval function Krang.SlowLightIntensityPixel(
-#        met::Krang.Kerr{$typespin},
-#        α::$αT,
-#        β::$βT,
-#        θo::$θT,
-#    ) 
-#        return _reactant_slow_light_intensity_pixel(met, α, β, θo)
-#    end
-#
-#    @eval function Krang.IntensityPixel(
-#        met::Krang.Kerr{$typespin},
-#        α::$αT,
-#        β::$βT,
-#        θo::$θT,
-#    )
-#        return _reactant_intensity_pixel(met, α, β, θo)
-#    end
-#end
-
 end
