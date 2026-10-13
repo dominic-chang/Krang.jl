@@ -203,6 +203,47 @@
         @test p32.Iϕ_inf ≈ p64.Iϕ_inf rtol = 1e-2
         @test p32.It_inf ≈ p64.It_inf rtol = 1e-2
     end
+
+    @testset "Radial root colliding with a horizon" begin
+        # On the screen line λ = (rh² + a²)/a the radial potential R(rh) = (rh² + a² - aλ)²
+        # vanishes, so one root lands on the horizon: the 1/(r - rh) partial-fraction term
+        # diverges while its (rh - aλ/2) prefactor vanishes on that same line. The limit is
+        # finite (the pole is a principal value), but the closed forms used to return NaN
+        # when the root hit rh exactly, and a wrong finite value one ulp past it.
+        met = Krang.Kerr(0.1488920854854475)
+        θo = deg2rad(165.1348867591876)
+        α0, β0 = -0.5836283673902987, 0.26401133520389547
+        Iϕ_at(α) = Krang.Iϕ_inf(
+            met,
+            get_radial_roots(met, η(met, α, β0, θo), λ(met, α, θo)),
+            λ(met, α, θo),
+        )
+        ref = Iϕ_at(α0 + 1e-5) # far enough off the line for the plain formula to be sound
+        @testset "δα = $δ" for δ in (0.0, -1e-15, 1e-15, 1e-13, 1e-11, 1e-9)
+            @test isfinite(Iϕ_at(α0 + δ))
+            @test Iϕ_at(α0 + δ) ≈ ref rtol = 1e-5
+        end
+
+        # Sweep both horizon lines. The inner one collides with r4 (four real roots) or r2
+        # (two real roots); R'(rh) fixes which, so these cover both case 2 and case 3.
+        nonfinite = 0
+        for a in range(0.05, 0.95; length = 50),
+            θ in range(100, 179; length = 20) .* (π / 180),
+            β in (-3.0, 0.0, 3.0)
+
+            m = Kerr(a)
+            for rh in (1 - √(1 - a^2), 1 + √(1 - a^2))
+                αh = -((rh^2 + a^2) / a) / sin(θ)
+                ηh, λh = η(m, αh, β, θ), λ(m, αh, θ)
+                rts = get_radial_roots(m, ηh, λh)
+                isfinite(Krang.Iϕ_inf(m, rts, λh)) || (nonfinite += 1)
+                isfinite(Krang.It_inf(m, rts, λh)) || (nonfinite += 1)
+                all(isfinite, Krang.radial_inf_integrals(m, rts)) || (nonfinite += 1)
+            end
+        end
+        @test nonfinite == 0
+    end
+
     @testset "Radial Integrals 2" begin
         a = 0.99
         met = Krang.Kerr(a)
@@ -356,7 +397,7 @@
                 end
                 @testset "radial_inf_integrals_case4 Im" begin
                     # direct Im check vs adaptive numerical integration
-                    rp = 1 + √(1 - a^2);
+                    rp = 1 + √(1 - a^2)
                     rm = 1 - √(1 - a^2)
                     _, _, _, Im_anal = Krang.radial_inf_integrals_case4(met, roots)
                     _, _, _, Im_s =

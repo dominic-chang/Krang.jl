@@ -97,12 +97,24 @@ end
 # is smooth at D → 0, avoiding the catastrophic Float32 cancellation in
 # `B·r2 − A·r1` near the photon sphere. R is computed directly as
 # `4·A·B·r1·r2` (not via `S² − D²`). `√abs` mirrors `p1`'s defensive form.
+#
+# `R` is floored at `S²·√eps`. Callers pass `(r1, r2) = (rh - r1, rh - r2)` for a horizon
+# `rh`, and `R(rh) = (rh² + a² - aλ)²` is a perfect square, so `rh - r2 → 0⁺` exactly on
+# the screen line `λ = (rh² + a²)/a`, quadratically in `λ - λ*`. There `R → 0` while
+# `n_α = S²/R → ∞`: `Pi` underflows to zero past `n_α ≈ 1e14` and `R = 0` turns the whole
+# expression into `NaN`, which the `(rh - aλ/2)` prefactor at the call site cannot kill
+# because it vanishes on the same line (`0 × ∞`, and `0 × NaN` partials under reverse AD).
+# The limit itself is finite — the pole at `r = rh` is a principal value whose divergence
+# cancels — so bounding `n_α` by `1/√eps` evaluates it at the smallest `R` that `Pi` still
+# resolves. That reproduces the true `R → 0` limit to ~7 digits and leaves every
+# non-degenerate `R` (where `n_α = O(1)`) untouched. The floor also absorbs the
+# `r2 = rh + 1ulp` rounding that would otherwise make `R` negative and the result wrong.
 @inline function _R1_alpha_combined(A::T, B::T, r1::T, r2::T, r21::T, φ, j) where {T}
     AB = A * B
     sqrtAB = √AB
     S = B * r2 + A * r1
     D = B * r2 - A * r1
-    R = 4 * AB * r1 * r2
+    R = max(4 * AB * r1 * r2, S * S * √eps(T))
     n_α = S * S / R + eps(T)
     sinφ = sin(φ)
     tempsinφ = √(one(T) - j * sinφ * sinφ)
@@ -110,6 +122,31 @@ end
     f1_α = (p1_α / 2) * log(abs((p1_α * tempsinφ + sinφ) / (p1_α * tempsinφ - sinφ)))
     Π = JacobiElliptic.Pi(n_α, φ, j)
     return 2 * r21 * sqrtAB * (S * f1_α - D * Π) / R
+end
+
+# Horizon term `coef·Π(n, φ, k)` of the four-real-root case, with
+# `coef = 2·r43/(√(r31·r42)·rh3·rh4)` and `n = rh3·r41/(rh4·r31)` for `rhi = rh - ri`.
+#
+# `R(rh) = (rh² + a² - aλ)²` is a perfect square, so `R(rh) = rh1·rh2·rh3·rh4` vanishes —
+# and one root collides with the horizon — exactly on the screen line `λ = (rh² + a²)/a`.
+# `R'(rh) = ∓(r₊ - r₋)·(η + (λ - a)²)` fixes which root: at `r₋` it is `r4` (or the unused
+# `r2`), at `r₊` it is `r3` (or the unused `r1`). So `rh4 → 0` is the collision this term
+# has to survive, and there `coef → ∞` while `n → ∞`; the product stays finite because
+# `n·Π(n, φ, k) → Δφ·cot φ - F(φ, k) + E(φ, k)`. Numerically both factors overflow
+# (`Pi` underflows to zero past `n ≈ 1e14`, and `rh4 = 0` gives `Inf`/`NaN`), which the
+# vanishing `(rh - aλ/2)` prefactor at the call site cannot kill — it is zero on the same
+# line, so the result is `0 × ∞`, and `0 × NaN` partials under reverse-mode AD.
+# Flooring `|rh4|` so that `|n| ≤ 1/√eps` keeps both factors in range and reproduces the
+# limit. Near the collision `rh1`, `rh2`, `rh3 > 0`, so `R(rh) ≥ 0` forces `rh4 ≥ 0`: the
+# floor pushes onto that side, which also absorbs a `rh4` rounded one ulp past zero. The
+# window is `√eps`-relative, so an `rh4` that is legitimately negative and `O(1)` — the
+# horizon sitting between `r2` and `r3` — is left untouched.
+@inline function _Pi_horizon_combined(r31, r42, r43, r41, rh3, rh4::T, φ, k) where {T}
+    floor4 = abs(rh3 * r41 / r31) * √eps(T)
+    rh4 = ifelse(abs(rh4) < floor4, floor4, rh4)
+    n = rh3 * r41 / (rh4 * r31)
+    n += ifelse(n == k, eps(T), zero(T)) # Fix for ∂_m Pi blowing up when n = m
+    return 2 / √(r31 * r42) * r43 / (rh3 * rh4) * JacobiElliptic.Pi(n, φ, k)
 end
 
 function R2(α, φ, j)
@@ -519,16 +556,8 @@ function Iϕ_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     k = r32 * r41 / (r31 * r42)
     x2_o = √(r31 / r41)
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Πm_o = coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k)
+    Πp_o = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Πm_o = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     Ipo_inf_m_I0_terms = -Πp_o
     Imo_inf_m_I0_terms = -Πm_o
@@ -656,15 +685,8 @@ function Iϕ_w_I0_terms_case2(metric::Kerr{T}, rs, τ, roots::NTuple{4}, νr, λ
     #!(-1 < x2_s < 1) 
     !(x2_s < 1) && return T(Inf)
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Πm_s = coef_m * JacobiElliptic.Pi(arg, asin(x2_s), k)
+    Πp_s = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_s), k)
+    Πm_s = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_s), k)
 
     Ip = -τ / rp3 - (-1)^νr * Πp_s
     Im = -τ / rm3 - (-1)^νr * Πm_s
@@ -800,15 +822,8 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     #equation B38
     I2_total = r3 - E_o # asymptotic Divergent piece is not included
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_o = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Πm_o = coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k) # Seems to cause NaNs
+    Πp_o = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Πm_o = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     Ip_total = -Πp_o
     Im_total = -Πm_o
@@ -1016,15 +1031,8 @@ end
     I2_s = √(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
     I2_total = -(r1 * r4 + r2 * r3) / 2 * τ + (-1)^νr * I2_s# asymptotic Divergent piece is not included
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Πm_s = coef_m * JacobiElliptic.Pi(rm3 * r41 / (rm4 * r31), asin(x2_s), k)
+    Πp_s = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_s), k)
+    Πm_s = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_s), k)
 
     Ip_total = -τ / rp3 - (-1)^νr * Πp_s
     Im_total = -τ / rm3 - (-1)^νr * Πm_s
@@ -1191,17 +1199,8 @@ Returns the radial integrals for the case where there are four real roots in the
     #equation B38
     I2o_m_I0_terms = r3 - E_o# asymptotic Divergent piece is not included
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-
-    Ipo_m_I0_terms =
-        -coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31) + eps(T), asin(x2_o), k)
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Imo_m_I0_terms = -coef_m * JacobiElliptic.Pi(arg, asin(x2_o), k)
+    Ipo_m_I0_terms = -_Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Imo_m_I0_terms = -_Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 
@@ -1371,15 +1370,8 @@ Returns the radial integrals for the case where there are four real roots in the
     I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
     I2_total = (r1 * r4 + r2 * r3) / 2 * τ - (-1)^νr * I2_s# asymptotic Divergent piece is not included
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * JacobiElliptic.Pi(rp3 * r41 / (rp4 * r31), asin(x2_s), k)
-    arg = rm3 * r41 / (rm4 * r31)
-    # TODO: Come up with a better solve for this
-    if arg == k # Fix for ∂_m Pi blowing up when n = m
-        arg += eps(T)
-    end
-    Πm_s = coef_m * JacobiElliptic.Pi(arg, asin(x2_s), k)
+    Πp_s = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_s), k)
+    Πm_s = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_s), k)
 
     Ip_total = τ / rp3 + (-1)^νr * Πp_s
     Im_total = τ / rm3 + (-1)^νr * Πm_s
