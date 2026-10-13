@@ -48,6 +48,41 @@
         @test_nowarn Krang.SlowLightIntensityPixel(met, α, β, θo)
     end
 
+    @testset "Cardano cube-root cancellation" begin
+        # Resolvent-cubic degeneracy: as P → 0 with Q > 0, √(Δ/108) → |Q|/2 and the
+        # `-Q/2 + √(Δ/108)` branch cancels, so ωp → 0 and v = -P/(3ωp) is 0/0. Every root
+        # came back NaN inside a ~1e-6-wide band in α, and carried spurious imaginary
+        # parts just outside it. Cardano holds with either sign of the square root, so the
+        # degenerate band takes the other one.
+        aspin, θline = 0.9387019683755741, deg2rad(94.91559403834371)
+        αline, βline = -1.172784384687551, -0.1443508333390526
+        m = Kerr(aspin)
+        quartic(r, ηq, λq) =
+            r^4 + (aspin^2 - ηq - λq^2) * r^2 + 2(ηq + (λq - aspin)^2) * r - aspin^2 * ηq
+
+        @testset "δα = $δ" for δ in (0.0, 1e-9, -1e-6, 1e-6, 1e-3)
+            ηq = η(m, αline + δ, βline, θline)
+            λq = λ(m, αline + δ, θline)
+            rts = get_radial_roots(m, ηq, λq)
+            @test all(r -> isfinite(real(r)) && isfinite(imag(r)), rts)
+            # every root actually solves the quartic
+            @test maximum(r -> abs(quartic(r, ηq, λq)), rts) < 1e-12
+        end
+
+        # sweep the whole band: nothing non-finite, residuals at machine precision
+        nonfinite = 0
+        worstres = 0.0
+        for δ in range(-5e-5, 5e-5; length = 2001)
+            ηq = η(m, αline + δ, βline, θline)
+            λq = λ(m, αline + δ, θline)
+            rts = get_radial_roots(m, ηq, λq)
+            all(r -> isfinite(real(r)) && isfinite(imag(r)), rts) || (nonfinite += 1)
+            worstres = max(worstres, maximum(r -> abs(quartic(r, ηq, λq)), rts))
+        end
+        @test nonfinite == 0
+        @test worstres < 1e-12
+    end
+
 
     @testset "Radial Integrals 1" begin
         a = 0.99
