@@ -1,5 +1,6 @@
 module Krang
 using DocStringExtensions
+using Adapt
 using StaticArrays
 using JacobiElliptic
 using PolarizedTypes
