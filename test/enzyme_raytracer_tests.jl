@@ -67,6 +67,44 @@ using EnzymeTestUtils: test_forward, test_reverse
         test_reverse(f_ϕ, Enzyme.Active, (ϕBL, Enzyme.Active); rtol = 1e-5, atol = 1e-6)
     end
 
+    @testset "Horizon-colliding root stays differentiable" begin
+        # On the screen line λ = (r₋² + a²)/a a radial root lands on the inner horizon and
+        # Iϕ_inf used to evaluate to NaN. Reverse mode then poisoned the whole gradient
+        # through 0 × NaN partials, even where the value itself is multiplied by zero.
+        aspin = 0.1488920854854475
+        θline = deg2rad(165.1348867591876)
+        αline, βline = -0.5836283673902987, 0.26401133520389547
+
+        Iϕline(q) = begin
+            m = Krang.Kerr(q[3])
+            ηq, λq = Krang.η(m, q[1], q[2], q[4]), Krang.λ(m, q[1], q[4])
+            return Krang.Iϕ_inf(m, Krang.get_radial_roots(m, ηq, λq), λq)
+        end
+        unused(q) =
+            Krang.total_mino_time(
+                Krang.Kerr(q[3]),
+                Krang.get_radial_roots(
+                    Krang.Kerr(q[3]),
+                    Krang.η(Krang.Kerr(q[3]), q[1], q[2], q[4]),
+                    Krang.λ(Krang.Kerr(q[3]), q[1], q[4]),
+                ),
+            ) + 0.0 * Iϕline(q)
+
+        q0 = [αline, βline, aspin, θline]
+        for g in (Iϕline, unused)
+            dq = zeros(4)
+            Enzyme.autodiff(Enzyme.Reverse, g, Enzyme.Active, Enzyme.Duplicated(q0, dq))
+            @test all(isfinite, dq)
+        end
+
+        # and the surviving gradient is the right one
+        dq = zeros(4)
+        Enzyme.autodiff(Enzyme.Reverse, Iϕline, Enzyme.Active, Enzyme.Duplicated(q0, dq))
+        h = 1e-6
+        fd = (Iϕline(q0 .+ [h, 0, 0, 0]) - Iϕline(q0 .- [h, 0, 0, 0])) / 2h
+        @test dq[1] ≈ fd rtol = 1e-5
+    end
+
     @testset "Fast-Light Kerr-Schild" begin
         f_r(r) = begin
             x, y, z = Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
