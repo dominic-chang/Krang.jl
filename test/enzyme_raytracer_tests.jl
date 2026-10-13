@@ -105,6 +105,29 @@ using EnzymeTestUtils: test_forward, test_reverse
         @test dq[1] ≈ fd rtol = 1e-5
     end
 
+    @testset "Cardano cancellation stays differentiable" begin
+        # Where the resolvent cubic's cube-root term cancels, every radial root came back
+        # NaN, which took the gradient of anything built from the pixel with it.
+        rootsum(q) = begin
+            m = Krang.Kerr(q[3])
+            ηq, λq = Krang.η(m, q[1], q[2], q[4]), Krang.λ(m, q[1], q[4])
+            return sum(x -> real(x) + imag(x)^2, Krang.get_radial_roots(m, ηq, λq))
+        end
+        q0 = [
+            -1.172784384687551,
+            -0.1443508333390526,
+            0.9387019683755741,
+            deg2rad(94.91559403834371),
+        ]
+        dq = zeros(4)
+        Enzyme.autodiff(Enzyme.Reverse, rootsum, Enzyme.Active, Enzyme.Duplicated(q0, dq))
+        @test all(isfinite, dq)
+
+        h = 1e-7
+        fd = (rootsum(q0 .+ [h, 0, 0, 0]) - rootsum(q0 .- [h, 0, 0, 0])) / 2h
+        @test dq[1] ≈ fd rtol = 1e-5
+    end
+
     @testset "Fast-Light Kerr-Schild" begin
         f_r(r) = begin
             x, y, z = Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(

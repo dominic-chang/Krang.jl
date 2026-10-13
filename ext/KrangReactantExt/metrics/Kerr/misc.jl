@@ -19,7 +19,12 @@ Reactant.@reactant_overlay function Krang.get_radial_roots(
     Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B^2 / T(8)
 
     negΔ3 = T(4) * P * P * P + T(27) * (Q^2)
-    ωp = ^(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im, T(1 / 3))
+    sq = sqrt(negΔ3 / T(108))
+    # Cardano's formula holds with either sign of `sq`; see the comment in `src/`. The `+`
+    # branch cancels as `P → 0` with `Q > 0`, which makes `v = -P/(3ωp)` a `0/0` NaN.
+    base = -Q / T(2) + sq
+    base = Base.ifelse(abs(base) < T(1e-6) * (abs(Q) / 2 + abs(sq)), -Q / T(2) - sq, base)
+    ωp = ^(base + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1 / 2) + T(√3 / 2)im, -T(1 / 2) - T(√3 / 2)im, one(T) + zero(T)im) .* ωp

@@ -319,7 +319,17 @@ function get_radial_roots(metric::Kerr{T}, η, λ) where {T}
     Q = -A / T(3) * (A * A / T(36) + zero(T)im - C) - B^2 / T(8)
 
     negΔ3 = T(4) * P * P * P + T(27) * (Q^2)
-    ωp = ^(-Q / T(2) + sqrt(negΔ3 / T(108)) + zero(T)im, T(1 / 3))
+    sq = sqrt(negΔ3 / T(108))
+    # Cardano's formula holds with either sign of `sq`: the two choices swap `ωp` and
+    # `v = -P/(3ωp)` (their product is `-P/3`), so the three resolvent roots — and with
+    # them `ξ0` and the quartic roots — come out the same either way. When `P → 0` with
+    # `Q > 0`, `sq → |Q|/2` and the `+` branch cancels: `ωp → 0` turns `v` into `0/0`,
+    # making every root NaN, and just outside that band `v` is a ratio of rounding errors
+    # that leaves the roots with spurious imaginary parts. Take the `-` branch only where
+    # the cancellation actually bites, so every other evaluation stays bit-identical.
+    base = -Q / T(2) + sq
+    base = ifelse(abs(base) < T(1e-6) * (abs(Q) / 2 + abs(sq)), -Q / T(2) - sq, base)
+    ωp = ^(base + zero(T)im, T(1 / 3))
 
     #C = ((-1+0im)^(2/3), (-1+0im)^(4/3), 1) .* ωp
     C = (-T(1 / 2) + T(√3 / 2)im, -T(1 / 2) - T(√3 / 2)im, one(T) + zero(T)im) .* ωp
