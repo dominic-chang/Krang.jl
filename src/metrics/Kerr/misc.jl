@@ -115,7 +115,13 @@ end
     S = B * r2 + A * r1
     D = B * r2 - A * r1
     R = max(4 * AB * r1 * r2, S * S * √eps(T))
-    n_α = S * S / R + eps(T)
+    # `n_α = S²/(S² - D²) ≥ 1` exactly, but `R` is computed as `4·A·B·r1·r2`, not as `S² - D²`, so once
+    # `D² < eps·S²` (a thin curve on the screen, e.g. `D = B·(r₊ - r2) - A·(r₊ - r1) → 0` in the
+    # outer-horizon term of `Iϕ_inf_case3`) `S²/R` can round to just below 1 and `S²/R + eps` lands on
+    # exactly 1. With `φ > π/2` the pole of `Π(n_α, φ, j)` at θ = π/2 is then inside the range and `Pi`
+    # returns `Inf`, although `D·Π` (and the result) has a finite limit; the `Inf` also turns reverse-mode
+    # partials of everything upstream into `NaN`. Clamp to the exact bound before adding `eps`.
+    n_α = max(S * S / R, one(T)) + eps(T)
     sinφ = sin(φ)
     tempsinφ = √(one(T) - j * sinφ * sinφ)
     p1_α = √abs(R / (j * D * D + (one(T) - j) * S * S))
