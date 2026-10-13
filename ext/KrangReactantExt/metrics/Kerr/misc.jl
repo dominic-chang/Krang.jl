@@ -128,12 +128,8 @@ Reactant.@reactant_overlay function Krang.Iϕ_inf_case2(
     k = r32 * r41 / (r31 * r42)
     x2_o = √(r31 / r41)
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_o = coef_p * ellPi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-
-    arg = _regularize_equal(rm3 * r41 / (rm4 * r31), k, TT)
-    Πm_o = coef_m * ellPi(arg, asin(x2_o), k)
+    Πp_o = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Πm_o = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     Ipo_inf_m_I0_terms = -Πp_o
     Imo_inf_m_I0_terms = -Πm_o
@@ -175,16 +171,13 @@ Reactant.@reactant_overlay function Krang.Iϕ_inf_case3(
         if isnan(φ_o)
             ans = TT(Base.NaN)
         else
-            αp = (B * rp2 + A * rp1) / (B * rp2 - A * rp1)
-            αm = (B * rm2 + A * rm1) / (B * rm2 - A * rm1)
+            # `_R1_alpha_combined` is the `(2·r21·√AB / D)·R1(S/D, φ, j)` product in the
+            # form that survives a root colliding with a horizon; see its comment in `src/`.
+            C1p_o = _R1_alpha_combined(A, B, rp1, rp2, r21, φ_o, k3)
+            C1m_o = _R1_alpha_combined(A, B, rm1, rm2, r21, φ_o, k3)
 
-            R1p_o = R1(αp, φ_o, k3)
-            R1m_o = R1(αm, φ_o, k3)
-
-            Ip =
-                -inv(B * rp2 + A * rp1) * (2 * r21 * √(A * B) / (B * rp2 - A * rp1) * R1p_o)
-            Im =
-                -inv(B * rm2 + A * rm1) * (2 * r21 * √(A * B) / (B * rm2 - A * rm1) * R1m_o)
+            Ip = -inv(B * rp2 + A * rp1) * C1p_o
+            Im = -inv(B * rm2 + A * rm1) * C1m_o
 
             ans = 2a / (rp - rm) * ((rp - a * λ / 2) * Ip - (rm - a * λ / 2) * Im)
         end
@@ -282,11 +275,8 @@ Reactant.@reactant_overlay function Krang.It_inf_case2(
         log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k))
     I2_total = r3 - E_o
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_o = coef_p * ellPi(rp3 * r41 / (rp4 * r31), asin(x2_o), k)
-    arg = _regularize_equal(rm3 * r41 / (rm4 * r31), k, TT)
-    Πm_o = coef_m * ellPi(arg, asin(x2_o), k)
+    Πp_o = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Πm_o = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     Ip_total = -Πp_o
     Im_total = -Πm_o
@@ -333,8 +323,6 @@ Reactant.@reactant_overlay function Krang.It_inf_case3(
             result = TT(Base.NaN)
         else
             αo = (B + A) / (B - A)
-            αp = (B * rp2 + A * rp1) / (B * rp2 - A * rp1)
-            αm = (B * rm2 + A * rm1) / (B * rm2 - A * rm1)
 
             Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3)
             Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3)
@@ -342,11 +330,9 @@ Reactant.@reactant_overlay function Krang.It_inf_case3(
             I1_total = Π1_o + log(16 * r21^2 / ((A2 - B2)^2 + 4 * A * B * r21^2)) / 2
             I2_total = (-√(A * B) * Π2_o) + (B * r2 + A * r1) / (A + B)
             Ip_total =
-                -inv(B * rp2 + A * rp1) *
-                (2 * r21 * √(A * B) / (B * rp2 - A * rp1) * R1(αp, φ_o, k3))
+                -inv(B * rp2 + A * rp1) * _R1_alpha_combined(A, B, rp1, rp2, r21, φ_o, k3)
             Im_total =
-                -inv(B * rm2 + A * rm1) *
-                (2 * r21 * √(A * B) / (B * rm2 - A * rm1) * R1(αm, φ_o, k3))
+                -inv(B * rm2 + A * rm1) * _R1_alpha_combined(A, B, rm1, rm2, r21, φ_o, k3)
 
             result = -(
                 4 / (rp - rm) *
@@ -478,12 +464,8 @@ Reactant.@reactant_overlay function Krang.radial_inf_integrals_case2(
         log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k))
     I2o_m_I0_terms = r3 - E_o
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-
-    Ipo_m_I0_terms = -coef_p * ellPi(rp3 * r41 / (rp4 * r31) + eps(TT), asin(x2_o), k)
-    arg = _regularize_equal(rm3 * r41 / (rm4 * r31), k, TT)
-    Imo_m_I0_terms = -coef_m * ellPi(arg, asin(x2_o), k)
+    Ipo_m_I0_terms = -_Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, asin(x2_o), k)
+    Imo_m_I0_terms = -_Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, asin(x2_o), k)
 
     return I1o_m_I0_terms, I2o_m_I0_terms, Ipo_m_I0_terms, Imo_m_I0_terms
 end
@@ -910,11 +892,9 @@ Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case2(
     I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
     I2_total = (r1 * r4 + r2 * r3) / 2 * τ - signνr * I2_s
 
-    coef_p = 2 / √(r31 * r42) * r43 / (rp3 * rp4)
-    coef_m = 2 / √(r31 * r42) * r43 / (rm3 * rm4)
-    Πp_s = coef_p * ellPi(rp3 * r41 / (rp4 * r31), asin(clamp(x2_s, zero(T), one(T))), k)
-    arg = _regularize_equal(rm3 * r41 / (rm4 * r31), k, T)
-    Πm_s = coef_m * ellPi(arg, asin(clamp(x2_s, zero(T), one(T))), k)
+    φ_s = asin(clamp(x2_s, zero(T), one(T)))
+    Πp_s = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, φ_s, k)
+    Πm_s = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, φ_s, k)
 
     Ip_total = τ / rp3 + signνr * Πp_s
     Im_total = τ / rm3 + signνr * Πm_s
@@ -958,8 +938,6 @@ Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case3(
     x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
     φ_s = acos(clamp(x3_s, -one(T), one(T)))
     αo = (B + A) / (B - A)
-    αp = (B * rp2 + A * rp1) / (B * rp2 - A * rp1)
-    αm = (B * rm2 + A * rm1) / (B * rm2 - A * rm1)
     coef = 2 * r21 * √(A * B) / (B2 - A2)
 
     Π1_s = coef * R1(αo, φ_s, k3)
@@ -973,10 +951,10 @@ Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case3(
     )
     Ip_total =
         inv(B * rp2 + A * rp1) *
-        ((B + A) * I0_total + 2 * r21 * √(A * B) / (B * rp2 - A * rp1) * (-R1(αp, φ_s, k3)))
+        ((B + A) * I0_total - _R1_alpha_combined(A, B, rp1, rp2, r21, φ_s, k3))
     Im_total =
         inv(B * rm2 + A * rm1) *
-        ((B + A) * I0_total + 2 * r21 * √(A * B) / (B * rm2 - A * rm1) * (-R1(αm, φ_s, k3)))
+        ((B + A) * I0_total - _R1_alpha_combined(A, B, rm1, rm2, r21, φ_s, k3))
 
     invalid = abs(x3_s) > one(T)
     z = zero(T)
