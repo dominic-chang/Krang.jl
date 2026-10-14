@@ -1,5 +1,4 @@
 module KrangReactantExt
-#include("SlowLightIntensityPixel.jl")
 
 using Krang
 import Krang.JacobiElliptic as JacobiElliptic
@@ -7,8 +6,6 @@ using Reactant
 import Reactant: TracedRNumber
 
 
-types = (TracedRNumber, Any)
-Ts = Union{TracedRNumber,Any}
 _isreal2 = Krang._isreal2
 Ir_inf = Krang.Ir_inf
 horizon = Krang.horizon
@@ -62,7 +59,6 @@ _rs_case4 = Krang._rs_case4
 include("utils.jl")
 include("metrics/Kerr/misc.jl")
 include("metrics/Kerr/emission_coordinates.jl")
-include("cameras/IntensityCamera.jl")
 include("cameras/SlowLightIntensityCamera.jl")
 include("geometries/geometry_types.jl")
 

@@ -5,10 +5,6 @@ function _regularize_zero(x, ::Type{T}) where {T}
     return Base.ifelse(x == zero(T), eps(T), x)
 end
 
-function _regularize_equal(x, y, ::Type{T}) where {T}
-    return Base.ifelse(x == y, x + eps(T), x)
-end
-
 @inline function _argmax_real3(x1, x2, x3)
     return Base.ifelse(
         real(x1) >= real(x2),

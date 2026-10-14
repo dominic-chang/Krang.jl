@@ -221,8 +221,12 @@ Reactant.@reactant_overlay function Krang.Iϕ_inf_case4(
     Reactant.@trace if isnan(x4_p) | isnan(x4_m)
         result = TT(Base.NaN)
     else
-        S1p_o = S1(gp, TT(Base.pi / 2) + atan(go), k4)
-        S1m_o = S1(gm, TT(Base.pi / 2) + atan(go), k4)
+        # One amplitude for every elliptic integral in this case; `F` at it is shared.
+        φ4_o = TT(Base.pi / 2) + atan(go)
+        F4_o = ellF(φ4_o, k4)
+        E4_o = _ellE(φ4_o, k4)
+        S1p_o = S1(gp, φ4_o, k4, F4_o)
+        S1m_o = S1(gm, φ4_o, k4, F4_o)
 
         Ip =
             go / (a2r * (1 - go * x4_p)) *
@@ -329,8 +333,15 @@ Reactant.@reactant_overlay function Krang.It_inf_case3(
         else
             αo = (B + A) / (B - A)
 
-            Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3)
-            Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3)
+            # `regularized_R1` and `regularized_R2` both evaluate `F(φ_o, k3)`, and `R2`
+            # also wants `E` there. `_F_E` branches on its argument, which will not trace,
+            # so keep the two calls and just thread both values through.
+            F3_o = ellF(φ_o, k3)
+            E3_o = _ellE(φ_o, k3)
+            Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3, F3_o)
+            Π2_o =
+                ((2 * r21 * √(A * B) / (B2 - A2))^2) *
+                regularized_R2(αo, φ_o, k3, F3_o, E3_o)
 
             I1_total = Π1_o + log(16 * r21^2 / ((A2 - B2)^2 + 4 * A * B * r21^2)) / 2
             I2_total = (-√(A * B) * Π2_o) + (B * r2 + A * r1) / (A + B)
@@ -381,17 +392,19 @@ Reactant.@reactant_overlay function Krang.It_inf_case4(
     Reactant.@trace if isnan(x4_p) | isnan(x4_m)
         result = TT(Base.NaN)
     else
-        S1p_o = S1(gp, TT(Base.pi / 2) + atan(go), k4)
-        S1m_o = S1(gm, TT(Base.pi / 2) + atan(go), k4)
+        # One amplitude for every elliptic integral in this case; `F` at it is shared.
+        φ4_o = TT(Base.pi / 2) + atan(go)
+        F4_o = ellF(φ4_o, k4)
+        E4_o = _ellE(φ4_o, k4)
+        S1p_o = S1(gp, φ4_o, k4, F4_o)
+        S1m_o = S1(gm, φ4_o, k4, F4_o)
 
-        Π1_o =
-            2 / (C + D) *
-            (a2r / go * (1 + go^2)) *
-            regularizedS1(go, TT(Base.pi / 2) + atan(go), k4)
+        S1reg_o = regularizedS1(go, φ4_o, k4, F4_o)
+        Π1_o = 2 / (C + D) * (a2r / go * (1 + go^2)) * S1reg_o
         Π2_o =
             2 / (C + D) *
             (a2r / go * (1 + go^2))^2 *
-            regularizedS2(go, TT(Base.pi / 2) + atan(go), k4)
+            regularizedS2(go, φ4_o, k4, S1reg_o, F4_o, E4_o)
 
         I1_total =
             -Π1_o +
@@ -619,84 +632,37 @@ end
     )
 end
 
-function _reactant_Gθ_vortical_minotime(
-    Go,
-    Ghat,
-    θs,
-    θo,
-    signβ,
-    n,
-    isindir,
-    um,
-    up,
-    m,
-    a2,
-    isincone,
-    TT,
-)
+"""
+Elliptic-integral arguments for the vortical (η < 0) branch of `Krang.Gθ`.
+
+Returns `(φ, k, invalid, Gssign, Go_eff)`. Deliberately stops short of evaluating `ellF`:
+the caller selects between this and the non-vortical branch first, so only one incomplete
+elliptic integral is emitted into the trace instead of two. `ellF` expands to a fixed
+ten-pass Carlson duplication under Reactant, so the discarded one was a large share of both
+compile time and runtime.
+"""
+@inline function _reactant_Gθ_vortical_args(Go, θs, θo, um, up, m, TT)
     args = (cos(θs)^2 - um) / (up - um)
     argo = (cos(θo)^2 - um) / (up - um)
     k = one(TT) - m
     invalid =
         !(((zero(TT) < argo) & (argo < one(TT))) & ((zero(TT) < args) & (args < one(TT))))
     safe_args = clamp(args, eps(TT), one(TT) - eps(TT))
-    tempfac = inv(√abs(um * a2))
     signθs = Base.ifelse(θs > TT(Base.pi / 2), -one(TT), one(TT))
-    Go2 = signθs * Go
-    Gs = signθs * tempfac * ellF(asin(√safe_args), k)
-    νθ = Base.ifelse(isincone, (n % 2 == 1) ⊻ (θo > θs), !isindir ⊻ (θs > TT(Base.pi / 2)))
-    signs = Base.ifelse(νθ, -one(TT), one(TT))
-    τcand = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go2 - signs * Gs,
-        n * Ghat - signβ * Go2 - signs * Gs,
-    )
-    τ = Base.ifelse(invalid, zero(Go), τcand)
-    validi = Base.ifelse(invalid, zero(Go), one(Go))
-    # On the vortical failure path `Krang.Gθ` returns the *cached* Go/Ghat, not zeros.
-    Gs_out = Base.ifelse(invalid, zero(Go), Gs)
-    Go_out = Base.ifelse(invalid, Go, Go2)
-
-    return τ, Gs_out, Go_out, Ghat, validi
+    return asin(√safe_args), k, invalid, signθs, signθs * Go
 end
 
-function _reactant_Gθ_nonvortical_minotime(
-    Go,
-    Ghat,
-    θs,
-    θo,
-    signβ,
-    n,
-    isindir,
-    um,
-    up,
-    m,
-    a2,
-    isincone,
-    TT,
-)
+"""
+Elliptic-integral arguments for the non-vortical (η >= 0) branch of `Krang.Gθ`.
+Counterpart of [`_reactant_Gθ_vortical_args`](@ref); see it for why `ellF` is not called here.
+"""
+@inline function _reactant_Gθ_nonvortical_args(Go, θs, θo, up, m, TT)
     args = cos(θs) / √up
     argo = cos(θo) / √up
     invalid =
         !(((-one(TT) < args) & (args < one(TT))) & ((-one(TT) < argo) & (argo < one(TT))))
     safe_args = clamp(args, -one(TT) + eps(TT), one(TT) - eps(TT))
-    tempfac = inv(√abs(um * a2))
-    Gs = tempfac * ellF(asin(safe_args), m)
-    νθ = Base.ifelse(isincone, (n % 2 == 1) ⊻ (θo > θs), !isindir ⊻ (θs > TT(Base.pi / 2)))
-    signs = Base.ifelse(νθ, -one(TT), one(TT))
-    τcand = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go - signs * Gs,
-        n * Ghat - signβ * Go - signs * Gs,
-    )
-    τ = Base.ifelse(invalid, zero(Go), τcand)
-    validi = Base.ifelse(invalid, zero(Go), one(Go))
-    # Unlike the vortical branch, `Krang.Gθ` zeroes Go/Ghat when this one fails.
-    Gs_out = Base.ifelse(invalid, zero(Go), Gs)
-    Go_out = Base.ifelse(invalid, zero(Go), Go)
-    Ghat_out = Base.ifelse(invalid, zero(Ghat), Ghat)
-
-    return τ, Gs_out, Go_out, Ghat_out, validi
+    return asin(safe_args), m, invalid, one(TT), Go
 end
 
 function _reactant_Gϕ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
@@ -1000,10 +966,13 @@ Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case4(
     gp = (go * x4_p - one(T)) / (go + x4_p)
     gm = (go * x4_m - one(T)) / (go + x4_m)
 
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
-    Π1_s = 2 / (C + D) * (a2 / go * (one(T) + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
-    Π2_s = 2 / (C + D) * (a2 / go * (one(T) + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
+    φ4_s = atan(x4_s) + atan(go)
+    F4_s = ellF(φ4_s, k4)
+    E4_s = _ellE(φ4_s, k4)
+    S1p_s = S1(gp, φ4_s, k4, F4_s)
+    S1m_s = S1(gm, φ4_s, k4, F4_s)
+    Π1_s = 2 / (C + D) * (a2 / go * (one(T) + go^2)) * S1(go, φ4_s, k4, F4_s)
+    Π2_s = 2 / (C + D) * (a2 / go * (one(T) + go^2))^2 * S2(go, φ4_s, k4, F4_s, E4_s)
 
     I1_total = -(a2 / go - b1) * τ + (-Π1_s)
     I2_total = -((a2 / go - b1)^2) * τ + 2(a2 / go - b1) * (-Π1_s) - (-Π2_s)
@@ -1066,41 +1035,38 @@ function _reactant_Gθ_full(pix::Krang.AbstractPixel, θs, isindir, n)
     up = min(Δθ + desc, one(TT) - eps(TT))
     um = Δθ - desc
     m = up / um
-    τvort, Gsvort, Govort, Ghatvort, validvort = _reactant_Gθ_vortical_minotime(
-        Go,
-        Ghat,
-        θs,
-        θo,
-        signβ,
-        n,
+    # Select the branch's elliptic-integral arguments *before* evaluating anything, so the
+    # trace carries a single `ellF` rather than one per branch with one result discarded.
+    φv, kv, invalidv, Gssignv, Goeffv =
+        _reactant_Gθ_vortical_args(Go, θs, θo, um, up, m, TT)
+    φn, kn, invalidn, Gssignn, Goeffn = _reactant_Gθ_nonvortical_args(Go, θs, θo, up, m, TT)
+
+    φ = Base.ifelse(isvortical, φv, φn)
+    k = Base.ifelse(isvortical, kv, kn)
+    invalid = Base.ifelse(isvortical, invalidv, invalidn)
+    Gssign = Base.ifelse(isvortical, Gssignv, Gssignn)
+    Goeff = Base.ifelse(isvortical, Goeffv, Goeffn)
+
+    tempfac = inv(√abs(um * a2))
+    Gs = Gssign * tempfac * ellF(φ, k)
+
+    νθ = Base.ifelse(isincone, (n % 2 == 1) ⊻ (θo > θs), !isindir ⊻ (θs > TT(Base.pi / 2)))
+    signs = Base.ifelse(νθ, -one(TT), one(TT))
+    τcandidate = Base.ifelse(
         isindir,
-        um,
-        up,
-        m,
-        a2,
-        isincone,
-        TT,
+        (n + 1) * Ghat - signβ * Goeff - signs * Gs,
+        n * Ghat - signβ * Goeff - signs * Gs,
     )
-    τnon, Gsnon, Gonon, Ghatnon, validnon = _reactant_Gθ_nonvortical_minotime(
-        Go,
-        Ghat,
-        θs,
-        θo,
-        signβ,
-        n,
-        isindir,
-        um,
-        up,
-        m,
-        a2,
-        isincone,
-        TT,
-    )
-    τcandidate = Base.ifelse(isvortical, τvort, τnon)
-    Gscandidate = Base.ifelse(isvortical, Gsvort, Gsnon)
-    Gocandidate = Base.ifelse(isvortical, Govort, Gonon)
-    Ghatcandidate = Base.ifelse(isvortical, Ghatvort, Ghatnon)
-    validi = Base.ifelse(isvortical, validvort, validnon)
+
+    # The two branches disagree on what to hand back when their argument check fails: the
+    # vortical one keeps the cached Go/Ghat, the non-vortical one zeroes them.
+    Gofail = Base.ifelse(isvortical, Go, zero(Go))
+    Ghatfail = Base.ifelse(isvortical, Ghat, zero(Ghat))
+    τcandidate = Base.ifelse(invalid, zero(Go), τcandidate)
+    Gscandidate = Base.ifelse(invalid, zero(Go), Gs)
+    Gocandidate = Base.ifelse(invalid, Gofail, Goeff)
+    Ghatcandidate = Base.ifelse(invalid, Ghatfail, Ghat)
+    validi = Base.ifelse(invalid, zero(Go), one(Go))
 
     # The angular gate returns the cached Go/Ghat with everything else zeroed.
     τ = Base.ifelse(bad, zero(Go), τcandidate)

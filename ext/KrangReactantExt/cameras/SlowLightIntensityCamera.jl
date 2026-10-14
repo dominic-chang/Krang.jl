@@ -39,28 +39,3 @@ end
 Reactant.@reactant_overlay function Krang.SlowLightIntensityPixel(met::Krang.Kerr, α, β, θo)
     return _reactant_slow_light_intensity_pixel(met, α, β, θo)
 end
-
-
-#for (typespin, αT, βT, θT) in Iterators.product(types, types, types, types)
-#    if typespin == αT == βT == θT == Any
-#        continue
-#    end
-#
-#    @eval function Krang.SlowLightIntensityPixel(
-#        met::Krang.Kerr{$typespin},
-#        α::$αT,
-#        β::$βT,
-#        θo::$θT,
-#    ) 
-#        return _reactant_slow_light_intensity_pixel(met, α, β, θo)
-#    end
-#
-#    @eval function Krang.IntensityPixel(
-#        met::Krang.Kerr{$typespin},
-#        α::$αT,
-#        β::$βT,
-#        θo::$θT,
-#    )
-#        return _reactant_intensity_pixel(met, α, β, θo)
-#    end
-#end

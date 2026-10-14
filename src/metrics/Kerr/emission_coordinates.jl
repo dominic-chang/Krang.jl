@@ -64,8 +64,6 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 @inline function emission_radius(pix::AbstractPixel, τ::T)::Tuple{T,Bool,Int,Bool} where {T}
     met = metric(pix)
     a = met.spin
-    ans = zero(T)
-    νr = true
 
     rh = one(T) + √(one(T) - a^2)
 
@@ -107,7 +105,10 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
     θo = inclination(pix)
     _, β = pix.screen_coordinate
 
-    return _θs(met, sign(β), θo, η(pix), λ(pix), τ)
+    # `absGθo_Gθhat(pix)` is exactly the `(τo, τhat)` `_θs` would recompute, so hand the
+    # cached pair over instead of paying for another `F` and `K`.
+    Go, Ghat = absGθo_Gθhat(pix)
+    return _θs(met, sign(β), θo, η(pix), λ(pix), τ, Go, Ghat)
 end
 
 """
@@ -130,18 +131,30 @@ Emission azimuth for point at Mino time τ whose image appears at screen coordin
     isindir,
     n,
 ) where {T}
-    met = metric(pix)
-    θo = inclination(pix)
+    Gϕtemp, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
+    return @inline emission_azimuth(pix, rs, τ, νr, Gϕtemp)
+end
 
-    α, _ = pix.screen_coordinate
-    λtemp = λ(pix)
+"""
+Emission azimuth from an already-computed `Gϕ`.
+
+For callers that already hold `Gϕ` and would otherwise pay for a second pass through
+[`Gϕ`](@ref), which redoes the whole angular setup.
+
+# Arguments
+
+- `pix` : Pixel information
+- `rs` : Emission radius
+- `τ` : Mino Time
+- `νr` : Sign of radial velocity direction at emission. This is always positive for case 3 and case 4 geodesics.
+- `Gϕtemp` : The ϕ angular antiderivative for this emission inclination
+"""
+@inline function emission_azimuth(pix::AbstractPixel, rs, τ, νr, Gϕtemp)
     Iϕ = Krang.Iϕ(pix, rs, τ, νr)
     (isnan(Iϕ) || !isfinite(Iϕ)) && return Iϕ
-
-    Gϕtemp, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
     (isnan(Gϕtemp) || !isfinite(Gϕtemp)) && return Iϕ
 
-    return (Iϕ + λtemp * Gϕtemp)
+    return (Iϕ + λ(pix) * Gϕtemp)
 end
 
 """
@@ -178,13 +191,13 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 
     # is θ̇s increasing or decreasing?
     νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-    if isincone
-        νθ = (θo > θs) ⊻ (n % 2 == 1)
-    end
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
     issuccess || return err_return
 
+    # `Gϕ` is deliberately left until after the `emission_radius` gate: on a pixel that does
+    # not cache `absGϕo_Gϕhat` it is the single most expensive term here, and hoisting it up
+    # to share the angular setup with `Gθ` costs far more on rays that never get this far.
     ϕs = @inline emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
 
     return rs, ϕs, νr, νθ, issuccess
@@ -203,11 +216,12 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     met = metric(pix)
     θo = inclination(pix)
 
-    θs, τs, _, _, n, isindir = @inline emission_inclination(pix, τ)
-    νθ = τs > 0
+    θs, _, _, _, n, isindir = @inline emission_inclination(pix, τ)
+    cosθs = cos(θs)
+    cosθo = cos(θo)
 
     err_return = (zero(T), zero(T), zero(T), true, true, false)
-    if cos(θs) > abs(cos(θo))
+    if cosθs > abs(cosθo)
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
@@ -223,8 +237,9 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
     issuccess || return err_return
     _, _, _, Ip, Im = @inline radial_integrals(pix, rs, τ, νr)
 
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
+    rtΔ = √(one(T) - a^2)
+    rp = one(T) + rtΔ
+    rm = one(T) - rtΔ
 
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
@@ -232,7 +247,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 
     emission_azimuth = (Iϕ + λtemp * Gϕtemp)
 
-    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
+    νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     return rs, θs, emission_azimuth, νr, νθ, issuccess
 end
 
@@ -254,8 +269,9 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     θo = inclination(pix)
     cosθs = cos(θs)
     cosθo = cos(θo)
+    isincone = abs(cosθs) < abs(cosθo)
     err_return = (zero(T), zero(T), zero(T), false, false, false)
-    if cos(θs) > abs(cosθo)
+    if cosθs > abs(cosθo)
         αmin = @inline αboundary(met, θs)
         βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
 
@@ -274,8 +290,10 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 
     λtemp = λ(pix)
 
-    νθ = abs(cosθs) < abs(cosθo) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
-    if (abs(cosθs) < abs(cosθo))
+    # `isindir` is only overwritten on the `isincone` branch, which is exactly the branch
+    # whose `νθ` does not read it, so this value still holds after the reassignment below.
+    νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
+    if isincone
         isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
     end
     if isnan(τ)
@@ -294,14 +312,11 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
         I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
-    Gttemp, _, _, _, _ = @inline Gt(pix, θs, isindir, n)
+    # One angular setup for both; bit-identical to calling `Gϕ` and `Gt` separately.
+    Gϕtemp, Gttemp, _ = @inline _Gϕt(pix, θs, isindir, n)
 
     emission_azimuth = (Iϕ + λtemp * Gϕtemp)
     emission_time_regularized = (zero(T) + It + a^2 * Gttemp)
-
-    # is θ̇s increasing or decreasing?
-    νθ = abs(cos(θs)) < abs(cos(θo)) ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
 
     return emission_time_regularized, rs, emission_azimuth, νr, νθ, issuccess
 end
@@ -347,8 +362,8 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
         I2
     Iϕ = 2a / (rp - rm) * ((rp - a * λtemp / 2) * Ip - (rm - a * λtemp / 2) * Im)
 
-    Gϕtemp, _, _, _, _ = @inline Gϕ(pix, θs, isindir, n)
-    Gttemp, _, _, _, _ = @inline Gt(pix, θs, isindir, n)
+    # One angular setup for both; bit-identical to calling `Gϕ` and `Gt` separately.
+    Gϕtemp, Gttemp, _ = @inline _Gϕt(pix, θs, isindir, n)
 
     emission_azimuth = (Iϕ + λtemp * Gϕtemp)
     emission_time_regularized = (It + a^2 * Gttemp)
@@ -361,27 +376,49 @@ function θs(metric::Kerr{T}, α, β, θo, τ) where {T}
     return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 
-@inline function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T}
+@inline _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T} =
+    _θs(metric, signβ, θo, η, λ, τ, _absGθo_Gθhat(metric, θo, η, λ)...)
+
+@doc """
+    _θs(metric, signβ, θo, η, λ, τ, Go, Ghat)
+
+Emission inclination at Mino time `τ`, with the angular antiderivative pair
+`(Go, Ghat) = `[`_absGθo_Gθhat`](@ref)` supplied by the caller.
+
+Every pixel caches that pair, and recomputing it here costs an `F` and a `K` — together
+about 30% of this function. The turning points below therefore use the *same* guarded
+forms as `_absGθo_Gθhat` (`√max(…, 0)` and `min(…, 1 - eps)`); they used to be computed
+without those guards, which made the two disagree on the rays that cross the pole and
+blocked this reuse.
+"""
+@inline function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ, Go, Ghat) where {T}
     a = metric.spin
-    Ghat_2, isvortical = zero(T), η < zero(T)
+    isvortical = η < zero(T)
 
     Δθ = (1 - (η + λ^2) / a^2) / 2
-    dsc = √(Δθ^2 + η / a^2)
-    up = Δθ + dsc
+    # `_absGθo_Gθhat` hands back `(0, 0)` for rays whose angular turning points are
+    # degenerate (`a → 0`, or `argo` outside its branch). Reusing that would put a zero in
+    # `τ / τhat`, so those fall back to computing the pair here, with the unguarded turning
+    # points the cache-free path has always used.
+    usable = isfinite(Ghat) & (Ghat > zero(T))
+    dsc = usable ? √max(Δθ^2 + η / a^2, zero(T)) : √(Δθ^2 + η / a^2)
+    up = usable ? min(Δθ + dsc, one(T) - eps(T)) : Δθ + dsc
     um = Δθ - dsc
     m = up / um
-    k = m
 
-    #isvortical = η < 0.
-    ans, k, argo, τs, τo, τhat = zero(T), zero(T), zero(T), zero(T), zero(T), zero(T)
-    tempfac = one(T) / √abs(um * a^2)
+    τo = Go
+    τhat = Ghat
     if isvortical
-        argo = clamp((cos(θo)^2 - um) / (up - um), zero(T), one(T))
         k = one(T) - m
         tempfac = inv(√abs(um * a^2))
-        τo = tempfac * JacobiElliptic.F(asin(√argo), k)
-        Ghat_2 = tempfac * JacobiElliptic.K(k)
-        τhat = 2Ghat_2
+        if !usable
+            τo =
+                tempfac * JacobiElliptic.F(
+                    asin(√clamp((cos(θo)^2 - um) / (up - um), zero(T), one(T))),
+                    k,
+                )
+            τhat = 2 * tempfac * JacobiElliptic.K(k)
+        end
         Δτtemp = (τ % τhat + (θo > T(π / 2) ? -one(T) : one(T)) * signβ * τo)
         n = unsafe_trunc(Int, τ / τhat)
         absτs = abs(argmin(abs, (τhat - Δτtemp, Δτtemp)))
@@ -392,12 +429,13 @@ end
         sign = ans > T(π / 2) ? -one(T) : one(T)
         τo = sign * τo
     else
-        argo = clamp(cos(θo) / √(up), -one(T), one(T))
         k = m
         tempfac = inv(√abs(um * a^2))
-        τo = tempfac * JacobiElliptic.F(asin(argo), k)
-        Ghat_2 = tempfac * JacobiElliptic.K(k)
-        τhat = Ghat_2 + Ghat_2
+        if !usable
+            τo =
+                tempfac * JacobiElliptic.F(asin(clamp(cos(θo) / √(up), -one(T), one(T))), k)
+            τhat = 2 * tempfac * JacobiElliptic.K(k)
+        end
         Δτtemp = (τ % τhat + signβ * τo)
         n = unsafe_trunc(Int, τ / τhat)
         sign = (n % 2 == 1) ? -one(T) : one(T)

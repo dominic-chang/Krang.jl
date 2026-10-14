@@ -32,35 +32,62 @@ Regularized elliptic integral of the third kind
 - `ϕ`: Arguments
 - `k`: Parameter
 """
-function regularized_Pi(n, ϕ, k)
+regularized_Pi(n, ϕ, k) = regularized_Pi(n, ϕ, k, JacobiElliptic.F(ϕ, k))
+
+"""
+`regularized_Pi` with `F(ϕ|k)` supplied by the caller.
+
+Inside one radial-integral case every elliptic integral is evaluated at the same amplitude
+and modulus, so `F(ϕ, k)` comes up several times with identical arguments — five times in
+case 4, twice in case 3. Threading the value through computes it once. The `_*_at_F`
+variants below exist for the same reason.
+"""
+@inline function regularized_Pi(n, ϕ, k, Fϕ)
     ω = k / n
-    return JacobiElliptic.F(ϕ, k) - JacobiElliptic.Pi(ω, ϕ, k)
+    return Fϕ - JacobiElliptic.Pi(ω, ϕ, k)
 end
 
-function regularized_R1(α, φ, j)
+regularized_R1(α, φ, j) = regularized_R1(α, φ, j, JacobiElliptic.F(φ, j))
+
+"`regularized_R1` with `F(φ|j)` supplied by the caller; see [`regularized_Pi`](@ref)."
+@inline function regularized_R1(α, φ, j, Fφ)
     n = α^2 / (α^2 - 1)
-    return 1 / (1 - α^2) * (regularized_Pi(n, φ, j))
+    return 1 / (1 - α^2) * (regularized_Pi(n, φ, j, Fφ))
 end
 
-function regularized_R2(α, φ, j)
+regularized_R2(α, φ, j) = regularized_R2(α, φ, j, JacobiElliptic.CarlsonAlg._F_E(φ, j)...)
 
-    return 1 / (1 - α^2) *
-           (JacobiElliptic.F(φ, j) - α^2 / (j + (1 - j) * α^2) * (JacobiElliptic.E(φ, j)
-    #-α*sin(φ)*sqrt(1-j*sin(φ)^2)/(1+α*cos(φ)) #Linear Divergent term
+"`regularized_R2` with `(F, E)` at `(φ, j)` from the caller; see [`regularized_Pi`](@ref)."
+@inline function regularized_R2(α, φ, j, Fφ, Eφ)
+    return 1 / (1 - α^2) * (Fφ - α^2 / (j + (1 - j) * α^2) * (
+        Eφ
+        #-α*sin(φ)*sqrt(1-j*sin(φ)^2)/(1+α*cos(φ)) #Linear Divergent term
     )) #+ 
     #inv(j+(1-j)*α^2)*(2*j-α^2/(α^2-1))*regularized_R1(α, φ, j)
 end
 
-function regularizedS1(α, φ, j)
+regularizedS1(α, φ, j) = regularizedS1(α, φ, j, JacobiElliptic.F(φ, j))
+
+"`regularizedS1` with `F(φ|j)` supplied by the caller; see [`regularized_Pi`](@ref)."
+@inline function regularizedS1(α, φ, j, Fφ)
     α2 = α * α
-    return inv(1 + α2) * (JacobiElliptic.F(φ, j) + α2 * regularized_Pi(1 + α2, φ, j))# - α*f2(α, sin(φ), j)) # logarithmic divergence removed
+    return inv(1 + α2) * (Fφ + α2 * regularized_Pi(1 + α2, φ, j, Fφ))# - α*f2(α, sin(φ), j)) # logarithmic divergence removed
 end
 
 function regularizedS2(α, φ, j)
+    Fφ, Eφ = JacobiElliptic.CarlsonAlg._F_E(φ, j)
+    return regularizedS2(α, φ, j, regularizedS1(α, φ, j, Fφ), Fφ, Eφ)
+end
 
-    return -inv((1 + α^2) * (1 - j + α^2)) *
-           ((1 - j) * JacobiElliptic.F(φ, j) + α^2 * JacobiElliptic.E(φ, j)) +# + α^2*√(1-j*sin(φ)^2)-α^3) +
-           (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * regularizedS1(α, φ, j)
+"""
+`regularizedS2` with `regularizedS1(α, φ, j)` supplied by the caller.
+
+`regularizedS1` costs three elliptic evaluations, and every caller of `regularizedS2`
+already evaluates it at the same `(α, φ, j)`, so passing it in avoids repeating them.
+"""
+@inline function regularizedS2(α, φ, j, S1reg, Fφ, Eφ)
+    return -inv((1 + α^2) * (1 - j + α^2)) * ((1 - j) * Fφ + α^2 * Eφ) +# + α^2*√(1-j*sin(φ)^2)-α^3) +
+           (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1reg
 end
 
 function p1(α, j)
@@ -168,20 +195,23 @@ function R2(α, φ, j)
     )/denom + inv(j + (1 - j) * α^2) * (2 * j + α^2 / ((1 - α^2) + epsT)) * R1(α, φ, j)
 end
 
-function S1(α, φ, j)
+S1(α, φ, j) = S1(α, φ, j, JacobiElliptic.F(φ, j))
+
+"`S1` with `F(φ|j)` supplied by the caller; see [`regularized_Pi`](@ref)."
+@inline function S1(α, φ, j, Fφ)
     α2 = α * α
-    return inv(1 + α2) * (
-        JacobiElliptic.F(φ, j) + α2 * JacobiElliptic.Pi(1 + α2, φ, j) -
-        α * f2(α, sin(φ), j)
-    )
+    return inv(1 + α2) * (Fφ + α2 * JacobiElliptic.Pi(1 + α2, φ, j) - α * f2(α, sin(φ), j))
 end
 
-function S2(α, φ, j)
+S2(α, φ, j) = S2(α, φ, j, JacobiElliptic.CarlsonAlg._F_E(φ, j)...)
+
+"`S2` with `(F, E)` at `(φ, j)` from the caller; see [`regularized_Pi`](@ref)."
+@inline function S2(α, φ, j, Fφ, Eφ)
     return -inv((1 + α^2) * (1 - j + α^2)) * (
-        (1 - j) * JacobiElliptic.F(φ, j) +
-        α^2 * JacobiElliptic.E(φ, j) +
+        (1 - j) * Fφ +
+        α^2 * Eφ +
         α^2 * √(1 - j * sin(φ)^2) * (α - tan(φ)) / (1 + α * tan(φ)) - α^3
-    ) + (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j)
+    ) + (inv(1 + α^2) + (1 - j) / (1 - j + α^2)) * S1(α, φ, j, Fφ)
 end
 
 """
@@ -642,8 +672,12 @@ function Iϕ_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_p) || isnan(x4_m)) && return T(NaN)
-    S1p_o = S1(gp, T(π / 2) + atan(go), k4)
-    S1m_o = S1(gm, T(π / 2) + atan(go), k4)
+    # Every elliptic integral in this case is evaluated at this one amplitude, and five of
+    # them are `F` with identical arguments, so evaluate it once and thread it through.
+    φ4_o = T(π / 2) + atan(go)
+    F4_o, E4_o = JacobiElliptic.CarlsonAlg._F_E(φ4_o, k4)
+    S1p_o = S1(gp, φ4_o, k4, F4_o)
+    S1m_o = S1(gm, φ4_o, k4, F4_o)
 
     Ip =
         go / (a2 * (1 - go * x4_p)) *
@@ -772,8 +806,12 @@ function Iϕ_w_I0_terms_case4(metric::Kerr{T}, rs, τ, roots::NTuple{4}, λ) whe
     gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(Inf)
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
+    # One amplitude for every elliptic integral here; `F` at it is shared (see
+    # [`regularized_Pi`](@ref)).
+    φ4_s = atan(x4_s) + atan(go)
+    F4_s, E4_s = JacobiElliptic.CarlsonAlg._F_E(φ4_s, k4)
+    S1p_s = S1(gp, φ4_s, k4, F4_s)
+    S1m_s = S1(gm, φ4_s, k4, F4_s)
 
     Ip =
         go / (a2 * (1 - go * x4_p)) *
@@ -830,11 +868,16 @@ function It_inf_case2(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
-    E_o = √(r31 * r42) * JacobiElliptic.E(asin(x2_o), k)
+    # `inv(√n)` and `x2_o` are the same turning point written two ways and differed by a
+    # few ulp; use the one amplitude, and take `F` and `E` from the single Carlson `RF`
+    # pass they share (`_F_E` falls back to the separate entry points off the principal
+    # arch, so it is safe for any argument).
+    φ2_o = asin(x2_o)
+    F2_o, E2_o = JacobiElliptic.CarlsonAlg._F_E(φ2_o, k)
+    E_o = √(r31 * r42) * E2_o
 
     #equation B37
-    I1_total =
-        log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k))# Removed the logarithmic divergence
+    I1_total = log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, φ2_o, k, F2_o))# Removed the logarithmic divergence
     #equation B38
     I2_total = r3 - E_o # asymptotic Divergent piece is not included
 
@@ -882,8 +925,11 @@ function It_inf_case3(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
 
     αo = (B + A) / (B - A)
 
-    Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3) # Divergence is removed, will be added back in the end
-    Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3)# Divergence is removed, will be added back in the end
+    # `regularized_R1` and `regularized_R2` both want `F(φ_o, k3)`, and `R2` also wants
+    # `E` at that amplitude; one `_F_E` pass covers all three.
+    F3_o, E3_o = JacobiElliptic.CarlsonAlg._F_E(φ_o, k3)
+    Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3, F3_o) # Divergence is removed, will be added back in the end
+    Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3, F3_o, E3_o)# Divergence is removed, will be added back in the end
 
     C1p_o = _R1_alpha_combined(A, B, rp1, rp2, r21, φ_o, k3)
     C1m_o = _R1_alpha_combined(A, B, rm1, rm2, r21, φ_o, k3)
@@ -927,12 +973,20 @@ function It_inf_case4(metric::Kerr{T}, roots::NTuple{4}, λ) where {T}
     gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_p) || isnan(x4_m)) && return T(NaN)
-    S1p_o = S1(gp, T(π / 2) + atan(go), k4)
-    S1m_o = S1(gm, T(π / 2) + atan(go), k4)
+    # Every elliptic integral in this case is evaluated at this one amplitude, and five of
+    # them are `F` with identical arguments, so evaluate it once and thread it through.
+    φ4_o = T(π / 2) + atan(go)
+    F4_o, E4_o = JacobiElliptic.CarlsonAlg._F_E(φ4_o, k4)
+    S1p_o = S1(gp, φ4_o, k4, F4_o)
+    S1m_o = S1(gm, φ4_o, k4, F4_o)
 
-    Π1_o = 2 / (C + D) * (a2 / go * (1 + go^2)) * regularizedS1(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
+    S1reg_o = regularizedS1(go, φ4_o, k4, F4_o)
+    # Divergences are removed here and added back at the end.
+    Π1_o = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1reg_o
     Π2_o =
-        2 / (C + D) * (a2 / go * (1 + go^2))^2 * regularizedS2(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
+        2 / (C + D) *
+        (a2 / go * (1 + go^2))^2 *
+        regularizedS2(go, φ4_o, k4, S1reg_o, F4_o, E4_o)
 
     I1_total =
         -(Π1_o) +
@@ -1142,11 +1196,15 @@ end
     gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return T(NaN)
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
+    # One amplitude for every elliptic integral here; `F` at it is shared (see
+    # [`regularized_Pi`](@ref)).
+    φ4_s = atan(x4_s) + atan(go)
+    F4_s, E4_s = JacobiElliptic.CarlsonAlg._F_E(φ4_s, k4)
+    S1p_s = S1(gp, φ4_s, k4, F4_s)
+    S1m_s = S1(gm, φ4_s, k4, F4_s)
 
-    Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
-    Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
+    Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, φ4_s, k4, F4_s)
+    Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, φ4_s, k4, F4_s, E4_s)
 
     I0_total = τ
     # Removed logarithmic divergence
@@ -1207,11 +1265,17 @@ Returns the radial integrals for the case where there are four real roots in the
 
     coef = 2 / √(r31 * r42)
     n = abs(r41 / r31)
-    E_o = √(r31 * r42) * JacobiElliptic.E(asin(x2_o), k)
+    # `inv(√n)` and `x2_o` are the same turning point written two ways and differed by a
+    # few ulp; use the one amplitude, and take `F` and `E` from the single Carlson `RF`
+    # pass they share (`_F_E` falls back to the separate entry points off the principal
+    # arch, so it is safe for any argument).
+    φ2_o = asin(x2_o)
+    F2_o, E2_o = JacobiElliptic.CarlsonAlg._F_E(φ2_o, k)
+    E_o = √(r31 * r42) * E2_o
 
     #equation B37
     I1o_m_I0_terms =
-        log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, asin(inv(√n)), k))
+        log(16 / (r31 + r42)^2) / 2 + r43 * (coef * regularized_Pi(n, φ2_o, k, F2_o))
     #equation B38
     I2o_m_I0_terms = r3 - E_o# asymptotic Divergent piece is not included
 
@@ -1247,8 +1311,9 @@ Returns the radial integrals for the case where there are two real roots in the 
     αo = (B + A) / (B - A)
 
     φ_o = acos((A - B) / (A + B))
-    Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3)
-    Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3)
+    F3_o, E3_o = JacobiElliptic.CarlsonAlg._F_E(φ_o, k3)
+    Π1_o = 2 * r21 * √real(A * B) / (B2 - A2) * regularized_R1(αo, φ_o, k3, F3_o)
+    Π2_o = ((2 * r21 * √(A * B) / (B2 - A2))^2) * regularized_R2(αo, φ_o, k3, F3_o, E3_o)
 
     C1p_o = _R1_alpha_combined(A, B, rp1, rp2, r21, φ_o, k3)
     C1m_o = _R1_alpha_combined(A, B, rm1, rm2, r21, φ_o, k3)
@@ -1286,11 +1351,19 @@ Returns the radial integrals for the case where there are no real roots in the r
     gp = (go * x4_p - 1) / (go + x4_p)
     gm = (go * x4_m - 1) / (go + x4_m)
 
-    S1p_o = S1(gp, T(π / 2) + atan(go), k4)
-    S1m_o = S1(gm, T(π / 2) + atan(go), k4)
-    Π1_o = 2 / (C + D) * (a2 / go * (1 + go^2)) * regularizedS1(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
+    # Every elliptic integral in this case is evaluated at this one amplitude, and five of
+    # them are `F` with identical arguments, so evaluate it once and thread it through.
+    φ4_o = T(π / 2) + atan(go)
+    F4_o, E4_o = JacobiElliptic.CarlsonAlg._F_E(φ4_o, k4)
+    S1p_o = S1(gp, φ4_o, k4, F4_o)
+    S1m_o = S1(gm, φ4_o, k4, F4_o)
+    S1reg_o = regularizedS1(go, φ4_o, k4, F4_o)
+    # Divergences are removed here and added back at the end.
+    Π1_o = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1reg_o
     Π2_o =
-        2 / (C + D) * (a2 / go * (1 + go^2))^2 * regularizedS2(go, T(π / 2) + atan(go), k4) # Divergence is removed, will be added back in the end
+        2 / (C + D) *
+        (a2 / go * (1 + go^2))^2 *
+        regularizedS2(go, φ4_o, k4, S1reg_o, F4_o, E4_o)
 
     # Removed logarithmic divergence
     I1o_num = (16 * (1 + go^2 - sqrt((1 + go^2) * (1 + go^2 - k4))) * (1 + go^2 - k4))
@@ -1483,11 +1556,15 @@ Returns the radial integrals for the case where there are no real roots in the r
     gm = (go * x4_m - 1) / (go + x4_m)
 
     (isnan(x4_s) || isnan(x4_p) || isnan(x4_m)) && return zero(T), zero(T), zero(T), zero(T)
-    S1p_s = S1(gp, atan(x4_s) + atan(go), k4)
-    S1m_s = S1(gm, atan(x4_s) + atan(go), k4)
+    # One amplitude for every elliptic integral here; `F` at it is shared (see
+    # [`regularized_Pi`](@ref)).
+    φ4_s = atan(x4_s) + atan(go)
+    F4_s, E4_s = JacobiElliptic.CarlsonAlg._F_E(φ4_s, k4)
+    S1p_s = S1(gp, φ4_s, k4, F4_s)
+    S1m_s = S1(gm, φ4_s, k4, F4_s)
     #Fr_s = 2 / (C + D) * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
-    Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, atan(x4_s) + atan(go), k4)
-    Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, atan(x4_s) + atan(go), k4)
+    Π1_s = 2 / (C + D) * (a2 / go * (1 + go^2)) * S1(go, φ4_s, k4, F4_s)
+    Π2_s = 2 / (C + D) * (a2 / go * (1 + go^2))^2 * S2(go, φ4_s, k4, F4_s, E4_s)
 
     # Removed logarithmic divergence
     I1_total = -(a2 / go - b1) * τ + (-Π1_s)
@@ -1742,12 +1819,7 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
     up = min(Δθ + desc, 1 - eps(T))
     um = Δθ - desc
     m = up / um
-    k = m
 
-    #isvortical = η < 0.
-    args = zero(T)
-    argo = zero(T)
-    k = zero(T)
     if isvortical
         args = (cosθs^2 - um) / (up - um)
         argo = (cosθo^2 - um) / (up - um)
@@ -1823,19 +1895,22 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
 end
 
 @inline function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
 
     signβ = sign(β)
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
 
     a = met.spin
+    a2 = a^2
     Go, Ghat = absGϕo_Gϕhat(pix)
     Gs, ans, isvortical = zero(T), zero(T), ηtemp < zero(T)
 
-    isincone = abs(cos(θs)) < abs(cos(θo))
+    cosθs = cos(θs)
+    cosθo = cos(θo)
+    isincone = abs(cosθs) < abs(cosθo)
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
         return ans, Gs, Go, Ghat, isvortical, false
     end
@@ -1845,35 +1920,32 @@ end
         return ans, Gs, Go, Ghat, isvortical, false
     end
 
-    Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), 1 - eps(T))
-    um = Δθ - √(Δθ^2 + ηtemp / a^2)
+    Δθ = (1 - (ηtemp + λtemp^2) / a2) / T(2)
+    desc = √(Δθ^2 + ηtemp / a2)
+    up = min(Δθ + desc, 1 - eps(T))
+    um = Δθ - desc
     m = up / um
     k = m
 
-    #isvortical = η < 0.
-    args = zero(T)
-    argo = zero(T)
-    #k = 0
     if isvortical
-        args = (cos(θs)^2 - um) / (up - um)
-        argo = (cos(θo)^2 - um) / (up - um)
+        args = (cosθs^2 - um) / (up - um)
+        argo = (cosθo^2 - um) / (up - um)
         k = 1 - m
         if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
             return ans, Gs, Go, Ghat, isvortical, false
         end
-        tempfac = inv((1 - um) * √abs(um * a^2))
+        tempfac = inv((1 - um) * √abs(um * a2))
         argn = (up - um) / (1 - um)
         Go = ((θs > T(π / 2)) ? -1 : 1) * Go
         Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.Pi(argn, asin(√args), k)
     else
-        args = cos(θs) / √(up)
-        argo = cos(θo) / √(up)
+        args = cosθs / √(up)
+        argo = cosθo / √(up)
         #k = abs(m)
         if !(-1 < args < 1) || !(-1 < argo < 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
-        tempfac = inv(√abs(um * a^2))
+        tempfac = inv(√abs(um * a2))
         Gs = tempfac * JacobiElliptic.Pi(up, asin(args), k)
     end
 
@@ -1886,18 +1958,22 @@ end
 end
 
 @inline function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
-    α, β = screen_coordinate(pix)
+    _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
     signβ = sign(β)
 
-    ηtemp = η(met, α, β, θo)
-    λtemp = λ(met, α, θo)
+    # The pixel already caches these; recomputing them from (α, β, θo) gives the same bits.
+    ηtemp = η(pix)
+    λtemp = λ(pix)
     a = met.spin
+    a2 = a^2
     Go, Ghat = absGto_Gthat(pix)
     Gs, ans, isvortical = zero(T), zero(T), ηtemp < zero(T)
 
-    isincone = abs(cos(θs)) < abs(cos(θo))
+    cosθs = cos(θs)
+    cosθo = cos(θo)
+    isincone = abs(cosθs) < abs(cosθo)
     if isincone && (isindir != ((signβ > zero(T)) ⊻ (θo > T(π / 2))))
         return ans, Gs, Go, Ghat, isvortical, false
     end
@@ -1907,39 +1983,37 @@ end
         return ans, Gs, Go, Ghat, isvortical, false
     end
 
-    Δθ = (1 - (ηtemp + λtemp^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), 1 - eps(T))
-    um = Δθ - √(Δθ^2 + ηtemp / a^2)
+    Δθ = (1 - (ηtemp + λtemp^2) / a2) / T(2)
+    desc = √(Δθ^2 + ηtemp / a2)
+    up = min(Δθ + desc, 1 - eps(T))
+    um = Δθ - desc
     m = up / um
     k = m
 
-    #isvortical = η < 0.
-    args = zero(T)
-    argo = zero(T)
-    #k = 0
-    cosθo = cos(θo)
     if isvortical
-        args = (cos(θs)^2 - um) / (up - um)
+        args = (cosθs^2 - um) / (up - um)
         argo = (cosθo^2 - um) / (up - um)
         k = 1 - m
         if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
             return ans, Gs, Go, Ghat, isvortical, false
         end
-        tempfac = √abs(um / a^2)
+        tempfac = √abs(um / a2)
         Go *= ((θs > T(π / 2)) ? -1 : 1)
         Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.E(asin(√args), k)
 
     else
-        args = cos(θs) / √(up)
+        args = cosθs / √(up)
         argo = cosθo / √(up)
         #k = abs(m)
         if !(-1 < args < 1) || !(-1 < argo < 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
-        tempfac = -2 * up * inv(√abs(um * a^2))
-        Gs =
-            tempfac * (JacobiElliptic.E(asin(args), k) - JacobiElliptic.F(asin(args), k)) /
-            (2k)
+        tempfac = -2 * up * inv(√abs(um * a2))
+        # `E` and `F` at one amplitude come out of a single Carlson pass, and the Enzyme
+        # rule for `_F_E` likewise builds the whole 2x2 Jacobian from that one pair.
+        φs = asin(args)
+        Fs, Es = JacobiElliptic.CarlsonAlg._F_E(φs, k)
+        Gs = tempfac * (Es - Fs) / (2k)
     end
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
@@ -1948,6 +2022,89 @@ end
         n * Ghat - signβ * Go + (νθ ? 1 : -1) * Gs
     ) #Sign of Go indicates whether the ray is from the forward cone or the rear cone
     return ans, Gs, Go, Ghat, isvortical, true
+end
+
+"""
+Returns `(Gϕ, Gt, issuccess)`: the ϕ and t angular antiderivatives of [`Gϕ`](@ref) and
+[`Gt`](@ref) for the same emission inclination.
+
+Both share the whole angular setup — `η`, `λ`, the turning points `up`/`um`, the modulus `k`
+and the amplitude `asin(args)` — and differ only in which elliptic integral they evaluate at
+that amplitude. The `emission_coordinates` methods always want both, so computing the setup
+once avoids doing it twice. Results are bit-identical to calling `Gϕ` and `Gt` separately.
+"""
+@inline function _Gϕt(pix::AbstractPixel, θs::T, isindir, n)::Tuple{T,T,Bool} where {T}
+    _, β = screen_coordinate(pix)
+    met = metric(pix)
+    θo = inclination(pix)
+    signβ = sign(β)
+    ηtemp = η(pix)
+    λtemp = λ(pix)
+
+    a = met.spin
+    a2 = a^2
+    isvortical = ηtemp < zero(T)
+    z = zero(T)
+
+    cosθs = cos(θs)
+    cosθo = cos(θo)
+    isincone = abs(cosθs) < abs(cosθo)
+    if isincone && (isindir != ((signβ > z) ⊻ (θo > T(π / 2))))
+        return z, z, false
+    end
+    if ((((signβ < z) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) ||
+       (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
+        return z, z, false
+    end
+
+    Δθ = (1 - (ηtemp + λtemp^2) / a2) / T(2)
+    desc = √(Δθ^2 + ηtemp / a2)
+    up = min(Δθ + desc, 1 - eps(T))
+    um = Δθ - desc
+    m = up / um
+
+    if isvortical
+        args = (cosθs^2 - um) / (up - um)
+        argo = (cosθo^2 - um) / (up - um)
+        k = 1 - m
+        if (!(z < argo < 1) || !(z < args < 1))
+            return z, z, false
+        end
+        φs = asin(√args)
+        sgn = (θs > T(π / 2)) ? -1 : 1
+        Gϕs =
+            sgn *
+            inv((1 - um) * √abs(um * a2)) *
+            JacobiElliptic.Pi((up - um) / (1 - um), φs, k)
+        Gts = sgn * √abs(um / a2) * JacobiElliptic.E(φs, k)
+        # Fetched only here: on a pixel that does not cache them these are a full
+        # recompute, and every early return above would otherwise pay for it.
+        Gϕo_t, Gϕhat = absGϕo_Gϕhat(pix)
+        Gto_t, Gthat = absGto_Gthat(pix)
+        Gϕo = sgn * Gϕo_t
+        Gto = sgn * Gto_t
+    else
+        args = cosθs / √(up)
+        argo = cosθo / √(up)
+        k = m
+        if !(-1 < args < 1) || !(-1 < argo < 1)
+            return z, z, false
+        end
+        φs = asin(args)
+        tempfac = inv(√abs(um * a2))
+        Gϕs = tempfac * JacobiElliptic.Pi(up, φs, k)
+        Fs, Es = JacobiElliptic.CarlsonAlg._F_E(φs, k)
+        Gts = (-2 * up * tempfac) * (Es - Fs) / (2k)
+        Gϕo, Gϕhat = absGϕo_Gϕhat(pix)
+        Gto, Gthat = absGto_Gthat(pix)
+    end
+
+    νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
+    sgnθ = νθ ? 1 : -1
+    norb = isindir ? n + 1 : n
+    return norb * Gϕhat - signβ * Gϕo + sgnθ * Gϕs,
+    norb * Gthat - signβ * Gto + sgnθ * Gts,
+    true
 end
 
 ##----------------------------------------------------------------------------------------------------------------------
@@ -1965,10 +2122,6 @@ end
     up = min(Δθ + desc, 1 - eps(T))
     um = Δθ - desc
     m = up / um
-    k = m
-
-    argo = zero(T)
-    k = zero(T)
 
     cosθo = cos(θo)
     if isvortical
@@ -1986,7 +2139,7 @@ end
         if !(-1 < argo < 1)
             return Go, Ghat
         end
-        tempfac = 1 / √abs(um * a^2)
+        tempfac = 1 / √abs(um * a2)
         Go = tempfac * JacobiElliptic.F(asin(argo), k)
         Ghat = 2 * tempfac * JacobiElliptic.K(k)
     end
@@ -1997,17 +2150,16 @@ end
 @inline function _absGϕo_Gϕhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
 
     a = metric.spin
+    a2 = a^2
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
-    Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + η / a^2), 1 - eps(T))
-    um = Δθ - √(Δθ^2 + η / a^2)
+    Δθ = (1 - (η + λ^2) / a2) / T(2)
+    desc = √(Δθ^2 + η / a2)
+    up = min(Δθ + desc, 1 - eps(T))
+    um = Δθ - desc
     m = up / um
     k = m
 
-    #isvortical = η < 0.
-    argo = zero(T)
-    #k = 0
     cosθo = cos(θo)
     if isvortical
         argo = (cosθo^2 - um) / (up - um)
@@ -2015,7 +2167,7 @@ end
         if (!(zero(T) < argo < 1))
             return Go, Ghat
         end
-        tempfac = inv((1 - um) * √abs(um * a^2))
+        tempfac = inv((1 - um) * √abs(um * a2))
         argn = (up - um) / (1 - um)
         Go = tempfac * JacobiElliptic.Pi(argn, asin(√argo), k)
         Ghat = 2tempfac * JacobiElliptic.Pi(argn, k)
@@ -2025,7 +2177,7 @@ end
         if !(-1 < argo < 1)
             return Go, Ghat
         end
-        tempfac = inv(√abs(um * a^2))
+        tempfac = inv(√abs(um * a2))
 
         Go = tempfac * JacobiElliptic.Pi(up, asin(argo), k)
         Ghat = 2tempfac * JacobiElliptic.Pi(up, k)
@@ -2036,17 +2188,16 @@ end
 
 @inline function _absGto_Gthat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
+    a2 = a^2
     Go, Ghat, isvortical = zero(T), zero(T), η < zero(T)
 
-    Δθ = (1 - (η + λ^2) / a^2) / T(2)
-    up = min(Δθ + √(Δθ^2 + η / a^2), 1 - eps(T))
-    um = Δθ - √(Δθ^2 + η / a^2)
+    Δθ = (1 - (η + λ^2) / a2) / T(2)
+    desc = √(Δθ^2 + η / a2)
+    up = min(Δθ + desc, 1 - eps(T))
+    um = Δθ - desc
     m = up / um
     k = m
 
-    #isvortical = η < 0.
-    argo = zero(T)
-    #k = 0
     cosθo = cos(θo)
     if isvortical
         argo = (cosθo^2 - um) / (up - um)
@@ -2054,7 +2205,7 @@ end
         if (!(zero(T) < argo < 1))
             return Go, Ghat
         end
-        tempfac = √abs(um / a^2)
+        tempfac = √abs(um / a2)
         Go = tempfac * JacobiElliptic.E(asin(√argo), k)
         Ghat = 2tempfac * JacobiElliptic.E(k)
 
@@ -2064,11 +2215,15 @@ end
         if !(-1 < argo < 1)
             return Go, Ghat
         end
-        tempfac = -2 * up * inv(√abs(um * a^2))
-        Go =
-            tempfac * (JacobiElliptic.E(asin(argo), k) - JacobiElliptic.F(asin(argo), k)) /
-            (2k)
-        Ghat = tempfac * (JacobiElliptic.E(k) - JacobiElliptic.K(k)) / k
+        tempfac = -2 * up * inv(√abs(um * a2))
+        φo = asin(argo)
+        Fo, Eo = JacobiElliptic.CarlsonAlg._F_E(φo, k)
+        Go = tempfac * (Eo - Fo) / (2k)
+        # `K(k)` and `E(k)` each run the whole AGM pass and discard the other half.
+        # `ellipke` returns both from one pass and, since JacobiElliptic gained Enzyme
+        # rules for it, costs the same under `Reverse` as the two separate calls.
+        Kc, Ec = JacobiElliptic.ArithmeticGeometricMeanAlg.ellipke(k)
+        Ghat = tempfac * (Ec - Kc) / k
     end
 
     return Go, Ghat
