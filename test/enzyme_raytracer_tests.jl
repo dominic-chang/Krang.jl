@@ -128,6 +128,29 @@ using EnzymeTestUtils: test_forward, test_reverse
         @test dq[1] ≈ fd rtol = 1e-5
     end
 
+    @testset "Outer-horizon Π pole stays differentiable" begin
+        # Where `Iϕ_inf`'s outer-horizon term had n_α = 1 exactly, `Pi` returned `Inf`, and its
+        # partials took the gradient of everything upstream of it to `NaN`.
+        iϕsum(q) = begin
+            m = Krang.Kerr(q[3])
+            ηq, λq = Krang.η(m, q[1], q[2], q[4]), Krang.λ(m, q[1], q[4])
+            return Krang.Iϕ_inf(m, Krang.get_radial_roots(m, ηq, λq), λq)
+        end
+        q0 = [
+            -0.008606771507524978,
+            1.1337476592968216,
+            0.6433543857993874,
+            deg2rad(178.74774632565868),
+        ]
+        dq = zeros(4)
+        Enzyme.autodiff(Enzyme.Reverse, iϕsum, Enzyme.Active, Enzyme.Duplicated(q0, dq))
+        @test all(isfinite, dq)
+
+        h = 1e-6
+        fd = (iϕsum(q0 .+ [0, h, 0, 0]) - iϕsum(q0 .- [0, h, 0, 0])) / 2h
+        @test dq[2] ≈ fd rtol = 1e-4
+    end
+
     @testset "Fast-Light Kerr-Schild" begin
         f_r(r) = begin
             x, y, z = Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light(
