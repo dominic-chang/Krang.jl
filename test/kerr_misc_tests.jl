@@ -83,6 +83,28 @@
         @test worstres < 1e-12
     end
 
+    @testset "Outer-horizon Π pole at n_α = 1" begin
+        # Case-3 rays where D = B·(r₊ - r2) - A·(r₊ - r1) → 0 in `Iϕ_inf`'s outer-horizon term:
+        # `S²/R` rounded to ≤ 1, so `n_α = S²/R + eps` hit exactly 1 and `Pi(1, φ > π/2, j)` gave
+        # `Inf`. The true value is finite and smooth across the curve.
+        @testset "a = $aspin" for (αq, βq, aspin, θdeg) in (
+            (-0.008606771507524978, 1.1337476592968216, 0.6433543857993874, 178.74774632565868),
+            (1.552211279342129, 1.3510414731222058, 0.1659479920332821, 164.8378376688867),
+            (-1.801980906526612, -1.2428547345524468, 0.21844395579901663, 167.31388832950844),
+        )
+            m = Kerr(aspin)
+            θq = deg2rad(θdeg)
+            iϕ(αx) = begin
+                ηq, λq = η(m, αx, βq, θq), λ(m, αx, θq)
+                Krang.Iϕ_inf(m, get_radial_roots(m, ηq, λq), λq)
+            end
+            @test isfinite(iϕ(αq))
+            # matches the neighbouring screen points, where n_α is resolved
+            @test iϕ(αq) ≈ iϕ(αq + 1e-8) rtol = 1e-7
+            @test iϕ(αq) ≈ iϕ(αq - 1e-8) rtol = 1e-7
+        end
+    end
+
 
     @testset "Radial Integrals 1" begin
         a = 0.99
