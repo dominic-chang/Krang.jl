@@ -266,13 +266,15 @@ end
 """
     absGθo_Gθhat(pix::AbstractPixel)
 
-Calculate the absolute value of Gθo divided by Gθhat for a given pixel.
+Calculate the pair `(|Gθo|, Gθhat)` for a given pixel: the angular antiderivative at the
+observer, and the same antiderivative over a half orbit. The two names are the two returned
+quantities, not a quotient.
 
 # Arguments
 - `pix::AbstractPixel`: The pixel of a screen.
 
 # Returns
-- The absolute value of Gθo divided by Gθhat of the pixel.
+- The 2-tuple `(|Gθo|, Gθhat)` of the pixel.
 """
 function absGθo_Gθhat(pix::AbstractPixel)
     return _absGθo_Gθhat(metric(pix), inclination(pix), η(pix), λ(pix))
@@ -281,13 +283,15 @@ end
 """
     absGϕo_Gϕhat(pix::AbstractPixel)
 
-Calculate the absolute value of Gϕo divided by Gϕhat for a given pixel.
+Calculate the pair `(|Gϕo|, Gϕhat)` for a given pixel: the angular antiderivative at the
+observer, and the same antiderivative over a half orbit. The two names are the two returned
+quantities, not a quotient.
 
 # Arguments
 - `pix::AbstractPixel`: The pixel of a screen.
 
 # Returns
-- The absolute value of Gϕo divided by Gϕhat of the pixel.
+- The 2-tuple `(|Gϕo|, Gϕhat)` of the pixel.
 """
 function absGϕo_Gϕhat(pix::AbstractPixel)
     return _absGϕo_Gϕhat(metric(pix), inclination(pix), η(pix), λ(pix))
@@ -296,13 +300,15 @@ end
 """
     absGto_Gthat(pix::AbstractPixel)
 
-Calculate the absolute value of Gto divided by Gthat for a given pixel.
+Calculate the pair `(|Gto|, Gthat)` for a given pixel: the angular antiderivative at the
+observer, and the same antiderivative over a half orbit. The two names are the two returned
+quantities, not a quotient.
 
 # Arguments
 - `pix::AbstractPixel`: The pixel of a screen.
 
 # Returns
-- The absolute value of Gto divided by Gthat of the pixel.
+- The 2-tuple `(|Gto|, Gthat)` of the pixel.
 """
 function absGto_Gthat(pix::AbstractPixel)
     return _absGto_Gthat(metric(pix), inclination(pix), η(pix), λ(pix))

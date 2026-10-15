@@ -30,14 +30,3 @@ There are currently two types of cameras which can be used for either 'slow ligh
 * `IntensityCamera` : Pre-computes geodesic information necessary to solve the 'fast light' raytracing problem.
 
 * `SlowLightIntensityCamera` : Pre-computes geodesic information necessary to solve the 'slow light' raytracing problem.
-
-With `KernelAbstractions` and a GPU backend loaded, construct a screen by passing the GPU array type as the final positional argument. For example, with CUDA:
-
-```julia
-using CUDA, KernelAbstractions
- 
-screen = Krang.SlowLightIntensityScreen(
-    metric, -ρmax, ρmax, -ρmax, ρmax, θo, sze, CuArray
-)
-store = Krang.render.(screen.pixels, Ref(scene))
-```

@@ -1,4 +1,4 @@
-export render, render!, render_cpu_threaded!
+export render, render_cpu_threaded!
 abstract type AbstractScheme end
 
 function render(camera::AbstractCamera, scene::Scene)

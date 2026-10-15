@@ -398,8 +398,8 @@ function absGto_Gthat(pix::SlowLightIntensityPixel)
 end
 
 # `Adapt` support: lets the struct-of-arrays screen (and the lazy pixel view over it) be moved
-# onto a device and, critically, be converted to device-array types inside a KernelAbstractions
-# kernel -- an array of pixels needed none of this, a struct holding arrays does.
+# onto a device and, critically, be converted to device-array types there -- an array of
+# pixels needed none of this, a struct holding arrays does.
 function Adapt.adapt_structure(to, s::SlowLightIntensityScreen)
     return SlowLightIntensityScreen(
         s.αrange,

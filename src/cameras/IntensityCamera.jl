@@ -37,8 +37,8 @@ Construct an `IntensityPixel` object with the given Kerr metric, screen coordina
 - An `IntensityPixel` object initialized with the given parameters.
 
 # Details
-This function calculates the η and λ values using the provided Kerr metric and screen coordinates. 
-It then computes the radial roots and adjusts them if necessary. 
+This function calculates the η and λ values using the provided Kerr metric and screen coordinates.
+It then computes the radial roots and the radial and angular antiderivatives.
 Finally, it initializes an `IntensityPixel` object with the calculated values and the provided parameters.
 """
 function IntensityPixel(met::Kerr{T}, α, β, θo) where {T}
@@ -249,8 +249,8 @@ function absGθo_Gθhat(pix::IntensityPixel)
 end
 
 # `Adapt` support: lets the struct-of-arrays screen (and the lazy pixel view over it) be moved
-# onto a device and, critically, be converted to device-array types inside a KernelAbstractions
-# kernel -- an array of pixels needed none of this, a struct holding arrays does.
+# onto a device and, critically, be converted to device-array types there -- an array of
+# pixels needed none of this, a struct holding arrays does.
 function Adapt.adapt_structure(to, s::IntensityScreen)
     return IntensityScreen(
         s.αrange,
