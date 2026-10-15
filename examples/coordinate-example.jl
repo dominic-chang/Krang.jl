@@ -61,7 +61,7 @@ function coordinate_point(
         if rs ≤ rmin || rs ≥ rmax
             continue
         end
-        coords = isnan(rs) ? observation : (ts, rs, θs, ϕs)
+        coords = isnan(rs) ? coords : (ts, rs, θs, ϕs)
     end
     return coords
 end

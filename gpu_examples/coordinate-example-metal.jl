@@ -56,7 +56,9 @@ function coordinate_point(
     isindir = false
     for _ = 1:2 # Looping over isindir this way is needed to get Metal to work
         isindir ⊻= true
-        ts, rs, θs, ϕs = emission_coordinates(pix, geometry.opening_angle, isindir, n)
+        # `emission_coordinates(pix, θs, isindir, n)` returns (t, r, ϕ, νr, νθ, issuccess);
+        # θs is an input, so take the first three and reuse the cone's opening angle.
+        ts, rs, ϕs = emission_coordinates(pix, geometry.opening_angle, isindir, n)
         if rs ≤ rmin || rs ≥ rmax
             continue
         end
