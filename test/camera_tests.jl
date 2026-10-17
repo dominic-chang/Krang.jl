@@ -51,15 +51,8 @@
     end
 
     @testset "Slow-light screen storage" begin
-        screen = Krang.SlowLightIntensityScreen(
-            Krang.Kerr(0.5),
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            θo,
-            2,
-        )
+        screen =
+            Krang.SlowLightIntensityScreen(Krang.Kerr(0.5), -1.0, 1.0, -1.0, 1.0, θo, 2)
         @test isconcretetype(eltype(screen.pixels))
     end
 end
