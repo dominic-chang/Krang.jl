@@ -213,5 +213,5 @@ end
     return StokesParams(i, q, u, zero(T))
 end
 
-isFastLight(::ElectronSynchrotronPowerLawPolarization) = true
-isAxisymmetric(::ElectronSynchrotronPowerLawPolarization) = true
+lightTrait(::ElectronSynchrotronPowerLawPolarization) = FastLightTrait()
+symmetryTrait(::ElectronSynchrotronPowerLawPolarization) = AxisymmetricTrait()

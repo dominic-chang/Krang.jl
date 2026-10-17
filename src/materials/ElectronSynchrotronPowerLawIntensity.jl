@@ -146,5 +146,5 @@ function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(
     return norm^(one(T) + spectral_index) * min(lp, T(1e2)) * prof
 end
 
-isFastLight(material::ElectronSynchrotronPowerLawIntensity) = true
-isAxisymmetric(material::ElectronSynchrotronPowerLawIntensity) = true
+lightTrait(::ElectronSynchrotronPowerLawIntensity) = FastLightTrait()
+symmetryTrait(::ElectronSynchrotronPowerLawIntensity) = AxisymmetricTrait()

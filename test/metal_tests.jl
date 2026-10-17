@@ -77,8 +77,8 @@ end
             weight::T
         end
 
-        Krang.isFastLight(::MetalConeMaterial) = true
-        Krang.isAxisymmetric(::MetalConeMaterial) = true
+        Krang.lightTrait(::MetalConeMaterial) = Krang.FastLightTrait()
+        Krang.symmetryTrait(::MetalConeMaterial) = Krang.AxisymmetricTrait()
 
         function (mat::MetalConeMaterial)(pix, intersection)
             α, β = Krang.screen_coordinate(pix)

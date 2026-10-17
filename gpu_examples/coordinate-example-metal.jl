@@ -22,7 +22,7 @@ rmax = 10.0f0; # maximum radius to be ray traced
 ρmax = 15.0f0; # horizontal and vertical limits of the screen
 
 # Create Figure
-fig = Figure(resolution = (700, 700));
+fig = Figure(size = (700, 700));
 axes_list = [
     [
         Axis(
@@ -39,7 +39,7 @@ axes_list = [
 
 
 # Initialize Camera and Pre-Allocate Memory for data to be plotted
-coordinates = (zeros(sze, sze) for _ = 1:3)
+coordinates = ntuple(_ -> zeros(sze, sze), 3)
 camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze);
 colormaps = (:afmhot, :afmhot, :hsv)
 colorrange = ((-20, 20), (0, rmax), (0, 2π))
@@ -67,7 +67,10 @@ function coordinate_point(
     return coords
 end
 
-θs = (75 * π / 180) # opening angle of the cone
+# Float32 throughout: `75 * π / 180` is Float64, which would make `ConeGeometry{Float64}`
+# and force the broadcast to produce an `NTuple{4,Float64}` that Metal cannot allocate.
+# The animation below already feeds Float32 angles via `range(0.0f0, 1.0f0π, ...)`.
+θs = 75.0f0 * π / 180 # opening angle of the cone
 geometry = Krang.ConeGeometry(θs, (0, rmin, rmax))
 coordinate_point.(MtlArray(camera.screen.pixels), Ref(geometry))
 

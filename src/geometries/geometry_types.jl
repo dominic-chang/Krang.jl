@@ -46,6 +46,43 @@ struct ConeGeometry{T,A} <: AbstractGeometry
         new{T,A}(opening_angle, attributes)
 end
 
+"""
+    _intersection(::AbstractLightTrait, ::AbstractSymmetryTrait, pix, θs, isindir, n)
+
+Emission coordinates on the `θs` cone, dispatching on the material's
+[`AbstractLightTrait`](@ref) and [`AbstractSymmetryTrait`](@ref). Fast-light materials
+skip the emission time and axisymmetric ones also skip the emission azimuth; skipped
+coordinates are reported as zero.
+"""
+@inline function _intersection(::FastLightTrait, ::AxisymmetricTrait, pix, θs, isindir, n)
+    rs, νr, νθ, _, issuccess = @inline emission_radius(pix, θs, isindir, n)
+    return Intersection(zero(rs), rs, θs, zero(rs), νr, νθ), issuccess
+end
+
+@inline function _intersection(
+    ::FastLightTrait,
+    ::NonAxisymmetricTrait,
+    pix,
+    θs,
+    isindir,
+    n,
+)
+    rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates_fast_light(pix, θs, isindir, n)
+    return Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
+end
+
+@inline function _intersection(
+    ::SlowLightTrait,
+    ::AbstractSymmetryTrait,
+    pix,
+    θs,
+    isindir,
+    n,
+)
+    ts, rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates(pix, θs, isindir, n)
+    return Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
+end
+
 @inline function _raytrace(
     observation,
     pix::AbstractPixel,
@@ -62,22 +99,16 @@ end
         isindir ⊻= true
         for n in subimgs
             #νθ = cos(θs) < abs(cos(θo)) ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
-            intersection, issuccess = if isFastLight(material)
-                if isAxisymmetric(material)
-                    rs, νr, νθ, _, issuccess = @inline emission_radius(pix, θs, isindir, n)
-                    Intersection(zero(rs), rs, θs, zero(rs), νr, νθ), issuccess
-                else
-                    rs, ϕs, νr, νθ, issuccess =
-                        @inline emission_coordinates_fast_light(pix, θs, isindir, n)
-                    Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
-                end
-            else
-                ts, rs, ϕs, νr, νθ, issuccess =
-                    @inline emission_coordinates(pix, θs, isindir, n)
-                Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
-            end
+            intersection, issuccess = @inline _intersection(
+                lightTrait(material),
+                symmetryTrait(material),
+                pix,
+                θs,
+                isindir,
+                n,
+            )
 
-            if issuccess && (horizon(metric(pix)) < rs < T(Inf))
+            if issuccess && (horizon(metric(pix)) < intersection.rs < T(Inf))
                 observation += @inline(material(pix, intersection))
             end
         end
