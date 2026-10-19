@@ -18,6 +18,8 @@ end
 """
     $TYPEDEF
 
+Pairs an `AbstractGeometry` with the `AbstractMaterial` that emits on it. A `Scene` is a
+tuple of these, and rendering sums each mesh's contribution to every pixel.
 """
 struct Mesh{G<:AbstractGeometry,M<:AbstractMaterial}
     geometry::G

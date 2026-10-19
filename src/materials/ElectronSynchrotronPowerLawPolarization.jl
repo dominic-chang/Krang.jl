@@ -113,7 +113,7 @@ struct ElectronSynchrotronPowerLawPolarization{N,T} <: AbstractMaterial
         fluid_speed::T, 
         fluid_inclination_angle::T, 
         fluid_azimuthal_angle::T, 
-        spectral_index::T
+        spectral_index::T,
         R::T,
         p1::T,
         p2::T,

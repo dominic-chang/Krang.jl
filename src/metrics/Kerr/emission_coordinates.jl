@@ -384,12 +384,6 @@ end
 
 Emission inclination at Mino time `τ`, with the angular antiderivative pair
 `(Go, Ghat) = `[`_absGθo_Gθhat`](@ref)` supplied by the caller.
-
-Every pixel caches that pair, and recomputing it here costs an `F` and a `K` — together
-about 30% of this function. The turning points below therefore use the *same* guarded
-forms as `_absGθo_Gθhat` (`√max(…, 0)` and `min(…, 1 - eps)`); they used to be computed
-without those guards, which made the two disagree on the rays that cross the pole and
-blocked this reuse.
 """
 @inline function _θs(metric::Kerr{T}, signβ, θo, η, λ, τ, Go, Ghat) where {T}
     a = metric.spin

@@ -70,7 +70,7 @@ struct ElectronSynchrotronPowerLawIntensity{N,T} <: AbstractMaterial
         fluid_speed::T, 
         fluid_inclination_angle::T, 
         fluid_azimuthal_angle::T, 
-        spectral_index::T
+        spectral_index::T,
         R::T,
         p1::T,
         p2::T,
@@ -93,7 +93,7 @@ struct ElectronSynchrotronPowerLawIntensity{N,T} <: AbstractMaterial
     - `subimgs::NTuple{N, Int}`: The sub-images to ray trace.
 
     # Returns
-    - `ElectronSynchrotronPowerLawIntensity{N, T}`: A new instance of `ElectronSynchrotronPowerLawPolarization`.
+    - `ElectronSynchrotronPowerLawIntensity{N, T}`: A new instance of `ElectronSynchrotronPowerLawIntensity`.
 """
     function ElectronSynchrotronPowerLawIntensity(
         magnetic_fieldx::T,
@@ -121,7 +121,7 @@ struct ElectronSynchrotronPowerLawIntensity{N,T} <: AbstractMaterial
 end
 
 """
-    Functor for the the ElectronSynchrotronPowerLawIntensity material
+    Functor for the ElectronSynchrotronPowerLawIntensity material
 """
 function (linpol::ElectronSynchrotronPowerLawIntensity{N,T})(
     pix::AbstractPixel,
