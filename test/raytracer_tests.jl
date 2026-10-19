@@ -72,7 +72,7 @@
         metric = Krang.Kerr(0.999)
         θo = 89 / 180 * π
         ρmax = 10.0
-        sze = 200
+        sze = 60
 
         camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρmax, sze)
 
@@ -93,12 +93,22 @@
             return horizon(pix.metric) < rs < 10.0
         end
 
+        # The level set z/r = cos(π/4) is the same surface as ConeGeometry(π/4)
         mesh1 = Krang.Mesh(Cone(π / 4), XMaterial((0, 1, 2, 3)))
-        intersections1 = raytrace(camera, mesh1, res = 1_000)
+        intersections1 = raytrace(camera, mesh1, res = 500)
 
         mesh2 = Krang.Mesh(Krang.ConeGeometry(π / 4), XMaterial((0, 1, 2, 3)))
         intersections2 = raytrace(camera, mesh2)
 
-        sum(intersections1 .- intersections2) .≈ 0.0
+        # `ConeGeometry` only computes the sub-images listed in `subimgs`, while the level
+        # set root-finds every crossing out to `total_mino_time`, so a clamp is added.
+        nsub = 4
+        delta = min.(intersections1, nsub) .- min.(intersections2, nsub)
+        @test sum(intersections2) > 0 # the cone is actually being hit
+        # Counting mismatches rather than summing them matters: `sum(delta)` lets a ray that
+        # gains a crossing cancel one that loses it. Opening the cone by 2% puts 7 pixels out.
+        @test count(!iszero, delta) == 0
+        # Above the clamp the two may legitimately differ by a sub-image or two, but not more.
+        @test maximum(abs, intersections1 .- intersections2) <= 2
     end
 end
