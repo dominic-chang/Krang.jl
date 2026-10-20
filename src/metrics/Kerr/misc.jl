@@ -1690,6 +1690,9 @@ end
 
     fo = I0_inf(pix)
 
+    # `Ir_s` feeds a short-circuiting `&&`, and `JacobiElliptic.F` is pure, so LLVM already
+    # sinks this evaluation into the `r4 < rh` branch; hoisting it by hand measured no
+    # faster and would add control flow that Metal and Reactant both dislike.
     r4 < rh && τ > (fo - Ir_s) && return err_return# invalid case2
 
     X2 = √(r31 * r42) * (fo - τ) / 2
@@ -1711,11 +1714,10 @@ end
     A = √abs2(r32)
     B = √abs2(r31)
     k = (((A + B)^2 - r21^2) / (4 * A * B))
-    temprat = B * (rh - r2) / (A * (rh - r1))
-    x3_s = clamp(((1 - temprat) / (1 + temprat)), -1, 1)
-    coef = 1 * √inv(A * B)
-    Ir_s = coef * JacobiElliptic.F((acos(x3_s)), k)
-    τ > (fo - Ir_s) && return err_return
+    # `total_mino_time` is *defined* as `I0_inf - Ir_s(rh)` whenever fewer than four roots
+    # are real, and the `Ir_s(rh)` it uses is `Ir_s_case3` -- the same expression this
+    # guard used to rebuild with its own elliptic `F`. Read the cached value instead.
+    τ > total_mino_time(pix) && return err_return
 
     X3 = √(A * B) * real(fo - τ)
     if X3 < zero(T)
@@ -1741,12 +1743,10 @@ end
     k4 = 4C * D / (C + D)^2
 
     go = √max((T(4)a2^2 - (C - D)^2) / ((C + D)^2 - T(4)a2^2), zero(T))
-    x4_s = (rh + b1) / a2
-    coef = 2 / (C + D)
-    Ir_s = coef * JacobiElliptic.F(atan(x4_s) + atan(go), k4)
-
     fo = I0_inf(pix)
-    τ > (fo - Ir_s) && return (zero(T), false, false)
+    # As in `_rs_case3`: no root is real here, so `total_mino_time == I0_inf - Ir_s(rh)`
+    # with `Ir_s_case4` supplying the subtrahend, which is what this guard recomputed.
+    τ > total_mino_time(pix) && return (zero(T), false, false)
 
     X4 = (C + D) / T(2) * (fo - τ)
     num = go - JacobiElliptic.sc(X4, k4)
