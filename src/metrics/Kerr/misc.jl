@@ -1894,6 +1894,21 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     return Δτ
 end
 
+"""
+Returns the antiderivative \$G_\\phi=\\int\\frac{d\\theta}{\\sin^2\\theta\\sqrt{\\Theta(\\theta)}}\$,
+the azimuthal companion of [`Gθ`](@ref). See [`θ_potential(x)`](@ref) for an implementation
+of \$\\Theta(\\theta)\$.
+
+Returns `(Gϕ, Gs, Go, Ghat, isvortical, issuccess)`. When both this and [`Gt`](@ref) are
+wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angular setup once.
+
+# Arguments
+
+- `pix` : Pixel information
+- `θs` : Emission inclination
+- `isindir` : Is the path direct or indirect?
+- `n` : nth image ordered by minotime
+"""
 @inline function Gϕ(pix::AbstractPixel, θs::T, isindir, n) where {T}
     _, β = screen_coordinate(pix)
     met = metric(pix)
@@ -1957,6 +1972,21 @@ end
     return ans, Gs, Go, Ghat, isvortical, true
 end
 
+"""
+Returns the antiderivative \$G_t=\\int\\frac{\\cos^2\\theta\\,d\\theta}{\\sqrt{\\Theta(\\theta)}}\$,
+the time companion of [`Gθ`](@ref). See [`θ_potential(x)`](@ref) for an implementation of
+\$\\Theta(\\theta)\$.
+
+Returns `(Gt, Gs, Go, Ghat, isvortical, issuccess)`. When both this and [`Gϕ`](@ref) are
+wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angular setup once.
+
+# Arguments
+
+- `pix` : Pixel information
+- `θs` : Emission inclination
+- `isindir` : Is the path direct or indirect?
+- `n` : nth image ordered by minotime
+"""
 @inline function Gt(pix::AbstractPixel, θs::T, isindir, n) where {T}
     _, β = screen_coordinate(pix)
     met = metric(pix)
@@ -2111,6 +2141,14 @@ end
 # SlowLightIntensityCachedPixel utility functions
 ##----------------------------------------------------------------------------------------------------------------------
 
+"""
+Returns `(|Gθo|, Ĝθ)`: the magnitude of the [`Gθ`](@ref) antiderivative evaluated at the
+observer inclination, and the half-period `Ĝθ` between angular turning points.
+
+Both depend only on the metric, `θo`, `η` and `λ`, so they are constant along a ray and are
+cached on the pixel -- see [`Krang.absGθo_Gθhat`](@ref) for the accessor. Every sub-image
+index `n` reuses the same pair, which is what makes the angular inversion cheap.
+"""
 @inline function _absGθo_Gθhat(metric::Kerr{T}, θo, η, λ)::NTuple{2,T} where {T}
     a = metric.spin
     a2 = a^2

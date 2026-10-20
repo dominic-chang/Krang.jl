@@ -38,6 +38,11 @@ Krang.Ir
 ```@docs
 Krang.θ_potential
 Krang.Gθ
+Krang.Gϕ
+Krang.Gt
+Krang._Gϕt
+Krang._θs
+Krang._absGθo_Gθhat
 ```
 
 ### Screen Coordinates
@@ -73,6 +78,21 @@ Krang.MeshGeometry
 Krang.AbstractLevelSetGeometry
 Krang.ElectronSynchrotronPowerLawIntensity
 Krang.ElectronSynchrotronPowerLawPolarization
+```
+
+### Material Traits
+These pick the emission-coordinate call a material needs; see
+`examples/custom-material-example.jl` for how a custom material sets them.
+```@docs
+Krang.AbstractLightTrait
+Krang.FastLightTrait
+Krang.SlowLightTrait
+Krang.lightTrait
+Krang.AbstractSymmetryTrait
+Krang.AxisymmetricTrait
+Krang.NonAxisymmetricTrait
+Krang.symmetryTrait
+Krang._intersection
 ```
 
 ### Pixel Related Functions
@@ -127,5 +147,15 @@ Krang.radial_inf_integrals_case2
 Krang.It_inf 
 Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild
 Krang.boyer_lindquist_to_quasi_cartesian_kerr_schild_fast_light 
+Krang.S1
+Krang.S2
+Krang.regularizedS1
+Krang.regularizedS2
+Krang.regularized_R1
+Krang.regularized_R2
+Krang.IntensityPixelArray
+Krang.SlowLightIntensityPixelArray
+Krang._intensity_pixel_type
+Krang._slow_light_intensity_pixel_type
 ```
 

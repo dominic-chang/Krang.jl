@@ -16,10 +16,12 @@ bunny_mesh = rotate(
     translate(
         rotate(
             scale(
-                load(
-                    download(
-                        "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
-                        "bunny.obj",
+                MeshGeometry(
+                    load(
+                        download(
+                            "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
+                            "bunny.obj",
+                        ),
                     ),
                 ),
                 100,
@@ -45,7 +47,17 @@ bunny_mesh = rotate(
 
 # Let us now ray trace the image to see what the mesh looks like from the observer's perspective.
 
-intersections = raytrace(camera, bunny_mesh; res = 10);
+# `raytrace` takes a `Krang.Mesh`, which pairs the geometry with a material. Materials are
+# functors of `(pixel, intersection)`; this one contributes 1 per intersection, so the
+# image counts how many times each ray crosses the mesh.
+
+struct IntersectionCounter <: Krang.AbstractMaterial end
+
+(::IntersectionCounter)(pixel, intersection) = 1.0
+
+bunny = Krang.Mesh(bunny_mesh, IntersectionCounter())
+
+intersections = raytrace(camera, bunny; res = 10);
 
 # And plot the image with GLMakie, 
 
@@ -103,10 +115,10 @@ recording = GLMk.record(fig, "mesh.mp4", 1:(sze*sze), framerate = 120) do i
     for a in [ax1, ax2, ax3]
         GLMk.mesh!(
             a,
-            bunny_mesh,
+            bunny_mesh.geometryBasicsMesh,
             color = [
                 parse(GLMk.Colorant, "rgba(0%, 50%, 70%,1.0)") for
-                tri in bunny_mesh.position
+                tri in bunny_mesh.geometryBasicsMesh.position
             ],
             colormap = :blues,
             transparency = true,
