@@ -100,7 +100,6 @@ Krang.AbstractSymmetryTrait
 Krang.AxisymmetricTrait
 Krang.NonAxisymmetricTrait
 Krang.symmetryTrait
-Krang.AbsorptiveIntensityTrait
 Krang.AbsorptiveIntensity
 Krang._accumulate
 Krang._intersection
