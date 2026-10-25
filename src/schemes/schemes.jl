@@ -21,12 +21,18 @@ function render(::AbstractPolarizationTrait, pixel::AbstractPixel, scene::Scene)
     return _render(_render_init(pixel, scene), pixel, scene)
 end
 
+# The optical depth has done its job once every mesh has been accumulated, so only the
+# intensity is handed back.
+function render(::AbsorptiveIntensityTrait, pixel::AbstractPixel, scene::Scene)
+    return _render(_render_init(pixel, scene), pixel, scene).I
+end
+
 function _render(observation, pixel::AbstractPixel, scene::Scene)
     mesh = scene[1]
 
     for itr = 1:length(scene)
         mesh = scene[itr]
-        observation += raytrace(pixel, mesh)
+        observation = _accumulate(observation, raytrace(pixel, mesh))
     end
     return observation
 end

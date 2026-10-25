@@ -77,6 +77,50 @@ abstract type AbstractPolarizationTrait <: AbstractReturnTrait end
 struct SimplePolarizationTrait <: AbstractPolarizationTrait end
 struct SimpleIntensityTrait <: AbstractReturnTrait end
 
+struct AbsorptiveIntensityTrait <: AbstractReturnTrait end
+
+"""
+    $TYPEDEF
+
+An intensity carried along a ray together with the optical depth accumulated with it.
+
+# Fields
+
+$TYPEDFIELDS
+"""
+struct AbsorptiveIntensity{T}
+    "Intensity accumulated so far"
+    I::T
+    "Optical depth accumulated so far"
+    τ::T
+end
+
+@inline Base.zero(::Type{AbsorptiveIntensity{T}}) where {T} =
+    AbsorptiveIntensity(zero(T), zero(T))
+@inline Base.zero(::AbsorptiveIntensity{T}) where {T} = zero(AbsorptiveIntensity{T})
+
+"""
+    _accumulate(observation, contribution)
+
+Add `contribution` to what a ray has already picked up.
+
+```
+    I += exp(-τ) * I_new
+    τ += τ_new
+```
+"""
+@inline _accumulate(observation, contribution) = observation + contribution
+
+@inline function _accumulate(
+    observation::AbsorptiveIntensity,
+    contribution::AbsorptiveIntensity,
+)
+    return AbsorptiveIntensity(
+        observation.I + exp(-observation.τ) * contribution.I,
+        observation.τ + contribution.τ,
+    )
+end
+
 function returnTrait(mat::AbstractMaterial)
     return SimpleIntensityTrait()
 end

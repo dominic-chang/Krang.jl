@@ -218,7 +218,7 @@ end
             )
 
             if issuccess && (horizon(metric(pix)) < intersection.rs < T(Inf))
-                observation += @inline(material(pix, intersection))
+                observation = _accumulate(observation, @inline(material(pix, intersection)))
             end
         end
     end

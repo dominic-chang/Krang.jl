@@ -29,6 +29,7 @@ include("metrics/Kerr/emission_coordinates.jl")
 include("materials/physicsUtils.jl")
 include("materials/ElectronSynchrotronPowerLawPolarization.jl")
 include("materials/ElectronSynchrotronPowerLawIntensity.jl")
+include("materials/ThermalSynchrotron.jl")
 include("schemes/schemes.jl")
 include("schemes/RayTrace.jl")
 

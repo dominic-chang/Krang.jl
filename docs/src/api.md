@@ -73,6 +73,9 @@ Krang.penrose_walker
 Krang.synchrotronIntensity
 Krang.synchrotronPolarization
 Krang.synchrotron_emission_frame
+Krang.thermalSynchrotronIntensity
+Krang.thermal_synchrotron_shape
+Krang.blackbody
 ```
 
 ### Meshes, Geometries and Materials
@@ -82,6 +85,7 @@ Krang.MeshGeometry
 Krang.AbstractLevelSetGeometry
 Krang.ElectronSynchrotronPowerLawIntensity
 Krang.ElectronSynchrotronPowerLawPolarization
+Krang.ThermalSynchrotron
 ```
 
 ### Material Traits
@@ -96,6 +100,9 @@ Krang.AbstractSymmetryTrait
 Krang.AxisymmetricTrait
 Krang.NonAxisymmetricTrait
 Krang.symmetryTrait
+Krang.AbsorptiveIntensityTrait
+Krang.AbsorptiveIntensity
+Krang._accumulate
 Krang._intersection
 Krang.AngularCache
 ```

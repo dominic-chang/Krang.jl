@@ -87,6 +87,12 @@ function raytrace(::AbstractReturnTrait, pix::AbstractPixel, mesh::Mesh; res = 1
     return _raytrace(observation, pix, mesh; res = res)
 end
 
+function raytrace(::AbsorptiveIntensityTrait, pix::AbstractPixel, mesh::Mesh; res = 100)
+    T = typeof(metric(pix).spin)
+    observation = AbsorptiveIntensity(zero(T), zero(T))
+    return _raytrace(observation, pix, mesh; res = res)
+end
+
 function raytrace(::SimplePolarizationTrait, pix::AbstractPixel, mesh::Mesh; res = 100)
     T = typeof(metric(pix).spin)
     observation = StokesParams(zero(T), zero(T), zero(T), zero(T))
@@ -106,6 +112,20 @@ function raytrace(
 ) where {A}
     intersections =
         Array{typeof(camera.metric).parameters[1]}(undef, size(camera.screen.pixels)...)
+    for I in CartesianIndices(camera.screen.pixels)
+        intersections[I] = raytrace(camera.screen.pixels[I], mesh; res = res)
+    end
+    return intersections
+end
+
+function raytrace(
+    ::AbsorptiveIntensityTrait,
+    camera::AbstractCamera,
+    mesh::Mesh{A};
+    res = 100,
+) where {A}
+    T = typeof(camera.metric).parameters[1]
+    intersections = Array{AbsorptiveIntensity{T}}(undef, size(camera.screen.pixels)...)
     for I in CartesianIndices(camera.screen.pixels)
         intersections[I] = raytrace(camera.screen.pixels[I], mesh; res = res)
     end

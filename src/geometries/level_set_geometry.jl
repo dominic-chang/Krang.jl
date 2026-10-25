@@ -27,7 +27,8 @@ abstract type AbstractLevelSetGeometry{T} <: AbstractGeometry end
         end
 
         intersection = Krang.Intersection(0.0, rs, θs, ϕs, νr, νθ)
-        observation += τ == 0 ? zero(A) : material(pixel, intersection)#didintersect ? 1 : 0
+        observation =
+            _accumulate(observation, τ == 0 ? zero(A) : material(pixel, intersection))#didintersect ? 1 : 0
         origin_bl = Krang.emission_coordinates_fast_light(pixel, τref)
 
     end
