@@ -37,7 +37,7 @@ struct AngularCache{T}
     isvortical::Bool
     "`|cos θs| < |cos θo|`, the test [`Gθ`](@ref) branches on"
     isincone::Bool
-    "Whether the screen-boundary test rejects this ray"
+    "Whether the screen boundary rejects this ray; only computed for a `θs` outside the observer's cone, the one case a caller reads it"
     βreject::Bool
     "Whether the ray reaches `θs` at all"
     issuccess::Bool
@@ -114,11 +114,13 @@ end
 
 """
     _intersection(::AbstractLightTrait, ::AbstractSymmetryTrait, pix, θs, isindir, n)
+    _intersection(::AbstractLightTrait, ::AbstractSymmetryTrait, pix, cache::AngularCache, isindir, n)
 
 Emission coordinates on the `θs` cone, dispatching on the material's
 [`AbstractLightTrait`](@ref) and [`AbstractSymmetryTrait`](@ref). Fast-light materials
 skip the emission time and axisymmetric ones also skip the emission azimuth; skipped
-coordinates are reported as zero.
+coordinates are reported as zero. The second form takes the sub-image independent part of
+the angular solve from a [`Krang.AngularCache`](@ref) rather than recomputing it.
 """
 @inline function _intersection(::FastLightTrait, ::AxisymmetricTrait, pix, θs, isindir, n)
     rs, νr, νθ, _, issuccess = @inline emission_radius(pix, θs, isindir, n)
