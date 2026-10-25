@@ -15,17 +15,7 @@ camera = Krang.SlowLightIntensityCamera(metric, θo, -ρmax, ρmax, -ρmax, ρma
 bunny_mesh = rotate(
     translate(
         rotate(
-            scale(
-                MeshGeometry(
-                    load(
-                        download(
-                            "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
-                            "bunny.obj",
-                        ),
-                    ),
-                ),
-                100,
-            ),
+            scale(MeshGeometry(load(joinpath(pkgdir(Krang), "assets", "bunny.obj"))), 100),
             π / 2,
             0.0,
             0.0,

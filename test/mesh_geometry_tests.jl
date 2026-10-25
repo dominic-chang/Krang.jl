@@ -11,12 +11,7 @@
     @test append_scene(Krang.Scene(), mesh) == Krang.add(Krang.Scene(), mesh)
     @test :load ∉ names(Krang)
 
-    bunny = FileIO.load(
-        Downloads.download(
-            "https://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj",
-            "bunny.obj",
-        ),
-    )
+    bunny = FileIO.load(joinpath(pkgdir(Krang), "assets", "bunny.obj"))
     rot = Rotations.AngleAxis(π / 2, 0.0, 0.0, 1.0)
     points = (Ref(rot) .* (bunny.position .* 150)) .+ Ref([15, 3, 0])
     faces = getfield(bunny, :faces)

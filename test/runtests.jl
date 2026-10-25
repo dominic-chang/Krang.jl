@@ -6,7 +6,6 @@ using Integrals
 using StaticArrays
 using FileIO
 using Rotations
-import Downloads
 using GeometryBasics
 using Enzyme, EnzymeTestUtils
 using Reactant
