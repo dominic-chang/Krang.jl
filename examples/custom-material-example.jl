@@ -30,7 +30,7 @@ function (m::ZAMORedshifts)(
     curr_p_bl_d = p_bl_d(metric, rs, θs, ηtemp, λtemp, νr, νθ)
 
     curr_p_bl_u = metric_uu(metric, rs, θs) * curr_p_bl_d
-    p_zamo_u = jac_zamo_u_bl_d(metric, rs, θs) * curr_p_bl_u
+    p_zamo_u = jac_zamo_u_bl_d(metric, rs, θs, curr_p_bl_u)
     redshift = inv(p_zamo_u[1])
 
     return max(redshift, eps())

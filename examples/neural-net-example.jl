@@ -57,7 +57,7 @@ function (m::KerrNeRF)(x, ps, st)
 
                     curr_p_bl_d = p_bl_d(metric, rs, π / 2, ηtemp, λtemp, νr, νθ)
                     curr_p_bl_u = metric_uu(metric, rs, π / 2) * curr_p_bl_d
-                    p_zamo_u = jac_zamo_u_bl_d(metric, rs, π / 2) * curr_p_bl_u
+                    p_zamo_u = jac_zamo_u_bl_d(metric, rs, π / 2, curr_p_bl_u)
                     coords[1, (i-1)*sze+j] = xs
                     coords[2, (i-1)*sze+j] = ys
                     redshifts[(i-1)*sze+j] = inv(p_zamo_u[1])

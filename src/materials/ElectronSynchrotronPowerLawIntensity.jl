@@ -14,26 +14,18 @@ Calculates the intensity of a photon emitted from a fluid particle with momentum
     θsign::Bool,
 ) where {T}
 
-    βv = βfluid[1]
-    θz = βfluid[2]
-    ϕz = βfluid[3]
-
-    ηtemp = η(metric, α, β, θo)
-    λtemp = λ(metric, α, θo)
-
-    curr_p_bl_d = p_bl_d(metric, ri, θs, ηtemp, λtemp, νr, θsign)
-
-    curr_p_bl_u = metric_uu(metric, ri, θs) * curr_p_bl_d
-    p_zamo_u = jac_zamo_u_bl_d(metric, ri, θs) * curr_p_bl_u
-    p_fluid_u = jac_fluid_u_zamo_d(metric, βv, θz, ϕz) * p_zamo_u
-    magnetic_fieldx, magnetic_fieldy, magnetic_fieldz = magnetic_field
-    _, p_fluid_ux, p_fluid_uy, p_fluid_uz = p_fluid_u ./ p_fluid_u[1]
-    vec = @SVector[
-        p_fluid_uy * magnetic_fieldz - p_fluid_uz * magnetic_fieldy,
-        p_fluid_uz * magnetic_fieldx - p_fluid_ux * magnetic_fieldz,
-        p_fluid_ux * magnetic_fieldy - p_fluid_uy * magnetic_fieldx,
-    ]
-    norm = √sum(vec .* vec) + eps(T)
+    _, p_fluid_u, _, norm = synchrotron_emission_frame(
+        metric,
+        α,
+        β,
+        ri,
+        θs,
+        θo,
+        magnetic_field,
+        βfluid,
+        νr,
+        θsign,
+    )
 
     return norm, inv(p_fluid_u[1]), abs(p_fluid_u[1] / p_fluid_u[4])
 end

@@ -61,6 +61,7 @@ Krang.jac_zamo_u_bl_d
 Krang.jac_bl_d_zamo_u
 Krang.jac_zamo_d_bl_u
 Krang.jac_fluid_u_zamo_d
+Krang.p_zamo_u
 ```
 
 ### Polarization
@@ -69,6 +70,7 @@ Krang.screen_polarization
 Krang.penrose_walker
 Krang.synchrotronIntensity
 Krang.synchrotronPolarization
+Krang.synchrotron_emission_frame
 ```
 
 ### Meshes, Geometries and Materials

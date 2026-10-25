@@ -34,48 +34,38 @@ Calculates the polarization of a photon emitted from a fluid particle with momen
     θsign::Bool,
 ) where {T}
 
-    a = metric.spin
     βv = βfluid[1]
     θz = βfluid[2]
     ϕz = βfluid[3]
 
-    ηtemp = η(metric, α, β, θo)
-    λtemp = λ(metric, α, θo)
+    p_zamo_u, p_fluid_u, vec, norm = synchrotron_emission_frame(
+        metric,
+        α,
+        β,
+        ri,
+        θs,
+        θo,
+        magnetic_field,
+        βfluid,
+        νr,
+        θsign,
+    )
 
-    curr_p_bl_d = p_bl_d(metric, ri, θs, ηtemp, λtemp, νr, θsign)
-
-    curr_p_bl_u = metric_uu(metric, ri, θs) * curr_p_bl_d
-    p_zamo_u = jac_zamo_u_bl_d(metric, ri, θs) * curr_p_bl_u
-    p_fluid_u = jac_fluid_u_zamo_d(metric, βv, θz, ϕz) * p_zamo_u
-    magnetic_fieldx, magnetic_fieldy, magnetic_fieldz = magnetic_field
-    _, p_fluid_ux, p_fluid_uy, p_fluid_uz = p_fluid_u ./ p_fluid_u[1]
-    vec = @SVector[
-        p_fluid_uy * magnetic_fieldz - p_fluid_uz * magnetic_fieldy,
-        p_fluid_uz * magnetic_fieldx - p_fluid_ux * magnetic_fieldz,
-        p_fluid_ux * magnetic_fieldy - p_fluid_uy * magnetic_fieldx,
-    ]
-    norm = √sum(vec .* vec) + eps(T)
+    # Undo the boost and the ZAMO transform
     f_fluid_u = SVector(zero(eltype(vec)), vec[1], vec[2], vec[3])
-    f_zamo_u = jac_fluid_u_zamo_d(metric, -βv, θz, ϕz) * f_fluid_u
-    f_bl_u = jac_bl_u_zamo_d(metric, ri, θs) * f_zamo_u
-    z = zero(T)
-    o = one(T)
-    sinθs = sin(θs)
-    A = @SMatrix [
-        z o z z
-        -o z z a*sinθs^2
-        z z z z
-        z -a*sinθs^2 z z
-    ]
-    B = @SMatrix [
-        z z -a*sinθs z
-        z z z z
-        a*sinθs z z -(ri^2 + a^2)*sinθs
-        z z (ri^2+a^2)*sinθs z
-    ]
-    f_temp_d = ((A - B * im) * (ri - a * cos(θs) * im)) * (f_bl_u)
-    κ = sum(curr_p_bl_u .* f_temp_d)
-    κ = κ * inv(sqrt((conj(κ) * κ)))
+    f_zamo_u = jac_fluid_u_zamo_d(metric, -βv, θz, ϕz, f_fluid_u)
+    f_bl_u = jac_bl_u_zamo_d(metric, ri, θs, f_zamo_u)
+    curr_p_bl_u = jac_bl_u_zamo_d(metric, ri, θs, p_zamo_u)
+
+    κ1, κ2 = penrose_walker(
+        metric,
+        ri,
+        θs,
+        @SVector([curr_p_bl_u[1], curr_p_bl_u[2], curr_p_bl_u[4], curr_p_bl_u[3]]),
+        @SVector([f_bl_u[1], f_bl_u[2], f_bl_u[4], f_bl_u[3]])
+    )
+    # normalising `κ` by `√(conj(κ)κ)` is just dividing by its modulus
+    κ = complex(κ1, κ2) * inv(hypot(κ1, κ2))
 
     eα, eβ = screen_polarization(metric, κ, θo, α, β) .* norm
 
