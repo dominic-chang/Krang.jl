@@ -38,6 +38,8 @@ Krang.Ir
 ```@docs
 Krang.θ_potential
 Krang.Gθ
+Krang._Gθ_setup
+Krang._Gθ_subimage
 Krang.Gϕ
 Krang.Gt
 Krang._Gϕt
@@ -95,6 +97,7 @@ Krang.AxisymmetricTrait
 Krang.NonAxisymmetricTrait
 Krang.symmetryTrait
 Krang._intersection
+Krang.AngularCache
 ```
 
 ### Pixel Related Functions
@@ -123,6 +126,7 @@ Krang.radial_inf_integrals_case4
 Krang.It_w_I0_terms 
 Krang.Ir_inf 
 Krang.emission_azimuth 
+Krang._emission_coordinates
 Krang.ConeGeometry
 Krang.Iϕ 
 Krang.SlowLightIntensityCamera

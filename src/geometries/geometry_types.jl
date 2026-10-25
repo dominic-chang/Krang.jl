@@ -18,6 +18,70 @@ end
 """
     $TYPEDEF
 
+The angular solve of a ray that is shared by all sub-images at a given `θs`.
+
+# Fields
+
+$TYPEDFIELDS
+"""
+struct AngularCache{T}
+    "Emission inclination this cache was built for"
+    θs::T
+    "The `θs` angular antiderivative"
+    Gθs::T
+    "`|Gθo|`, carrying the sign the vortical branch gives it"
+    Gθo::T
+    "Half period `Ĝθ` between angular turning points"
+    Gθhat::T
+    "Whether the ray is vortical (`η < 0`)"
+    isvortical::Bool
+    "`|cos θs| < |cos θo|`, the test [`Gθ`](@ref) branches on"
+    isincone::Bool
+    "Whether the screen-boundary test rejects this ray"
+    βreject::Bool
+    "Whether the ray reaches `θs` at all"
+    issuccess::Bool
+end
+
+"""
+    AngularCache(pix::AbstractPixel, θs)
+
+Build the [`Krang.AngularCache`](@ref) for the ray at `pix` and the cone of opening angle
+`θs`.
+"""
+@inline function AngularCache(pix::AbstractPixel, θs::T) where {T}
+    met = metric(pix)
+    θo = inclination(pix)
+    α, β = screen_coordinate(pix)
+
+    cosθo = cos(θo)
+    # The emission functions only consult the screen boundary for a cone that lies outside
+    # the observer's own, so for `isincone` -- an equatorial disk, say -- it is never read
+    # and never worth computing.
+    βreject = false
+    if !(θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo)
+        αmin = @inline αboundary(met, θs)
+        βbound = (abs(α) >= (αmin + eps(T)) ? @inline(βboundary(met, α, θo, θs)) : zero(T))
+        βreject = (abs(β) + eps(T)) < βbound
+    end
+
+    # `cos(θs) > |cos(θo)|` implies the `isincone` test of every emission function fails,
+    # so a rejected ray here is rejected for every sub-image and the angular solve below
+    # would be thrown away.
+    if βreject && (cos(θs) > abs(cosθo))
+        z = zero(T)
+        return AngularCache(θs, z, z, z, η(pix) < z, abs(cos(θs)) < abs(cosθo), true, false)
+    end
+
+    Go, Ghat = absGθo_Gθhat(pix)
+    Gθs, Gθo, Gθhat, isvortical, isincone, issuccess =
+        @inline Krang._Gθ_setup(met, θo, η(pix), λ(pix), Go, Ghat, θs)
+    return AngularCache(θs, Gθs, Gθo, Gθhat, isvortical, isincone, βreject, issuccess)
+end
+
+"""
+    $TYPEDEF
+
 Pairs an `AbstractGeometry` with the `AbstractMaterial` that emits on it. A `Scene` is a
 tuple of these, and rendering sums each mesh's contribution to every pixel.
 """
@@ -63,6 +127,18 @@ end
 
 @inline function _intersection(
     ::FastLightTrait,
+    ::AxisymmetricTrait,
+    pix,
+    cache::AngularCache,
+    isindir,
+    n,
+)
+    rs, νr, νθ, _, issuccess = @inline emission_radius(pix, cache, isindir, n)
+    return Intersection(zero(rs), rs, cache.θs, zero(rs), νr, νθ), issuccess
+end
+
+@inline function _intersection(
+    ::FastLightTrait,
     ::NonAxisymmetricTrait,
     pix,
     θs,
@@ -71,6 +147,19 @@ end
 )
     rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates_fast_light(pix, θs, isindir, n)
     return Intersection(zero(rs), rs, θs, ϕs, νr, νθ), issuccess
+end
+
+@inline function _intersection(
+    ::FastLightTrait,
+    ::NonAxisymmetricTrait,
+    pix,
+    cache::AngularCache,
+    isindir,
+    n,
+)
+    rs, ϕs, νr, νθ, issuccess =
+        @inline emission_coordinates_fast_light(pix, cache, isindir, n)
+    return Intersection(zero(rs), rs, cache.θs, ϕs, νr, νθ), issuccess
 end
 
 @inline function _intersection(
@@ -85,6 +174,18 @@ end
     return Intersection(ts, rs, θs, ϕs, νr, νθ), issuccess
 end
 
+@inline function _intersection(
+    ::SlowLightTrait,
+    ::AbstractSymmetryTrait,
+    pix,
+    cache::AngularCache,
+    isindir,
+    n,
+)
+    ts, rs, ϕs, νr, νθ, issuccess = @inline emission_coordinates(pix, cache, isindir, n)
+    return Intersection(ts, rs, cache.θs, ϕs, νr, νθ), issuccess
+end
+
 @inline function _raytrace(
     observation,
     pix::AbstractPixel,
@@ -96,6 +197,10 @@ end
     θs = geometry.opening_angle
     subimgs = material.subimgs
 
+    # The angular solve is the same for every sub-image and for both values of `isindir`,
+    # so it is done once here rather than inside the loop.
+    cache = @inline AngularCache(pix, θs)
+
     isindir = false
     for _ = 1:2 # Looping over isindir this way is needed to get Metal to work
         isindir ⊻= true
@@ -105,7 +210,7 @@ end
                 lightTrait(material),
                 symmetryTrait(material),
                 pix,
-                θs,
+                cache,
                 isindir,
                 n,
             )

@@ -53,6 +53,58 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
 end
 
 """
+[`emission_radius`](@ref) for a sub-image of a cone.
+
+Identical to `emission_radius(pix, cache.θs, isindir, n)`, but it reads `Gθs`, `Gθo` and
+`Ĝθ` out of the [`Krang.AngularCache`](@ref).
+
+# Arguments
+
+- `pix` : Pixel information
+- `cache` : The angular solve for this ray and emission inclination
+- `isindir` : Is emission to observer direct or indirect
+- `n` : Image index
+"""
+@inline function emission_radius(
+    pix::Krang.AbstractPixel,
+    cache::AngularCache{T},
+    isindir,
+    n,
+) where {T}
+    _, β = screen_coordinate(pix)
+    θo = inclination(pix)
+    θs = cache.θs
+    err_return = (zero(T), true, true, 0, false)
+
+    isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
+    (!isincone && cache.βreject) && return err_return
+
+    τ, _, _, _, _, issuccess = @inline _Gθ_subimage(
+        (
+            cache.Gθs,
+            cache.Gθo,
+            cache.Gθhat,
+            cache.isvortical,
+            cache.isincone,
+            cache.issuccess,
+        ),
+        sign(β),
+        θo,
+        θs,
+        isindir,
+        n,
+    )
+    issuccess || return err_return
+
+    # νθ is θ̇s increasing or decreasing?
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+
+    ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
+    issuccess || return err_return
+    return ans, νr, νθ, numreals, issuccess
+end
+
+"""
 Emission radius for point originating at at Mino time τ whose image appears at the screen coordinate (`α`, `β`). 
 Returns 0 if the emission coordinates do not exist for that screen coordinate.
 
@@ -204,6 +256,61 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 end
 
 """
+[`emission_coordinates_fast_light`](@ref) for a sub-image of a cone.
+
+Identical to `emission_coordinates_fast_light(pix, cache.θs, isindir, n)`, but it reads
+`Gθs`, `Gθo` and `Ĝθ` out of the [`Krang.AngularCache`](@ref).
+
+# Arguments
+
+- `pix` : Pixel information
+- `cache` : The angular solve for this ray and emission inclination
+- `isindir` : Is emission to observer direct or indirect
+- `n` : Image index
+"""
+@inline function emission_coordinates_fast_light(
+    pix::AbstractPixel,
+    cache::AngularCache{T},
+    isindir,
+    n,
+) where {T}
+    _, β = screen_coordinate(pix)
+    θo = inclination(pix)
+    θs = cache.θs
+    err_return = (zero(T), zero(T), false, false, false)
+
+    isincone = θo ≤ θs ≤ (π - θo) || (π - θo) ≤ θs ≤ θo
+    (!isincone && cache.βreject) && return err_return
+
+    τ, _, _, _, _, issuccess = @inline _Gθ_subimage(
+        (
+            cache.Gθs,
+            cache.Gθo,
+            cache.Gθhat,
+            cache.isvortical,
+            cache.isincone,
+            cache.issuccess,
+        ),
+        sign(β),
+        θo,
+        θs,
+        isindir,
+        n,
+    )
+    issuccess || return err_return
+
+    # is θ̇s increasing or decreasing?
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+
+    rs, νr, _, issuccess = emission_radius(pix, τ)
+    issuccess || return err_return
+
+    ϕs = @inline emission_azimuth(pix, θs, rs, τ, νr, isindir, n)
+
+    return rs, ϕs, νr, νθ, issuccess
+end
+
+"""
 Ray trace a point that appears at the screen coordinate (`α`, `β`) for an observer located at inclination θo
 
 # Arguments
@@ -282,6 +389,81 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
 
     τ, _, _, _, _, issuccess = @inline Gθ(pix, θs, isindir, n)
     issuccess || return err_return
+
+    return @inline _emission_coordinates(pix, θs, τ, isindir, n, isincone)
+end
+
+"""
+[`emission_coordinates`](@ref) for a sub-image of a cone.
+
+Identical to `emission_coordinates(pix, θs, isindir, n)`, but it reads `Gθs`, `Gθo`
+and `Ĝθ` out of the [`Krang.AngularCache`](@ref).
+
+# Arguments
+
+- `pix` : Pixel information
+- `cache` : The angular solve for this ray and emission inclination
+- `isindir` : Whether emission to observer is direct or indirect
+- `n` : Image index
+"""
+@inline function emission_coordinates(
+    pix::AbstractPixel,
+    cache::AngularCache{T},
+    isindir,
+    n,
+) where {T}
+    _, β = screen_coordinate(pix)
+    θo = inclination(pix)
+    θs = cache.θs
+    err_return = (zero(T), zero(T), zero(T), false, false, false)
+
+    (cos(θs) > abs(cos(θo))) && cache.βreject && return err_return
+
+    τ, _, _, _, _, issuccess = @inline _Gθ_subimage(
+        (
+            cache.Gθs,
+            cache.Gθo,
+            cache.Gθhat,
+            cache.isvortical,
+            cache.isincone,
+            cache.issuccess,
+        ),
+        sign(β),
+        θo,
+        θs,
+        isindir,
+        n,
+    )
+    issuccess || return err_return
+
+    return @inline _emission_coordinates(pix, θs, τ, isindir, n, cache.isincone)
+end
+
+"""
+The radial inversion and the `t` and `ϕ` integrals of [`emission_coordinates`](@ref), once
+the Mino time of the sub-image is known. Shared by its cached and uncached entry points.
+
+# Arguments
+
+- `pix` : Pixel information
+- `θs` : Emission Inclination
+- `τ` : Mino time of the sub-image
+- `isindir` : Whether emission to observer is direct or indirect
+- `n` : Image index
+- `isincone` : Whether `|cos θs| < |cos θo|`
+"""
+@inline function _emission_coordinates(
+    pix::AbstractPixel,
+    θs::T,
+    τ,
+    isindir,
+    n,
+    isincone,
+) where {T}
+    _, β = screen_coordinate(pix)
+    met = metric(pix)
+    θo = inclination(pix)
+    err_return = (zero(T), zero(T), zero(T), false, false, false)
 
     rs, νr, _, issuccess = @inline emission_radius(pix, τ)
     issuccess || return err_return

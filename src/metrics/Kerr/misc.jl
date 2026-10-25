@@ -1791,27 +1791,33 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
     n,
 )::Tuple{T,T,T,T,Bool,Bool} where {T}
     _, β = screen_coordinate(pix)
-    met = metric(pix)
     θo = inclination(pix)
-    signβ = sign(β)
-    ηtemp = η(pix)
-    λtemp = λ(pix)
-
-    a = met.spin
-    a2 = a^2
     Go, Ghat = absGθo_Gθhat(pix)
-    Gs, minotime, isvortical = zero(T), zero(T), ηtemp < zero(T)
+    setup = @inline _Gθ_setup(metric(pix), θo, η(pix), λ(pix), Go, Ghat, θs)
+    return @inline _Gθ_subimage(setup, sign(β), θo, θs, isindir, n)
+end
+
+"""
+The part of [`Gθ`](@ref) that does not depend on the sub-image index `n`.
+
+Returns `(Gθs, Gθo, Ĝθ, isvortical, isincone, issuccess)`, with `Gθo` carrying the sign the
+vortical geodesic branch gives it. `issuccess` is false when the ray never reaches `θs`.
+
+# Arguments
+
+- `met` : Kerr metric
+- `θo` : Observer inclination
+- `ηtemp`, `λtemp` : Reduced Carter constant and azimuthal angular momentum
+- `Go`, `Ghat` : The cached pair from [`Krang.absGθo_Gθhat`](@ref)
+- `θs` : Emission inclination
+"""
+@inline function _Gθ_setup(met::Kerr, θo, ηtemp, λtemp, Go::T, Ghat::T, θs) where {T}
+    a2 = met.spin^2
+    Gs, isvortical = zero(T), ηtemp < zero(T)
 
     cosθs = cos(θs)
     cosθo = cos(θo)
     isincone = abs(cosθs) < abs(cosθo)
-    if isincone && (isindir != ((signβ > 0) ⊻ (θo > T(π / 2))))
-        return minotime, Gs, Go, Ghat, isvortical, false
-    end
-    if ((((signβ < 0) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) ||
-       (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
-        return minotime, Gs, Go, Ghat, isvortical, false
-    end
 
     Δθ = (1 - (ηtemp + λtemp^2) / a2) / 2
     Δθ2 = Δθ^2
@@ -1825,21 +1831,41 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
         argo = (cosθo^2 - um) / (up - um)
         k = 1 - m
         if (!(zero(T) < argo < 1) || !(zero(T) < args < 1))
-            return minotime, Gs, Go, Ghat, isvortical, false
+            return Gs, Go, Ghat, isvortical, isincone, false
         end
         tempfac = 1 / √abs(um * a2)
-        Go *= (θs > T(π / 2) ? -1 : 1)
-        Gs = (θs > T(π / 2) ? -1 : 1) * tempfac * JacobiElliptic.F(asin(√args), k)
+        sgnθs = (θs > T(π / 2) ? -1 : 1)
+        Go *= sgnθs
+        Gs = sgnθs * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
         argo = cosθo / √(up)
         k = m
         if !(-1 < args < 1) || !(-1 < argo < 1)
-            return zero(T), zero(T), zero(T), zero(T), isvortical, false
+            return zero(T), zero(T), zero(T), isvortical, isincone, false
         end
-        tempfac = 1 / √abs(um * a^2)
+        tempfac = 1 / √abs(um * a2)
         Gs = tempfac * JacobiElliptic.F(asin(args), k)
     end
+
+    return Gs, Go, Ghat, isvortical, isincone, true
+end
+
+"""
+[`Gθ`](@ref) for one sub-image
+"""
+@inline function _Gθ_subimage(setup, signβ, θo, θs::T, isindir, n) where {T}
+    Gs, Go, Ghat, isvortical, isincone, issuccess = setup
+    minotime = zero(T)
+
+    if isincone && (isindir != ((signβ > 0) ⊻ (θo > T(π / 2))))
+        return minotime, Gs, Go, Ghat, isvortical, false
+    end
+    if ((((signβ < 0) ⊻ (θs > T(π / 2))) ⊻ (n % 2 == 1)) && !isincone && !isvortical) ||
+       (isvortical && ((θo >= T(π / 2)) ⊻ (θs > T(π / 2))))
+        return minotime, Gs, Go, Ghat, isvortical, false
+    end
+    issuccess || return minotime, Gs, Go, Ghat, isvortical, false
 
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     minotime = (
