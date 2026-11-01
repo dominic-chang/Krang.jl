@@ -4,15 +4,6 @@ using Test
 using Reactant
 import Reactant: to_rarray
 
-
-struct ReactantRaytraceMaterial{N} <: Krang.AbstractMaterial
-    subimgs::NTuple{N,Int}
-end
-function (mat::ReactantRaytraceMaterial)(pix, intersection)
-    rs = intersection.rs
-    return rs / (one(rs) + rs)
-end
-
 const MET = Krang.Kerr(0.94)
 const ΘO = 45 / 180 * π
 const ΘS = 80 / 180 * π
@@ -49,9 +40,6 @@ function rsof(m, α, β)
     rmax = maximum(real, rootsof(m, α, β))
     return rh + (max(rmax, rh + 2 * one(rh)) - rh) / 2
 end
-
-"Half the ray's own total Mino time, so τ names a point the geodesic reaches."
-τof(m, α, β) = Krang.total_mino_time(m, rootsof(m, α, β)) / 2
 
 """
 Broadcast slot `i` of `f` over the screen points, for each `i`, as a tuple of arrays.
@@ -274,52 +262,14 @@ end
                     bs,
                 ),
             )
-            # Same story as `Iϕ_inf`: these two carry the finite-radius elliptic integrals
-            # and do not finish compiling. Opt in with KRANG_REACTANT_SLOW_TESTS=true.
-            if get(ENV, "KRANG_REACTANT_SLOW_TESTS", "false") == "true"
-                cmp(
-                    "radial_w_I0_terms_integrals",
-                    ("I1", "I2", "Ip", "Im"),
-                    (m, as, bs) -> slots(
-                        (mm, a, b) -> Krang.radial_w_I0_terms_integrals(
-                            mm,
-                            rsof(mm, a, b),
-                            rootsof(mm, a, b),
-                            τof(mm, a, b),
-                            true,
-                        ),
-                        Val(4),
-                        m,
-                        as,
-                        bs,
-                    ),
-                )
-                cmp(
-                    "radial_integrals",
-                    ("I0", "I1", "I2", "Ip", "Im"),
-                    (m, as, bs) -> slots(
-                        (mm, a, b) -> Krang.radial_integrals(
-                            pixof(mm, a, b),
-                            rsof(mm, a, b),
-                            τof(mm, a, b),
-                            true,
-                        ),
-                        Val(5),
-                        m,
-                        as,
-                        bs,
-                    ),
-                )
-
-            end
 
             # --- pixel-level overlays ---
             # Each extra slot in a bundle is another full copy of the traced program, and
             # a `SlowLightIntensityPixel` traces its whole cache (roots, I0_inf, Mino time
-            # and all three angular pairs). Bundling six slots of `Gt` that way produced an
-            # XLA module that had not finished compiling after ten minutes, so the
-            # pixel-level overlays are spot-checked a slot or two at a time rather than
-            # swept exhaustively. `emission_radius` is the one driven across all three root
+            # and all three angular pairs), and bundles of that size have produced XLA
+            # modules that had not finished compiling after ten minutes, so the pixel-level
+            # overlays are spot-checked a slot or two at a time rather than swept
+            # exhaustively. `emission_radius` is the one driven across all three root
             # cases, since it is what selects `_rs_case1_and_2` / `_rs_case3` / `_rs_case4`.
             cmp(
                 "emission_radius rs",
@@ -355,7 +305,7 @@ end
     @testset "pixel-level overlays (4 real roots)" begin
         # `return` must not be used to skip here: a `@testset` body is not a function, so a
         # `return` propagates out of the *enclosing* testset and silently drops every test
-        # after it (it previously swallowed the two testsets below).
+        # after it.
         if get(ENV, "KRANG_REACTANT_PIXEL_TESTS", "false") != "true"
             @test_skip "set KRANG_REACTANT_PIXEL_TESTS=true to run"
         else
@@ -370,31 +320,6 @@ end
                 ("I0_inf",),
                 (m, as, bs) ->
                     only_value((mm, a, b) -> Krang.I0_inf(pixof(mm, a, b)), m, as, bs),
-            )
-            cmp(
-                "emission_coordinates ts",
-                ("ts",),
-                (m, as, bs) -> only_value(
-                    (mm, a, b) ->
-                        Krang.emission_coordinates(pixof(mm, a, b), ΘS, false, 0)[1],
-                    m,
-                    as,
-                    bs,
-                ),
-            )
-            cmp(
-                "emission_inclination θs",
-                ("θs",),
-                (m, as, bs) -> only_value(
-                    (mm, a, b) -> Krang.emission_inclination(
-                        pixof(mm, a, b),
-                        rsof(mm, a, b),
-                        true,
-                    )[1],
-                    m,
-                    as,
-                    bs,
-                ),
             )
         end
     end
@@ -436,19 +361,4 @@ end
         @test_throws Exception (@jit (x -> Int(pos(x))).(xr))
     end
 
-    # --- the cone render path, which composes every overlay above ---
-    @testset "cone _raytrace" begin
-        αs = [-6.0, -2.0, 3.0, 7.0]
-        βs = [-5.0, 1.0, 4.0, 6.0]
-        mesh = Krang.Mesh(Krang.ConeGeometry(ΘS), ReactantRaytraceMaterial((0, 1)))
-        compare(
-            "raytrace cone",
-            ("observation",),
-            (m, as, bs) ->
-                only_value((mm, a, b) -> Krang.raytrace(pixof(mm, a, b), mesh), m, as, bs),
-            MET,
-            (αs, βs),
-            (to_rarray(αs), to_rarray(βs)),
-        )
-    end
 end

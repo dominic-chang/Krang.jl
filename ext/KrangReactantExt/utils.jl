@@ -12,8 +12,3 @@ end
         Base.ifelse(real(x2) >= real(x3), x2, x3),
     )
 end
-
-@inline function _reactant_isapprox(x, y, ::Type{T}) where {T}
-    rtol = sqrt(eps(T))
-    return abs(x - y) <= rtol * max(abs(x), abs(y))
-end

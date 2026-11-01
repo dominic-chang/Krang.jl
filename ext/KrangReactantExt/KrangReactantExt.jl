@@ -19,9 +19,6 @@ It_inf_case4 = Krang.It_inf_case4
 radial_inf_integrals_case2 = Krang.radial_inf_integrals_case2
 radial_inf_integrals_case3 = Krang.radial_inf_integrals_case3
 radial_inf_integrals_case4 = Krang.radial_inf_integrals_case4
-radial_w_I0_terms_integrals_case2 = Krang.radial_w_I0_terms_integrals_case2
-radial_w_I0_terms_integrals_case3 = Krang.radial_w_I0_terms_integrals_case3
-radial_w_I0_terms_integrals_case4 = Krang.radial_w_I0_terms_integrals_case4
 _get_root_diffs = Krang._get_root_diffs
 screen_coordinate = Krang.screen_coordinate
 metric = Krang.metric
@@ -31,13 +28,11 @@ I0_inf = Krang.I0_inf
 absGθo_Gθhat = Krang.absGθo_Gθhat
 αboundary = Krang.αboundary
 βboundary = Krang.βboundary
-Intersection = Krang.Intersection
 R1 = Krang.R1
 R2 = Krang.R2
 _R1_alpha_combined = Krang._R1_alpha_combined
 _Pi_horizon_combined = Krang._Pi_horizon_combined
 S1 = Krang.S1
-S2 = Krang.S2
 regularized_Pi = Krang.regularized_Pi
 regularized_R1 = Krang.regularized_R1
 regularized_R2 = Krang.regularized_R2
@@ -60,6 +55,5 @@ include("utils.jl")
 include("metrics/Kerr/misc.jl")
 include("metrics/Kerr/emission_coordinates.jl")
 include("cameras/SlowLightIntensityCamera.jl")
-include("geometries/geometry_types.jl")
 
 end

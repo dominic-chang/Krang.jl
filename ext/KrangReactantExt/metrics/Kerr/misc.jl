@@ -665,345 +665,6 @@ Counterpart of [`_reactant_Gθ_vortical_args`](@ref); see it for why `ellF` is n
     return asin(safe_args), m, invalid, one(TT), Go
 end
 
-function _reactant_Gϕ_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
-    α, β = screen_coordinate(pix)
-    met = metric(pix)
-    θo = inclination(pix)
-    signβ = sign(β)
-    ηtemp = Krang.η(pix)
-    λtemp = Krang.λ(pix)
-    TT = typeof(met.spin)
-    a = met.spin
-    Go, Ghat = Krang.absGϕo_Gϕhat(pix)
-    ans = zero(TT)
-    isvortical = ηtemp < zero(TT)
-    isincone = abs(cos(θs)) < abs(cos(θo))
-
-    bad = _reactant_bad_angular_branch(signβ, θs, θo, isindir, n, isvortical, isincone, TT)
-
-    Δθ = (one(TT) - (ηtemp + λtemp^2) / a^2) / TT(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(TT) - eps(TT))
-    um = Δθ - √(Δθ^2 + ηtemp / a^2)
-    m = up / um
-    k = Base.ifelse(isvortical, one(TT) - m, m)
-    args_v = (cos(θs)^2 - um) / (up - um)
-    argo_v = (cos(θo)^2 - um) / (up - um)
-    args_n = cos(θs) / √up
-    argo_n = cos(θo) / √up
-    invalid_v = !(
-        ((zero(TT) < argo_v) & (argo_v < one(TT))) &
-        ((zero(TT) < args_v) & (args_v < one(TT)))
-    )
-    invalid_n = !(
-        ((-one(TT) < args_n) & (args_n < one(TT))) &
-        ((-one(TT) < argo_n) & (argo_n < one(TT)))
-    )
-
-    safe_args_v = clamp(args_v, eps(TT), one(TT) - eps(TT))
-    safe_args_n = clamp(args_n, -one(TT) + eps(TT), one(TT) - eps(TT))
-
-    argn = (up - um) / (one(TT) - um)
-    tempfac_v = inv((one(TT) - um) * √abs(um * a^2))
-    tempfac_n = inv(√abs(um * a^2))
-    signθs = Base.ifelse(θs > TT(Base.pi / 2), -one(TT), one(TT))
-    Go_v = signθs * Go
-    Gs_v = signθs * tempfac_v * ellPi(argn, asin(√safe_args_v), k)
-    Gs_n = tempfac_n * ellPi(up, asin(safe_args_n), k)
-
-    νθ = Base.ifelse(isincone, (n % 2 == 1) ⊻ (θo > θs), !isindir ⊻ (θs > TT(Base.pi / 2)))
-    signs = Base.ifelse(νθ, one(TT), -one(TT))
-    anscand_v = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go_v + signs * Gs_v,
-        n * Ghat - signβ * Go_v + signs * Gs_v,
-    )
-    anscand_n = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go + signs * Gs_n,
-        n * Ghat - signβ * Go + signs * Gs_n,
-    )
-    validi_v = Base.ifelse(invalid_v, zero(TT), one(TT))
-    validi_n = Base.ifelse(invalid_n, zero(TT), one(TT))
-    anscand = Base.ifelse(isvortical, anscand_v, anscand_n)
-    validi = Base.ifelse(isvortical, validi_v, validi_n)
-    ans = Base.ifelse(bad, zero(TT), anscand)
-    validi = Base.ifelse(bad, zero(TT), validi)
-
-    return ans, validi > zero(TT)
-end
-
-function _reactant_Gt_minotime(pix::Krang.SlowLightIntensityPixel, θs, isindir, n)
-    α, β = screen_coordinate(pix)
-    met = metric(pix)
-    θo = inclination(pix)
-    signβ = sign(β)
-    ηtemp = Krang.η(pix)
-    λtemp = Krang.λ(pix)
-    TT = typeof(met.spin)
-    a = met.spin
-    Go, Ghat = Krang.absGto_Gthat(pix)
-    ans = zero(TT)
-    isvortical = ηtemp < zero(TT)
-    isincone = abs(cos(θs)) < abs(cos(θo))
-
-    bad = _reactant_bad_angular_branch(signβ, θs, θo, isindir, n, isvortical, isincone, TT)
-
-    Δθ = (one(TT) - (ηtemp + λtemp^2) / a^2) / TT(2)
-    up = min(Δθ + √(Δθ^2 + ηtemp / a^2), one(TT) - eps(TT))
-    um = Δθ - √(Δθ^2 + ηtemp / a^2)
-    m = up / um
-    k = Base.ifelse(isvortical, one(TT) - m, m)
-    args_v = (cos(θs)^2 - um) / (up - um)
-    argo_v = (cos(θo)^2 - um) / (up - um)
-    args_n = cos(θs) / √up
-    argo_n = cos(θo) / √up
-    invalid_v = !(
-        ((zero(TT) < argo_v) & (argo_v < one(TT))) &
-        ((zero(TT) < args_v) & (args_v < one(TT)))
-    )
-    invalid_n = !(
-        ((-one(TT) < args_n) & (args_n < one(TT))) &
-        ((-one(TT) < argo_n) & (argo_n < one(TT)))
-    )
-
-    safe_args_v = clamp(args_v, eps(TT), one(TT) - eps(TT))
-    safe_args_n = clamp(args_n, -one(TT) + eps(TT), one(TT) - eps(TT))
-
-    tempfac_v = √abs(um / a^2)
-    tempfac_n = -TT(2) * up * inv(√abs(um * a^2))
-    signθs = Base.ifelse(θs > TT(Base.pi / 2), -one(TT), one(TT))
-    Go_v = signθs * Go
-    Gs_v = signθs * tempfac_v * _ellE(asin(√safe_args_v), k)
-    Gs_n =
-        tempfac_n * (_ellE(asin(safe_args_n), k) - ellF(asin(safe_args_n), k)) / (TT(2) * k)
-
-    νθ = Base.ifelse(isincone, (n % 2 == 1) ⊻ (θo > θs), !isindir ⊻ (θs > TT(Base.pi / 2)))
-    signs = Base.ifelse(νθ, one(TT), -one(TT))
-    anscand_v = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go_v + signs * Gs_v,
-        n * Ghat - signβ * Go_v + signs * Gs_v,
-    )
-    anscand_n = Base.ifelse(
-        isindir,
-        (n + 1) * Ghat - signβ * Go + signs * Gs_n,
-        n * Ghat - signβ * Go + signs * Gs_n,
-    )
-    validi_v = Base.ifelse(invalid_v, zero(TT), one(TT))
-    validi_n = Base.ifelse(invalid_n, zero(TT), one(TT))
-    anscand = Base.ifelse(isvortical, anscand_v, anscand_n)
-    validi = Base.ifelse(isvortical, validi_v, validi_n)
-    ans = Base.ifelse(bad, zero(TT), anscand)
-    validi = Base.ifelse(bad, zero(TT), validi)
-
-    return ans, validi > zero(TT)
-end
-
-Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals(
-    met::Krang.Kerr,
-    rs,
-    roots,
-    τ,
-    νr,
-)
-    numreals = sum(x->Base.ifelse(_isreal2(x), 1, 0), roots)
-    result = (
-        zero(real(roots[1])),
-        zero(real(roots[1])),
-        zero(real(roots[1])),
-        zero(real(roots[1])),
-    )
-    Reactant.@trace if numreals == 4
-        result = radial_w_I0_terms_integrals_case2(met, rs, real.(roots), τ, νr)
-    elseif numreals == 2
-        result = radial_w_I0_terms_integrals_case3(met, rs, roots, τ)
-    else
-        result = radial_w_I0_terms_integrals_case4(met, rs, roots, τ)
-    end
-    return result
-end
-
-Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case2(
-    metric::Krang.Kerr,
-    rs,
-    roots,
-    τ,
-    νr,
-)
-    T = typeof(metric.spin)
-    r1, r2, r3, r4 = roots
-    _, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-    r43 = r4 - r3
-    a = metric.spin
-    rp = one(T) + √(one(T) - a^2)
-    rm = one(T) - √(one(T) - a^2)
-    rp3 = _regularize_zero(rp - r3, T)
-    rp4 = rp - r4
-    rm3 = rm - r3
-    rm4 = rm - r4
-
-    k = r32 * r41 / (r31 * r42)
-    x2_s = √abs((rs - r4) / (rs - r3) * r31 / r41)
-    coef = 2 / √(r31 * r42)
-    n = abs(r41 / r31)
-    E_s = √(r31 * r42) * _ellE(asin(clamp(x2_s, zero(T), one(T))), k)
-    Π1_s = coef * ellPi(n, asin(clamp(x2_s, zero(T), one(T))), k)
-    I0_total = τ
-
-    poly_coefs = (
-        r1 * r2 * r3 * r4,
-        -r2 * r3 * r4 + r1 * (r2 * (-r3 - r4) - r3 * r4),
-        r3 * r4 + r2 * (r3 + r4) + r1 * (r2 + r3 + r4),
-        -r1 - r2 - r3 - r4,
-        one(T),
-    )
-    signνr = Base.ifelse(νr, -one(T), one(T))
-
-    I1_total = -r3 * I0_total - r43 * signνr * Π1_s
-    I2_s = √abs(evalpoly(rs, poly_coefs)) / (rs - r3) - E_s
-    I2_total = (r1 * r4 + r2 * r3) / 2 * τ - signνr * I2_s
-
-    φ_s = asin(clamp(x2_s, zero(T), one(T)))
-    Πp_s = _Pi_horizon_combined(r31, r42, r43, r41, rp3, rp4, φ_s, k)
-    Πm_s = _Pi_horizon_combined(r31, r42, r43, r41, rm3, rm4, φ_s, k)
-
-    Ip_total = τ / rp3 + signνr * Πp_s
-    Im_total = τ / rm3 + signνr * Πm_s
-
-    invalid = !(x2_s < one(T))
-    z = zero(T)
-    return (
-        Base.ifelse(invalid, z, I1_total),
-        Base.ifelse(invalid, z, I2_total),
-        Base.ifelse(invalid, z, Ip_total),
-        Base.ifelse(invalid, z, Im_total),
-    )
-end
-
-Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case3(
-    metric::Krang.Kerr,
-    rs,
-    roots,
-    τ,
-)
-    T = typeof(metric.spin)
-    r1, r2, _, _ = roots
-    r21, r31, r32, r41, r42, _ = _get_root_diffs(roots...)
-
-    r1, r2, r21 = real.((r1, r2, r21))
-    a = metric.spin
-    a2 = a * a
-    rp = one(T) + √(one(T) - a2)
-    rm = one(T) - √(one(T) - a2)
-    rp1 = rp - r1
-    rp2 = rp - r2
-    rm1 = rm - r1
-    rm2 = rm - r2
-
-    A2 = real(r32 * r42)
-    B2 = real(r31 * r41)
-    A = √A2
-    B = √B2
-    k3 = ((A + B)^2 - r21^2) / (4 * A * B)
-    temprat = B * (rs - r2) * inv(A * (rs - r1))
-    x3_s = real((one(T) - temprat) * inv(one(T) + temprat))
-    φ_s = acos(clamp(x3_s, -one(T), one(T)))
-    αo = (B + A) / (B - A)
-    coef = 2 * r21 * √(A * B) / (B2 - A2)
-
-    Π1_s = coef * R1(αo, φ_s, k3)
-    Π2_s = (coef^2) * R2(αo, φ_s, k3)
-
-    I0_total = τ
-    I1_total = -(B * r2 + A * r1) / (B + A) * I0_total + Π1_s
-    I2_total = -(
-        (((B * r2 + A * r1) / (B + A))^2) * I0_total -
-        2 * (B * r2 + A * r1) / (B + A) * (-Π1_s) - √(A * B) * (-Π2_s)
-    )
-    Ip_total =
-        inv(B * rp2 + A * rp1) *
-        ((B + A) * I0_total - _R1_alpha_combined(A, B, rp1, rp2, r21, φ_s, k3))
-    Im_total =
-        inv(B * rm2 + A * rm1) *
-        ((B + A) * I0_total - _R1_alpha_combined(A, B, rm1, rm2, r21, φ_s, k3))
-
-    invalid = abs(x3_s) > one(T)
-    z = zero(T)
-    return (
-        Base.ifelse(invalid, z, I1_total),
-        Base.ifelse(invalid, z, I2_total),
-        Base.ifelse(invalid, z, Ip_total),
-        Base.ifelse(invalid, z, Im_total),
-    )
-end
-
-Reactant.@reactant_overlay function Krang.radial_w_I0_terms_integrals_case4(
-    metric::Krang.Kerr,
-    rs,
-    roots,
-    τ,
-)
-    T = typeof(metric.spin)
-    _, r2, _, r4 = roots
-    a = metric.spin
-    a2m = a * a
-    rp = one(T) + √(one(T) - a2m)
-    rm = one(T) - √(one(T) - a2m)
-
-    a1 = abs(imag(r4))
-    a2 = abs(imag(r2))
-    b1 = real(r4)
-    b2 = real(r2)
-    C = sqrt((a1-a2)^2 + (b1-b2)^2)
-    D = sqrt((a1+a2)^2 + (b1-b2)^2)
-    k4 = 4C * D / (C + D)^2
-
-    x4_s = (rs + b1) / a2
-    x4_p = (rp + b1) / a2
-    x4_m = (rm + b1) / a2
-
-    go = √max((4a2^2 - (C - D)^2) / ((C + D)^2 - T(4) * a2^2), zero(T))
-    gp = (go * x4_p - one(T)) / (go + x4_p)
-    gm = (go * x4_m - one(T)) / (go + x4_m)
-
-    φ4_s = atan(x4_s) + atan(go)
-    F4_s = ellF(φ4_s, k4)
-    E4_s = _ellE(φ4_s, k4)
-    S1p_s = S1(gp, φ4_s, k4, F4_s)
-    S1m_s = S1(gm, φ4_s, k4, F4_s)
-    Π1_s = 2 / (C + D) * (a2 / go * (one(T) + go^2)) * S1(go, φ4_s, k4, F4_s)
-    Π2_s = 2 / (C + D) * (a2 / go * (one(T) + go^2))^2 * S2(go, φ4_s, k4, F4_s, E4_s)
-
-    I1_total = -(a2 / go - b1) * τ + (-Π1_s)
-    I2_total = -((a2 / go - b1)^2) * τ + 2(a2 / go - b1) * (-Π1_s) - (-Π2_s)
-    Ip_total =
-        -go / (a2 * (one(T) - go * x4_p)) *
-        (τ - 2 / (C + D) * ((one(T) + go^2) / (go * (go + x4_p))) * (-S1p_s))
-    Im_total =
-        -go / (a2 * (one(T) - go * x4_m)) *
-        (τ - 2 / (C + D) * ((one(T) + go^2) / (go * (go + x4_p))) * (-S1m_s))
-
-    invalid = isnan(x4_s) | isnan(x4_p) | isnan(x4_m)
-    z = zero(T)
-    return (
-        Base.ifelse(invalid, z, I1_total),
-        Base.ifelse(invalid, z, I2_total),
-        Base.ifelse(invalid, z, Ip_total),
-        Base.ifelse(invalid, z, Im_total),
-    )
-end
-
-Reactant.@reactant_overlay function Krang.radial_integrals(
-    pix::Krang.AbstractPixel,
-    rs,
-    τ,
-    νr,
-)
-    met = metric(pix)
-    I1_o, I2_o, Ip_o, Im_o = Krang.radial_inf_integrals(met, roots(pix))
-    I1_s, I2_s, Ip_s, Im_s = Krang.radial_w_I0_terms_integrals(met, rs, roots(pix), τ, νr)
-    return τ, I1_o - I1_s, I2_o - I2_s, Ip_o - Ip_s, Im_o - Im_s
-end
 
 """
 Branch-free counterpart of `Krang.Gθ`, returning the same six values:
@@ -1084,10 +745,6 @@ function _reactant_Gθ_minotime(pix::Krang.AbstractPixel, θs, isindir, n)
     return τ, valid
 end
 
-Reactant.@reactant_overlay function Krang.Gθ(pix::Krang.AbstractPixel, θs, isindir, n)
-    return _reactant_Gθ_full(pix, θs, isindir, n)
-end
-
 Reactant.@reactant_overlay function Krang._rs_case1_and_2(pix::Krang.AbstractPixel, rh, τ)
     radial_roots = map(real, roots(pix))
     _, _, r3, r4 = radial_roots
@@ -1098,20 +755,19 @@ Reactant.@reactant_overlay function Krang._rs_case1_and_2(pix::Krang.AbstractPix
     rh += eps(T)
     x2_s = √abs((rh - r4) / (rh - r3) * r31 / r41)
     coef = 2 / √real(r31 * r42)
-    Ir_s = zero(T)
-    @trace if (x2_s < 1)
-        Ir_s = coef * ellF(asin(x2_s), k)
-    end
+    # `asin` gets a clamped argument instead of sitting behind a branch: `x2_s >= 1` means
+    # `Ir_s = 0`, and the `ifelse` below supplies that, but an unclamped `asin(x2_s > 1)`
+    # would hand back a NaN that the select cannot repair on the other path.
+    Ir_s = Base.ifelse(x2_s < one(T), coef * ellF(asin(min(x2_s, one(T))), k), zero(T))
 
     fo = I0_inf(pix)
     X2 = √(r31 * r42) * (fo - τ) / 2
 
-    return_vals = (zero(T), false, false)
-    @trace if !(((r4 < rh) & (τ > (fo - Ir_s))) | (τ > 2fo))# invalid case2
-        sn = r41 * ellsn(X2, k)^2
-        return_vals = (r31 * r4 - r3 * sn) / (r31 - sn), X2 > zero(T), true
-    end
-    return return_vals
+    issuccess = !(((r4 < rh) & (τ > (fo - Ir_s))) | (τ > 2fo)) # invalid case2
+    sn = r41 * ellsn(X2, k)^2
+    rs = (r31 * r4 - r3 * sn) / (r31 - sn)
+
+    return Base.ifelse(issuccess, rs, zero(T)), issuccess & (X2 > zero(T)), issuccess
 end
 
 
@@ -1132,15 +788,13 @@ Reactant.@reactant_overlay function Krang._rs_case3(pix::Krang.AbstractPixel, rh
     Ir_s = coef * ellF((acos(x3_s)), k)
     X3 = √(A * B) * real(fo - τ)
 
-    return_vals = (zero(T), false, false)
-    @trace if !((X3 < zero(T)) | (τ > (fo - Ir_s)))
-        cn = ellcn(X3, k)
-        num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
-        den = -A + B + (A + B) * cn
-        return_vals = real(num / den), X3 > zero(T), true
-    end
+    issuccess = !((X3 < zero(T)) | (τ > (fo - Ir_s)))
+    cn = ellcn(X3, k)
+    num = -A * r1 + B * r2 + (A * r1 + B * r2) * cn
+    den = -A + B + (A + B) * cn
+    rs = real(num / den)
 
-    return return_vals
+    return Base.ifelse(issuccess, rs, zero(T)), issuccess & (X3 > zero(T)), issuccess
 end
 
 Reactant.@reactant_overlay function Krang._rs_case4(pix::Krang.AbstractPixel, rh, τ)
@@ -1161,35 +815,10 @@ Reactant.@reactant_overlay function Krang._rs_case4(pix::Krang.AbstractPixel, rh
     Ir_s = coef * ellF(atan(x4_s) + atan(go), k4)
     fo = I0_inf(pix)
 
-    return_vals = (zero(T), false, false)
-    @trace if !(τ > (fo - Ir_s))
-        X4 = (C + D) / T(2) * (fo - τ)
-        num = go - ellsc(X4, k4)
-        den = 1 + go * ellsc(X4, k4)
-        return_vals = -(a2 * num / den + b1), X4 > zero(T), true
-    end
+    issuccess = !(τ > (fo - Ir_s))
+    X4 = (C + D) / T(2) * (fo - τ)
+    sc = ellsc(X4, k4)
+    rs = -(a2 * (go - sc) / (1 + go * sc) + b1)
 
-    return return_vals
-end
-
-Reactant.@reactant_overlay function Krang.Gϕ(
-    pix::Krang.SlowLightIntensityPixel,
-    θs,
-    isindir,
-    n,
-)
-    ans, valid = _reactant_Gϕ_minotime(pix, θs, isindir, n)
-    TT = typeof(metric(pix).spin)
-    return ans, zero(TT), zero(TT), zero(TT), false, valid
-end
-
-Reactant.@reactant_overlay function Krang.Gt(
-    pix::Krang.SlowLightIntensityPixel,
-    θs,
-    isindir,
-    n,
-)
-    ans, valid = _reactant_Gt_minotime(pix, θs, isindir, n)
-    TT = typeof(metric(pix).spin)
-    return ans, zero(TT), zero(TT), zero(TT), false, valid
+    return Base.ifelse(issuccess, rs, zero(T)), issuccess & (X4 > zero(T)), issuccess
 end
