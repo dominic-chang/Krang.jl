@@ -1,5 +1,16 @@
-export render, render_cpu_threaded!
+export render, render!, render_cpu_threaded!
 abstract type AbstractScheme end
+
+"""
+    render!(store, camera::AbstractCamera, scene::Scene)
+
+Render `scene` through `camera` into `store`, dispatching on the backend `store` lives on.
+
+Provided by `KrangKernelAbstractionsExt`: load `KernelAbstractions` (plus the package owning
+the array type, e.g. `Metal` or `CUDA`) to get a method. A `Matrix` store runs on CPU threads,
+a device array runs on that device.
+"""
+function render! end
 
 function render(camera::AbstractCamera, scene::Scene)
     return render.(camera.screen.pixels, Ref(scene))
