@@ -15,6 +15,13 @@ export λ,
 
 
 """
+Sign of the vertical screen coordinate β with `_signβ(0) = 1`. At β = 0 the observer sits at a
+polar turning point, where the limits β → 0⁺ and β → 0⁻ give the same Mino times; `sign(0) = 0`
+would drop the observer term from them.
+"""
+@inline _signβ(β) = ifelse(β < zero(β), -one(β), one(β))
+
+"""
 Checks if a complex number is real to within √eps of its own magnitude
 (or √eps absolute, whichever is larger).
 """
@@ -1794,7 +1801,7 @@ See [`θ_potential(x)`](@ref) for an implementation of \$\\Theta(\theta)\$.
     θo = inclination(pix)
     Go, Ghat = absGθo_Gθhat(pix)
     setup = @inline _Gθ_setup(metric(pix), θo, η(pix), λ(pix), Go, Ghat, θs)
-    return @inline _Gθ_subimage(setup, sign(β), θo, θs, isindir, n)
+    return @inline _Gθ_subimage(setup, _signβ(β), θo, θs, isindir, n)
 end
 
 """
@@ -1839,9 +1846,9 @@ vortical geodesic branch gives it. `issuccess` is false when the ray never reach
         Gs = sgnθs * tempfac * JacobiElliptic.F(asin(√args), k)
     else
         args = cosθs / √(up)
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         k = m
-        if !(-1 < args < 1) || !(-1 < argo < 1)
+        if !(-1 < args < 1) || !(-1 <= argo <= 1)
             return zero(T), zero(T), zero(T), isvortical, isincone, false
         end
         tempfac = 1 / √abs(um * a2)
@@ -1881,7 +1888,7 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
     met = metric(pix)
     ηtemp = η(met, α, β, θo)
     λtemp = λ(met, α, θo)
-    signβ = sign(β)
+    signβ = _signβ(β)
 
     τ == T(NaN) && return T(NaN)
     a = met.spin
@@ -1909,7 +1916,7 @@ function Gs(pix::AbstractPixel, τ::T) where {T}
             (θo > T(π / 2) ? -1 : 1) *
             abs(argmin(abs, [(-1)^n * signβ * (Ghat - Δτtemp), (-1)^n * signβ * Δτtemp]))
     else
-        argo = cos(θo) / √(up)
+        argo = clamp(cos(θo) / √(up), -one(T), one(T))
         k = m
         tempfac = inv(√abs(um * a^2))
         Δτtemp = (τ % Ghat + signβ * Go)
@@ -1940,7 +1947,7 @@ wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angula
     met = metric(pix)
     θo = inclination(pix)
 
-    signβ = sign(β)
+    signβ = _signβ(β)
     ηtemp = η(pix)
     λtemp = λ(pix)
 
@@ -1981,9 +1988,9 @@ wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angula
         Gs = ((θs > T(π / 2)) ? -1 : 1) * tempfac * JacobiElliptic.Pi(argn, asin(√args), k)
     else
         args = cosθs / √(up)
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         #k = abs(m)
-        if !(-1 < args < 1) || !(-1 < argo < 1)
+        if !(-1 < args < 1) || !(-1 <= argo <= 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = inv(√abs(um * a2))
@@ -2017,7 +2024,7 @@ wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angula
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
-    signβ = sign(β)
+    signβ = _signβ(β)
 
     # The pixel already caches these; recomputing them from (α, β, θo) gives the same bits.
     ηtemp = η(pix)
@@ -2059,9 +2066,9 @@ wanted at the same inclination, [`Krang._Gϕt`](@ref) computes the shared angula
 
     else
         args = cosθs / √(up)
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         #k = abs(m)
-        if !(-1 < args < 1) || !(-1 < argo < 1)
+        if !(-1 < args < 1) || !(-1 <= argo <= 1)
             return ans, Gs, Go, Ghat, isvortical, false
         end
         tempfac = -2 * up * inv(√abs(um * a2))
@@ -2093,7 +2100,7 @@ once avoids doing it twice. Results are bit-identical to calling `Gϕ` and `Gt` 
     _, β = screen_coordinate(pix)
     met = metric(pix)
     θo = inclination(pix)
-    signβ = sign(β)
+    signβ = _signβ(β)
     ηtemp = η(pix)
     λtemp = λ(pix)
 
@@ -2141,9 +2148,9 @@ once avoids doing it twice. Results are bit-identical to calling `Gϕ` and `Gt` 
         Gto = sgn * Gto_t
     else
         args = cosθs / √(up)
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         k = m
-        if !(-1 < args < 1) || !(-1 < argo < 1)
+        if !(-1 < args < 1) || !(-1 <= argo <= 1)
             return z, z, false
         end
         φs = asin(args)
@@ -2198,9 +2205,9 @@ index `n` reuses the same pair, which is what makes the angular inversion cheap.
         Go = tempfac * JacobiElliptic.F(asin(√argo), k)
         Ghat = 2 * tempfac * JacobiElliptic.K(k)
     else
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         k = m
-        if !(-1 < argo < 1)
+        if !(-1 <= argo <= 1)
             return Go, Ghat
         end
         tempfac = 1 / √abs(um * a2)
@@ -2236,9 +2243,9 @@ end
         Go = tempfac * JacobiElliptic.Pi(argn, asin(√argo), k)
         Ghat = 2tempfac * JacobiElliptic.Pi(argn, k)
     else
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         #k = abs(m)
-        if !(-1 < argo < 1)
+        if !(-1 <= argo <= 1)
             return Go, Ghat
         end
         tempfac = inv(√abs(um * a2))
@@ -2274,9 +2281,9 @@ end
         Ghat = 2tempfac * JacobiElliptic.E(k)
 
     else
-        argo = cosθo / √(up)
+        argo = clamp(cosθo / √(up), -one(T), one(T))
         #k = abs(m)
-        if !(-1 < argo < 1)
+        if !(-1 <= argo <= 1)
             return Go, Ghat
         end
         tempfac = -2 * up * inv(√abs(um * a2))

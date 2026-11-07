@@ -310,3 +310,24 @@ end
     @test isempty(bad_θs_form)
     @test isempty(bad_τ_form)
 end
+
+@testset "Screen points on the β = 0 axis" begin
+    # At β = 0 the observer sits at a polar turning point; the emission radius there is the
+    # common limit of β → 0⁺ and β → 0⁻ (a = 0.94, θo = 17°, equatorial source, n = 0, 1, 2).
+    met = Krang.Kerr(0.94)
+    θo = 17 * π / 180
+    function rs_of(α, β, n)
+        pix = Krang.IntensityPixel(met, α, β, θo)
+        for isindir in (true, false)
+            rs, _, _, _, ok = emission_radius(pix, π / 2, isindir, n)
+            ok && Krang.horizon(met) < rs < Inf && return rs
+        end
+        return NaN
+    end
+    for α in (-7.0, -5.6, -3.0, 2.8, 4.0, 5.3, 6.5), n in 0:2
+        lim = rs_of(α, 1e-10, n)
+        @test isnan(lim) == isnan(rs_of(α, 0.0, n))
+        isnan(lim) || @test rs_of(α, 0.0, n) ≈ lim rtol = 1e-5
+        isnan(lim) || @test rs_of(α, -1e-10, n) ≈ lim rtol = 1e-5
+    end
+end
