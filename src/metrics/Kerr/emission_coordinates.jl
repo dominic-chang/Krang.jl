@@ -88,7 +88,7 @@ Identical to `emission_radius(pix, cache.θs, isindir, n)`, but it reads `Gθs`,
             cache.isincone,
             cache.issuccess,
         ),
-        sign(β),
+        _signβ(β),
         θo,
         θs,
         isindir,
@@ -160,7 +160,7 @@ Emission inclination for point at Mino time τ whose image appears at screen coo
     # `absGθo_Gθhat(pix)` is exactly the `(τo, τhat)` `_θs` would recompute, so hand the
     # cached pair over instead of paying for another `F` and `K`.
     Go, Ghat = absGθo_Gθhat(pix)
-    return _θs(met, sign(β), θo, η(pix), λ(pix), τ, Go, Ghat)
+    return _θs(met, _signβ(β), θo, η(pix), λ(pix), τ, Go, Ghat)
 end
 
 """
@@ -291,7 +291,7 @@ Identical to `emission_coordinates_fast_light(pix, cache.θs, isindir, n)`, but 
             cache.isincone,
             cache.issuccess,
         ),
-        sign(β),
+        _signβ(β),
         θo,
         θs,
         isindir,
@@ -428,7 +428,7 @@ and `Ĝθ` out of the [`Krang.AngularCache`](@ref).
             cache.isincone,
             cache.issuccess,
         ),
-        sign(β),
+        _signβ(β),
         θo,
         θs,
         isindir,
@@ -476,7 +476,7 @@ the Mino time of the sub-image is known. Shared by its cached and uncached entry
     # whose `νθ` does not read it, so this value still holds after the reassignment below.
     νθ = isincone ? (n % 2 == 1) ⊻ (θo > θs) : !isindir ⊻ (θs > T(π / 2))
     if isincone
-        isindir = ((sign(β) > 0) ⊻ (θo > T(π / 2)))
+        isindir = ((_signβ(β) > 0) ⊻ (θo > T(π / 2)))
     end
     if isnan(τ)
         return err_return
@@ -555,7 +555,7 @@ Ray trace a point that appears at the screen coordinate (`α`, `β`) for an obse
 end
 
 function θs(metric::Kerr{T}, α, β, θo, τ) where {T}
-    return _θs(metric, sign(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
+    return _θs(metric, _signβ(β), θo, η(metric, α, β, θo), λ(metric, α, θo), τ)
 end
 
 @inline _θs(metric::Kerr{T}, signβ, θo, η, λ, τ) where {T} =
