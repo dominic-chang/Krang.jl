@@ -45,7 +45,7 @@ Returns 0 if the emission coordinates do not exist for that screen coordinate.
     issuccess || return err_return
 
     # νθ is θ̇s increasing or decreasing?
-    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir ⊻ (θs > T(π / 2))
 
     ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
     issuccess || return err_return
@@ -97,7 +97,7 @@ Identical to `emission_radius(pix, cache.θs, isindir, n)`, but it reads `Gθs`,
     issuccess || return err_return
 
     # νθ is θ̇s increasing or decreasing?
-    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir ⊻ (θs > T(π / 2))
 
     ans, νr, numreals, issuccess = @inline emission_radius(pix, τ)
     issuccess || return err_return
@@ -242,7 +242,7 @@ coordinate (`α`, `β`) for an observer located at inclination θo.
     issuccess || return err_return
 
     # is θ̇s increasing or decreasing?
-    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir ⊻ (θs > T(π / 2))
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
     issuccess || return err_return
@@ -300,7 +300,7 @@ Identical to `emission_coordinates_fast_light(pix, cache.θs, isindir, n)`, but 
     issuccess || return err_return
 
     # is θ̇s increasing or decreasing?
-    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir
+    νθ = isincone ? (θo > θs) ⊻ (n % 2 == 1) : !isindir ⊻ (θs > T(π / 2))
 
     rs, νr, _, issuccess = emission_radius(pix, τ)
     issuccess || return err_return
