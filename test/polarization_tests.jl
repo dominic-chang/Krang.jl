@@ -163,10 +163,33 @@
 
                 profile(r) = (r / rpeak)^p1 / (1 + (r / rpeak)^(p1 + p2))
                 mag = hypot(q_temp, u_temp)
-                int2 = mag^(1 + spec) * lp * profile(rs) * redshift^(3 + spec)
+                int2 = hypot(eα, eβ)^(1 + spec) * lp * profile(rs) * redshift^(3 + spec)
                 q = int2 * q_temp / mag
                 u = int2 * u_temp / mag
                 @test stokes ≈ Krang.StokesParams(int2, q, u, 0.0)
+            end
+
+            @testset "Stokes I of the polarized and the intensity material" begin
+                # the same synchrotron model: the polarized material carries the Stokes I
+                # of ElectronSynchrotronPowerLawIntensity, and one image is fully polarized
+                metric = Kerr(0.94)
+                θo = 17 / 180 * π
+                field = @SVector[sin(0.58) * cos(2.64), sin(0.58) * sin(2.64), cos(0.58)]
+                vel = @SVector[0.87, π / 2, -1.7]
+                for θs in (π / 2, 75 / 180 * π), (α, β) in ((5.0, 2.0), (-3.0, 4.5), (2.5, -6.0))
+                    pix = Krang.IntensityPixel(metric, α, β, θo)
+                    geometry = Krang.ConeGeometry(θs)
+                    matI = Krang.ElectronSynchrotronPowerLawIntensity(field..., vel..., 0.73,
+                                                                       4.0, 1.0, 4.0, (0,))
+                    matP = Krang.ElectronSynchrotronPowerLawPolarization(field..., vel...,
+                                                                          0.73, 4.0, 1.0, 4.0,
+                                                                          (0,))
+                    iI = render(pix, (Krang.Mesh(geometry, matI),))
+                    sP = render(pix, (Krang.Mesh(geometry, matP),))
+                    @test iI > 0
+                    @test sP.I ≈ iI rtol = 1e-10
+                    @test hypot(sP.Q, sP.U) ≈ sP.I rtol = 1e-10
+                end
             end
         end
     end

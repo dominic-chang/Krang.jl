@@ -195,8 +195,10 @@ end
     u_temp = T(-2 * eα * eβ + eps(T))
     mag = hypot(q_temp, u_temp)
 
+    # The emissivity scales as |k̂ × B|^(1 + σ), the norm of (eα, eβ), as in
+    # ElectronSynchrotronPowerLawIntensity; mag = hypot(q_temp, u_temp) is its square.
     # Add a clamp to lp to help remove hot pixels
-    i = mag^(one(T) + spectral_index) * min(lp, T(1e2)) * prof
+    i = hypot(eα, eβ)^(one(T) + spectral_index) * min(lp, T(1e2)) * prof
     q = i * q_temp / mag
     u = i * u_temp / mag
 
