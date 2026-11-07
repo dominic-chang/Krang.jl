@@ -274,6 +274,35 @@
     end
 end
 
+@testset "Polar sign on surfaces closer to a pole than the observer" begin
+    # θs outside [θo, π - θo]: both hemispheres; νθ of every entry point must agree with
+    # `emission_coordinates(pix, θs, isindir, n)` and with the Mino-time entry point
+    met = Krang.Kerr(0.9)
+    θo = π / 3
+    nchecked = 0
+    @testset "θs = $θs" for θs in (π / 6, 5π / 6)
+        for α in (-4.0, -1.5, 2.0, 4.5), β in (-6.0, -3.5, 3.0, 5.5), isindir in (true, false),
+            n in 0:2
+
+            pix = Krang.IntensityPixel(met, α, β, θo)
+            ts, rs, ϕs, νr, νθ, ok = Krang.emission_coordinates(pix, θs, isindir, n)
+            ok || continue
+            rs1, νr1, νθ1, _, ok1 = Krang.emission_radius(pix, θs, isindir, n)
+            rs2, ϕs2, νr2, νθ2, ok2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, n)
+            τ = Krang.Gθ(pix, θs, isindir, n)[1]
+            _, _, θs3, _, _, νθ3, _ = Krang.emission_coordinates(pix, τ)
+            @test ok1 && ok2
+            @test rs1 ≈ rs && rs2 ≈ rs
+            @test θs3 ≈ θs
+            @test νθ1 == νθ
+            @test νθ2 == νθ
+            @test νθ3 == νθ
+            nchecked += 1
+        end
+    end
+    @test nchecked > 20
+end
+
 @testset "Emission radius failure sentinel" begin
     # When the emission coordinate does not exist, the documented convention is to return
     # zeros plus `issuccess = false` (never a non-finite radius), so the result stays
