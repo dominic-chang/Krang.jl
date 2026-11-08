@@ -281,14 +281,17 @@ end
     θo = π / 3
     nchecked = 0
     @testset "θs = $θs" for θs in (π / 6, 5π / 6)
-        for α in (-4.0, -1.5, 2.0, 4.5), β in (-6.0, -3.5, 3.0, 5.5), isindir in (true, false),
-            n in 0:2
+        for α in (-4.0, -1.5, 2.0, 4.5),
+            β in (-6.0, -3.5, 3.0, 5.5),
+            isindir in (true, false),
+            n = 0:2
 
             pix = Krang.IntensityPixel(met, α, β, θo)
             ts, rs, ϕs, νr, νθ, ok = Krang.emission_coordinates(pix, θs, isindir, n)
             ok || continue
             rs1, νr1, νθ1, _, ok1 = Krang.emission_radius(pix, θs, isindir, n)
-            rs2, ϕs2, νr2, νθ2, ok2 = Krang.emission_coordinates_fast_light(pix, θs, isindir, n)
+            rs2, ϕs2, νr2, νθ2, ok2 =
+                Krang.emission_coordinates_fast_light(pix, θs, isindir, n)
             τ = Krang.Gθ(pix, θs, isindir, n)[1]
             _, _, θs3, _, _, νθ3, _ = Krang.emission_coordinates(pix, τ)
             @test ok1 && ok2
@@ -353,7 +356,7 @@ end
         end
         return NaN
     end
-    for α in (-7.0, -5.6, -3.0, 2.8, 4.0, 5.3, 6.5), n in 0:2
+    for α in (-7.0, -5.6, -3.0, 2.8, 4.0, 5.3, 6.5), n = 0:2
         lim = rs_of(α, 1e-10, n)
         @test isnan(lim) == isnan(rs_of(α, 0.0, n))
         isnan(lim) || @test rs_of(α, 0.0, n) ≈ lim rtol = 1e-5
