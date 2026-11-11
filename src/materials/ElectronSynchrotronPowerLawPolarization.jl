@@ -62,7 +62,7 @@ Calculates the polarization of a photon emitted from a fluid particle with momen
         ri,
         θs,
         @SVector([curr_p_bl_u[1], curr_p_bl_u[2], curr_p_bl_u[4], curr_p_bl_u[3]]),
-        @SVector([f_bl_u[1], f_bl_u[2], f_bl_u[4], f_bl_u[3]])
+        @SVector([f_bl_u[1], f_bl_u[2], f_bl_u[4], f_bl_u[3]]),
     )
     # normalising `κ` by `√(conj(κ)κ)` is just dividing by its modulus
     κ = complex(κ1, κ2) * inv(hypot(κ1, κ2))
